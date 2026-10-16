@@ -1,0 +1,6 @@
+# Exact pins, resolved and verified on Python 3.11.9 (D:\tanese\.venv).
+# Regenerate check: .venv\Scripts\python.exe -m pip list --format=freeze
+pyyaml==6.0.3
+jsonschema==4.26.0
+pytest==9.1.1
+ruff==0.17.0

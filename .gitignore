@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+node_modules/
+data/private/
+*.zip
+.pytest_cache/
+.mypy_cache/
+models/
+.ruff_cache/
