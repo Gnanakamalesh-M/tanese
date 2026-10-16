@@ -1,0 +1,170 @@
+# Tanese romanization, v0.1 -- machine-readable source of truth.
+#
+# Locked decision 12: the ASCII-safe romanization is the canonical text form of Tanese, and
+# the script (spec/script.yaml) is a mapping layer on top of it. This file therefore defines
+# how a Tanese word is spelled; spec/phonology.yaml defines what may be spelled.
+#
+# Phoneme keys here are the same keys used in spec/phonology.yaml.
+
+version: v0.1
+
+alphabet:
+  letters: [a, b, d, e, g, h, i, k, l, m, "n", o, p, r, s, t, u, w, "y"]
+  separator: "'"
+  case: lower
+  reason: >-
+    Lowercase a-z plus one apostrophe. No capitals, no digits, no diacritics, nothing outside
+    7-bit ASCII. Keeping the form case-insensitive matters because Tanese strings travel
+    through YAML keys, filenames, URLs and embedding pipelines in later phases, where a stray
+    lowercasing of a case-significant spelling would silently corrupt a word.
+  note: >-
+    `c`, `f`, `j`, `q`, `v`, `x` and `z` are deliberately unused and are reserved, so that a
+    future phoneme can be added without respelling existing vocabulary.
+
+vowel_graphemes:
+  - grapheme: a
+    phoneme: a
+  - grapheme: i
+    phoneme: i
+  - grapheme: u
+    phoneme: u
+  - grapheme: e
+    phoneme: e
+  - grapheme: o
+    phoneme: o
+
+consonant_graphemes:
+  - grapheme: p
+    phoneme: p
+  - grapheme: b
+    phoneme: b
+  - grapheme: t
+    phoneme: t
+  - grapheme: d
+    phoneme: d
+  - grapheme: th
+    phoneme: th
+  - grapheme: dh
+    phoneme: dh
+  - grapheme: k
+    phoneme: k
+  - grapheme: g
+    phoneme: g
+  - grapheme: s
+    phoneme: s
+  - grapheme: m
+    phoneme: m
+  - grapheme: "n"
+    phoneme: "n"
+  - grapheme: nh
+    phoneme: nh
+  - grapheme: r
+    phoneme: r
+  - grapheme: l
+    phoneme: l
+  - grapheme: w
+    phoneme: w
+  - grapheme: "y"
+    phoneme: "y"
+
+retroflex_digraphs:
+  marker: h
+  pairs: [th, dh, nh]
+  unassigned: [lh]
+  reason: >-
+    The retroflexes are written with `h` as a second element. This works only because /h/ is
+    not a phoneme of Tanese, so `h` can be a pure diacritic letter: it never stands alone and
+    never begins a mora. That makes the spelling fully lowercase, free of punctuation and
+    unambiguous -- there is no `ha` mora for `tha` or `nha` to be confused with, and clusters
+    are illegal, so `t` + `h` can never be two onsets.
+  alternatives: >-
+    Capital letters (`T D N`), which are unambiguous and spend no letter but make the
+    romanization case-significant -- rejected for the reason in `alphabet.reason`. Or `r` as
+    the marker (`tr dr nr`), which reads naturally but is ambiguous after a moraic n
+    (`kanra`) and visually suggests a cluster the phonotactics forbid.
+  problems: >-
+    A known and accepted cost: readers literate in an Indic language will read `th` as an
+    aspirated /t-h/ rather than a retroflex, because that is what the convention means in
+    Tamil, Hindi and Sanskrit transliteration. `lh` is reserved but unassigned, since /l/
+    retroflex is not in the v0.1 inventory.
+
+long_vowels:
+  rule: Double the vowel grapheme -- aa, ii, uu, ee, oo.
+  reason: >-
+    Forced by locked decision 12: a macron or colon is either non-ASCII or punctuation.
+    Doubling is also mora-transparent, since a long vowel is two moras and gets two letters.
+  disambiguation: >-
+    Identical adjacent vowels are ALWAYS one long vowel, never two syllabic moras. `kaa` is
+    only /ka:/. See constraint PT-009 in spec/phonology.yaml.
+
+gemination:
+  rule: Repeat the full onset spelling of the doubled consonant -- kk, pp, tt, ss, ll, thth, dhdh.
+  reason: >-
+    One rule with no exceptions, including for the retroflex digraphs. The obvious shortcut --
+    double only the digraph's first letter, giving `kattha` for /ka(TT)a/ -- was rejected
+    because it collides with moraic-n spellings and would make `nnha` ambiguous.
+  problems: >-
+    `thth` and `dhdh` are visually heavy. Accepted: geminate retroflexes are rare, and
+    unambiguity matters more than elegance for a form that code has to parse.
+
+moraic_nasal:
+  grapheme: "n"
+  rule: >-
+    `n` is the moraic nasal whenever it is not followed by a vowel grapheme and does not form
+    the digraph `nh` with a following vowel. It is written with an apostrophe before a vowel,
+    `y`, or `w`.
+  reason: >-
+    `nn` is therefore always moraic-n + /n/, never a geminate, because nasal gemination is
+    illegal (see the `gemination` block in spec/phonology.yaml). Likewise `nnh` is always
+    moraic-n + /nh/, while a geminate /nh/ would have to be spelled `nhnh` and is rejected.
+
+# Worked cases that pin the parse down. These are the examples the romanization tests use.
+ambiguity_cases:
+  - roman: katha
+    moras: [TS-KA, TS-THA]
+    why: "`th` is one onset; no `ha` mora exists, so no other reading is available."
+  - roman: kantha
+    moras: [TS-KA, TS-NASAL, TS-THA]
+    why: "`n` is not followed by `h`, so it is the moraic nasal; then `th` is the onset."
+  - roman: kanha
+    moras: [TS-KA, TS-NHA]
+    why: "Longest-match takes the digraph `nh` as one onset."
+  - roman: kannha
+    moras: [TS-KA, TS-NASAL, TS-NHA]
+    why: "The first `n` is not followed by `h`, so it is moraic; then `nh` is the onset."
+  - roman: kanna
+    moras: [TS-KA, TS-NASAL, TS-NA]
+    why: "Always moraic-n + /n/, because nasal gemination is illegal."
+  - roman: kan'a
+    moras: [TS-KA, TS-NASAL, TS-A]
+    why: "The apostrophe forces the syllable break; without it `kana` is /ka.na/."
+  - roman: kana
+    moras: [TS-KA, TS-NA]
+    why: "`n` is followed by a vowel, so it is an onset, not the moraic nasal."
+  - roman: kaa
+    moras: [TS-KA, TS-LONG]
+    why: "Identical adjacent vowels are always one long vowel."
+  - roman: kaaka
+    moras: [TS-KA, TS-LONG, TS-KA]
+    why: "A long vowel followed by an ordinary onset. Legal; only hiatus is forbidden."
+  - roman: kaththa
+    moras: [TS-KA, TS-GEM, TS-THA]
+    why: "The onset spelling `th` is repeated in full, so the gemination mora is recognised."
+
+parse_order:
+  steps:
+    - Reject any character outside `alphabet`.
+    - >-
+      At each position, match the longest consonant grapheme first (two-letter digraphs
+      before single letters).
+    - >-
+      A consonant grapheme followed by a vowel grapheme opens a syllabic mora. A bare `n` not
+      followed by a vowel is the moraic nasal. A consonant grapheme immediately repeated
+      before a vowel is a gemination mora. Anything else is constraint PT-003.
+    - A vowel grapheme with no preceding onset opens a syllabic mora with no onset.
+    - >-
+      After a syllabic mora, a repeat of the same vowel grapheme is a length mora, never a
+      second syllabic mora.
+  reason: >-
+    This ordering is what makes the romanization a deterministic longest-match lexer, so every
+    legal word has exactly one parse and every mora sequence has exactly one spelling.

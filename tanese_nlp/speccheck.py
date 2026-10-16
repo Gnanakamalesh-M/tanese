@@ -22,8 +22,11 @@ SCHEMA_DIR = SPEC_DIR / "schemas"
 
 # Which schema governs which spec file. Keys are glob patterns relative to spec/;
 # values are schema stems in spec/schemas/. Later phases extend this table as they
-# add phonology.yaml, script.yaml, romanization.yaml, vocabulary_rules.yaml.
+# add vocabulary_rules.yaml.
 SCHEMA_MAP: dict[str, str] = {
+    "phonology.yaml": "phonology",
+    "romanization.yaml": "romanization",
+    "script.yaml": "script",
     "grammar_rules/*.yaml": "grammar_rule",
 }
 

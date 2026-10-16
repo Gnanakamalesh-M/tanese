@@ -14,7 +14,13 @@ from typing import Any
 import pytest
 import yaml
 
-from tanese_nlp.speccheck import SCHEMA_DIR, check_spec_tree, load_schemas, validate_file
+from tanese_nlp.speccheck import (
+    SCHEMA_DIR,
+    SCHEMA_MAP,
+    check_spec_tree,
+    load_schemas,
+    validate_file,
+)
 
 MINIMAL_RULE: dict[str, Any] = {
     "id": "GR-TEST-001",
@@ -168,7 +174,13 @@ def test_empty_spec_tree_is_not_an_error(tmp_path: Path) -> None:
 
 
 def test_unclaimed_yaml_file_is_reported(tmp_path: Path) -> None:
-    (tmp_path / "phonology.yaml").write_text("vowels: [a]\n", encoding="utf-8")
+    # Phase 1A claimed phonology.yaml, which this test used to use as its example. Assert the
+    # stand-in really is unclaimed, so the test fails loudly rather than silently passing for
+    # the wrong reason when a later phase claims this name too.
+    unclaimed = "not_a_real_spec_file.yaml"
+    assert unclaimed not in SCHEMA_MAP
+
+    (tmp_path / unclaimed).write_text("vowels: [a]\n", encoding="utf-8")
 
     errors = check_spec_tree(tmp_path, SCHEMA_DIR)
     assert any("no schema claims this file" in error for error in errors)

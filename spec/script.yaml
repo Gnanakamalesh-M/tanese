@@ -1,0 +1,624 @@
+# Tanese script, v0.1 -- machine-readable source of truth.
+#
+# Locked decisions 12 and 13: the script is a mapping layer on top of the romanization, with
+# one id per mora, and no custom font or Unicode proposal is in scope. The canonical text
+# form of a script word is the dot-joined id sequence (`kaatha` -> TS-KA.TS-LONG.TS-THA),
+# which stays readable in YAML and diffable in git; each mora also carries a Private Use
+# Area codepoint for Phase 6 rendering.
+#
+# The script is a FEATURAL abugida. Only the 21 atoms below are hand-designed -- 6 place
+# frames, 7 manner marks, 5 vowel marks and 3 standalone marks. The 17 bases are frame +
+# manner combinations, and every mora is a base + vowel mark, so the whole glyph table is
+# derived rather than drawn 86 times. (The Phase 1A plan said 25 atoms, counting the bases
+# themselves; making the bases featural compositions brought it down to 21.) The prose shape
+# descriptions therefore live on the atoms, where there is something real to describe, and
+# each mora entry carries its recipe instead of a restated sentence.
+#
+# The `moras` block is generated from spec/phonology.yaml -- it must contain exactly the
+# legal mora set, which tests/unit/test_spec_consistency.py asserts.
+
+version: v0.1
+
+design:
+  type: featural abugida
+  reason: >-
+    A pure syllabary would need one independently drawn glyph per mora, which is neither
+    honestly finishable nor justifiable -- there would be nothing principled to say about any
+    individual shape. Making the script featural instead (place encoded by the frame, manner
+    by an inner mark, in the spirit of Hangul but with no shared shapes) means the whole
+    table follows from 25 decisions, each of which has a reason, and it gives Phase 6 a
+    composition recipe it can render as SVG without a font.
+  alternatives: >-
+    (a) A hand-drawn syllabary, rejected above. (b) An abugida with arbitrary but maximally
+    distinctive base shapes, which would keep the consonants easier to tell apart but leave
+    every shape unjustified and lose the featural logic.
+  problems: >-
+    Featurally derived glyphs risk looking alike: the three retroflexes differ from their
+    alveolar counterparts only by the curled foot, and the two glides only by a doubled
+    stroke. Nothing has been rendered yet, so the shape descriptions are unverified prose --
+    see README "Not verified".
+
+inherent_vowel: none
+virama: none
+inherent_vowel_reason: >-
+  A deliberate departure from Indic abugidas, which give the bare consonant an inherent /a/
+  and need a virama to cancel it. Here every syllabic glyph carries an explicit vowel mark.
+  That costs one extra mark on the /a/ moras and removes a whole class of converter bugs,
+  since no glyph is ever ambiguous between "consonant + a" and "bare consonant".
+
+writing:
+  direction: left-to-right
+  marks_follow: >-
+    TS-LONG, TS-NASAL and TS-GEM are full moras and are written in sequence, not stacked on a
+    neighbour. TS-GEM precedes the mora whose onset it doubles; the other two follow the mora
+    they modify.
+
+# ---------------------------------------------------------------------------
+# The 25 hand-designed atoms.
+# ---------------------------------------------------------------------------
+
+atoms:
+  frames:
+    - id: FRAME-CARRIER
+      place: none
+      shape: A plain vertical stem, unadorned.
+    - id: FRAME-LABIAL
+      place: labial
+      shape: A vertical stem closed by a bowl on its left side.
+    - id: FRAME-ALVEOLAR
+      place: alveolar
+      shape: A vertical stem with a flat crossbar at mid height.
+    - id: FRAME-RETROFLEX
+      place: retroflex
+      shape: A vertical stem whose foot curls rightward into a hook.
+    - id: FRAME-VELAR
+      place: velar
+      shape: A vertical stem opening into a two-pronged fork at the top.
+    - id: FRAME-PALATAL
+      place: palatal
+      shape: A stem leaning to the right, drawn as a single diagonal.
+  manner_marks:
+    - id: MANNER-PLAIN
+      manner: voiceless plosive
+      shape: No inner mark. The bare frame is the voiceless plosive of its place.
+    - id: MANNER-DOT
+      manner: voiced plosive
+      shape: A single dot inside the frame.
+    - id: MANNER-BAR
+      manner: nasal
+      shape: A horizontal bar drawn through the stem.
+    - id: MANNER-SLASHES
+      manner: fricative
+      shape: Two short parallel slashes across the stem.
+    - id: MANNER-WAVE
+      manner: tap
+      shape: One short wave on the stem.
+    - id: MANNER-TAIL
+      manner: lateral
+      shape: A straight tail extending from the foot of the stem.
+    - id: MANNER-DOUBLE
+      manner: glide
+      shape: The frame drawn twice as two parallel strokes.
+  vowel_marks:
+    - id: VOW-A
+      vowel: a
+      shape: A short stroke to the right of the foot.
+    - id: VOW-I
+      vowel: i
+      shape: A tick at the top right.
+    - id: VOW-U
+      vowel: u
+      shape: A hook beneath the foot.
+    - id: VOW-E
+      vowel: e
+      shape: A bar across the top.
+    - id: VOW-O
+      vowel: o
+      shape: A bar on the right side at mid height.
+  standalone_marks:
+    - id: MARK-LONG
+      shape: A long horizontal stroke on the baseline.
+      reason: Visually "holds" the preceding vowel, matching what it does phonologically.
+    - id: MARK-NASAL
+      shape: A small closed hook on the baseline.
+      reason: >-
+        Closed, unlike the retroflex frame's open hook, so the only standalone hook in the
+        script cannot be read as a consonant frame.
+    - id: MARK-GEM
+      shape: A single dot on the baseline.
+      reason: >-
+        The smallest mark in the script, for the mora with the least content -- a held
+        closure and no segment of its own.
+
+# One base per onset, plus the carrier. Each is a frame and a manner mark; this is the whole
+# featural claim, and the 16 combinations below are all distinct.
+bases:
+  - id: BASE-CARRIER
+    onset: null
+    composition: [FRAME-CARRIER, MANNER-PLAIN]
+  - id: BASE-P
+    onset: p
+    composition: [FRAME-LABIAL, MANNER-PLAIN]
+  - id: BASE-B
+    onset: b
+    composition: [FRAME-LABIAL, MANNER-DOT]
+  - id: BASE-M
+    onset: m
+    composition: [FRAME-LABIAL, MANNER-BAR]
+  - id: BASE-W
+    onset: w
+    composition: [FRAME-LABIAL, MANNER-DOUBLE]
+  - id: BASE-T
+    onset: t
+    composition: [FRAME-ALVEOLAR, MANNER-PLAIN]
+  - id: BASE-D
+    onset: d
+    composition: [FRAME-ALVEOLAR, MANNER-DOT]
+  - id: BASE-N
+    onset: "n"
+    composition: [FRAME-ALVEOLAR, MANNER-BAR]
+  - id: BASE-S
+    onset: s
+    composition: [FRAME-ALVEOLAR, MANNER-SLASHES]
+  - id: BASE-R
+    onset: r
+    composition: [FRAME-ALVEOLAR, MANNER-WAVE]
+  - id: BASE-L
+    onset: l
+    composition: [FRAME-ALVEOLAR, MANNER-TAIL]
+  - id: BASE-TH
+    onset: th
+    composition: [FRAME-RETROFLEX, MANNER-PLAIN]
+  - id: BASE-DH
+    onset: dh
+    composition: [FRAME-RETROFLEX, MANNER-DOT]
+  - id: BASE-NH
+    onset: nh
+    composition: [FRAME-RETROFLEX, MANNER-BAR]
+  - id: BASE-K
+    onset: k
+    composition: [FRAME-VELAR, MANNER-PLAIN]
+  - id: BASE-G
+    onset: g
+    composition: [FRAME-VELAR, MANNER-DOT]
+  - id: BASE-Y
+    onset: "y"
+    composition: [FRAME-PALATAL, MANNER-DOUBLE]
+
+# ---------------------------------------------------------------------------
+# The mora table: one id per legal mora. Generated from spec/phonology.yaml.
+# `mora` is the romanized spelling for syllabic moras, null for the standalone marks
+# (which have no segment to spell on their own).
+# ---------------------------------------------------------------------------
+
+moras:
+  - id: TS-A
+    mora: "a"
+    kind: syllabic
+    composition: [BASE-CARRIER, VOW-A]
+    pua: U+E000
+  - id: TS-I
+    mora: "i"
+    kind: syllabic
+    composition: [BASE-CARRIER, VOW-I]
+    pua: U+E001
+  - id: TS-U
+    mora: "u"
+    kind: syllabic
+    composition: [BASE-CARRIER, VOW-U]
+    pua: U+E002
+  - id: TS-E
+    mora: "e"
+    kind: syllabic
+    composition: [BASE-CARRIER, VOW-E]
+    pua: U+E003
+  - id: TS-O
+    mora: "o"
+    kind: syllabic
+    composition: [BASE-CARRIER, VOW-O]
+    pua: U+E004
+  - id: TS-PA
+    mora: "pa"
+    kind: syllabic
+    composition: [BASE-P, VOW-A]
+    pua: U+E005
+  - id: TS-PI
+    mora: "pi"
+    kind: syllabic
+    composition: [BASE-P, VOW-I]
+    pua: U+E006
+  - id: TS-PU
+    mora: "pu"
+    kind: syllabic
+    composition: [BASE-P, VOW-U]
+    pua: U+E007
+  - id: TS-PE
+    mora: "pe"
+    kind: syllabic
+    composition: [BASE-P, VOW-E]
+    pua: U+E008
+  - id: TS-PO
+    mora: "po"
+    kind: syllabic
+    composition: [BASE-P, VOW-O]
+    pua: U+E009
+  - id: TS-BA
+    mora: "ba"
+    kind: syllabic
+    composition: [BASE-B, VOW-A]
+    pua: U+E00A
+  - id: TS-BI
+    mora: "bi"
+    kind: syllabic
+    composition: [BASE-B, VOW-I]
+    pua: U+E00B
+  - id: TS-BU
+    mora: "bu"
+    kind: syllabic
+    composition: [BASE-B, VOW-U]
+    pua: U+E00C
+  - id: TS-BE
+    mora: "be"
+    kind: syllabic
+    composition: [BASE-B, VOW-E]
+    pua: U+E00D
+  - id: TS-BO
+    mora: "bo"
+    kind: syllabic
+    composition: [BASE-B, VOW-O]
+    pua: U+E00E
+  - id: TS-TA
+    mora: "ta"
+    kind: syllabic
+    composition: [BASE-T, VOW-A]
+    pua: U+E00F
+  - id: TS-TI
+    mora: "ti"
+    kind: syllabic
+    composition: [BASE-T, VOW-I]
+    pua: U+E010
+  - id: TS-TU
+    mora: "tu"
+    kind: syllabic
+    composition: [BASE-T, VOW-U]
+    pua: U+E011
+  - id: TS-TE
+    mora: "te"
+    kind: syllabic
+    composition: [BASE-T, VOW-E]
+    pua: U+E012
+  - id: TS-TO
+    mora: "to"
+    kind: syllabic
+    composition: [BASE-T, VOW-O]
+    pua: U+E013
+  - id: TS-DA
+    mora: "da"
+    kind: syllabic
+    composition: [BASE-D, VOW-A]
+    pua: U+E014
+  - id: TS-DI
+    mora: "di"
+    kind: syllabic
+    composition: [BASE-D, VOW-I]
+    pua: U+E015
+  - id: TS-DU
+    mora: "du"
+    kind: syllabic
+    composition: [BASE-D, VOW-U]
+    pua: U+E016
+  - id: TS-DE
+    mora: "de"
+    kind: syllabic
+    composition: [BASE-D, VOW-E]
+    pua: U+E017
+  - id: TS-DO
+    mora: "do"
+    kind: syllabic
+    composition: [BASE-D, VOW-O]
+    pua: U+E018
+  - id: TS-THA
+    mora: "tha"
+    kind: syllabic
+    composition: [BASE-TH, VOW-A]
+    pua: U+E019
+  - id: TS-THI
+    mora: "thi"
+    kind: syllabic
+    composition: [BASE-TH, VOW-I]
+    pua: U+E01A
+  - id: TS-THU
+    mora: "thu"
+    kind: syllabic
+    composition: [BASE-TH, VOW-U]
+    pua: U+E01B
+  - id: TS-THE
+    mora: "the"
+    kind: syllabic
+    composition: [BASE-TH, VOW-E]
+    pua: U+E01C
+  - id: TS-THO
+    mora: "tho"
+    kind: syllabic
+    composition: [BASE-TH, VOW-O]
+    pua: U+E01D
+  - id: TS-DHA
+    mora: "dha"
+    kind: syllabic
+    composition: [BASE-DH, VOW-A]
+    pua: U+E01E
+  - id: TS-DHI
+    mora: "dhi"
+    kind: syllabic
+    composition: [BASE-DH, VOW-I]
+    pua: U+E01F
+  - id: TS-DHU
+    mora: "dhu"
+    kind: syllabic
+    composition: [BASE-DH, VOW-U]
+    pua: U+E020
+  - id: TS-DHE
+    mora: "dhe"
+    kind: syllabic
+    composition: [BASE-DH, VOW-E]
+    pua: U+E021
+  - id: TS-DHO
+    mora: "dho"
+    kind: syllabic
+    composition: [BASE-DH, VOW-O]
+    pua: U+E022
+  - id: TS-KA
+    mora: "ka"
+    kind: syllabic
+    composition: [BASE-K, VOW-A]
+    pua: U+E023
+  - id: TS-KI
+    mora: "ki"
+    kind: syllabic
+    composition: [BASE-K, VOW-I]
+    pua: U+E024
+  - id: TS-KU
+    mora: "ku"
+    kind: syllabic
+    composition: [BASE-K, VOW-U]
+    pua: U+E025
+  - id: TS-KE
+    mora: "ke"
+    kind: syllabic
+    composition: [BASE-K, VOW-E]
+    pua: U+E026
+  - id: TS-KO
+    mora: "ko"
+    kind: syllabic
+    composition: [BASE-K, VOW-O]
+    pua: U+E027
+  - id: TS-GA
+    mora: "ga"
+    kind: syllabic
+    composition: [BASE-G, VOW-A]
+    pua: U+E028
+  - id: TS-GI
+    mora: "gi"
+    kind: syllabic
+    composition: [BASE-G, VOW-I]
+    pua: U+E029
+  - id: TS-GU
+    mora: "gu"
+    kind: syllabic
+    composition: [BASE-G, VOW-U]
+    pua: U+E02A
+  - id: TS-GE
+    mora: "ge"
+    kind: syllabic
+    composition: [BASE-G, VOW-E]
+    pua: U+E02B
+  - id: TS-GO
+    mora: "go"
+    kind: syllabic
+    composition: [BASE-G, VOW-O]
+    pua: U+E02C
+  - id: TS-SA
+    mora: "sa"
+    kind: syllabic
+    composition: [BASE-S, VOW-A]
+    pua: U+E02D
+  - id: TS-SI
+    mora: "si"
+    kind: syllabic
+    composition: [BASE-S, VOW-I]
+    pua: U+E02E
+  - id: TS-SU
+    mora: "su"
+    kind: syllabic
+    composition: [BASE-S, VOW-U]
+    pua: U+E02F
+  - id: TS-SE
+    mora: "se"
+    kind: syllabic
+    composition: [BASE-S, VOW-E]
+    pua: U+E030
+  - id: TS-SO
+    mora: "so"
+    kind: syllabic
+    composition: [BASE-S, VOW-O]
+    pua: U+E031
+  - id: TS-MA
+    mora: "ma"
+    kind: syllabic
+    composition: [BASE-M, VOW-A]
+    pua: U+E032
+  - id: TS-MI
+    mora: "mi"
+    kind: syllabic
+    composition: [BASE-M, VOW-I]
+    pua: U+E033
+  - id: TS-MU
+    mora: "mu"
+    kind: syllabic
+    composition: [BASE-M, VOW-U]
+    pua: U+E034
+  - id: TS-ME
+    mora: "me"
+    kind: syllabic
+    composition: [BASE-M, VOW-E]
+    pua: U+E035
+  - id: TS-MO
+    mora: "mo"
+    kind: syllabic
+    composition: [BASE-M, VOW-O]
+    pua: U+E036
+  - id: TS-NA
+    mora: "na"
+    kind: syllabic
+    composition: [BASE-N, VOW-A]
+    pua: U+E037
+  - id: TS-NI
+    mora: "ni"
+    kind: syllabic
+    composition: [BASE-N, VOW-I]
+    pua: U+E038
+  - id: TS-NU
+    mora: "nu"
+    kind: syllabic
+    composition: [BASE-N, VOW-U]
+    pua: U+E039
+  - id: TS-NE
+    mora: "ne"
+    kind: syllabic
+    composition: [BASE-N, VOW-E]
+    pua: U+E03A
+  - id: TS-NO
+    mora: "no"
+    kind: syllabic
+    composition: [BASE-N, VOW-O]
+    pua: U+E03B
+  - id: TS-NHA
+    mora: "nha"
+    kind: syllabic
+    composition: [BASE-NH, VOW-A]
+    pua: U+E03C
+  - id: TS-NHI
+    mora: "nhi"
+    kind: syllabic
+    composition: [BASE-NH, VOW-I]
+    pua: U+E03D
+  - id: TS-NHU
+    mora: "nhu"
+    kind: syllabic
+    composition: [BASE-NH, VOW-U]
+    pua: U+E03E
+  - id: TS-NHE
+    mora: "nhe"
+    kind: syllabic
+    composition: [BASE-NH, VOW-E]
+    pua: U+E03F
+  - id: TS-NHO
+    mora: "nho"
+    kind: syllabic
+    composition: [BASE-NH, VOW-O]
+    pua: U+E040
+  - id: TS-RA
+    mora: "ra"
+    kind: syllabic
+    composition: [BASE-R, VOW-A]
+    pua: U+E041
+  - id: TS-RI
+    mora: "ri"
+    kind: syllabic
+    composition: [BASE-R, VOW-I]
+    pua: U+E042
+  - id: TS-RU
+    mora: "ru"
+    kind: syllabic
+    composition: [BASE-R, VOW-U]
+    pua: U+E043
+  - id: TS-RE
+    mora: "re"
+    kind: syllabic
+    composition: [BASE-R, VOW-E]
+    pua: U+E044
+  - id: TS-RO
+    mora: "ro"
+    kind: syllabic
+    composition: [BASE-R, VOW-O]
+    pua: U+E045
+  - id: TS-LA
+    mora: "la"
+    kind: syllabic
+    composition: [BASE-L, VOW-A]
+    pua: U+E046
+  - id: TS-LI
+    mora: "li"
+    kind: syllabic
+    composition: [BASE-L, VOW-I]
+    pua: U+E047
+  - id: TS-LU
+    mora: "lu"
+    kind: syllabic
+    composition: [BASE-L, VOW-U]
+    pua: U+E048
+  - id: TS-LE
+    mora: "le"
+    kind: syllabic
+    composition: [BASE-L, VOW-E]
+    pua: U+E049
+  - id: TS-LO
+    mora: "lo"
+    kind: syllabic
+    composition: [BASE-L, VOW-O]
+    pua: U+E04A
+  - id: TS-WA
+    mora: "wa"
+    kind: syllabic
+    composition: [BASE-W, VOW-A]
+    pua: U+E04B
+  - id: TS-WI
+    mora: "wi"
+    kind: syllabic
+    composition: [BASE-W, VOW-I]
+    pua: U+E04C
+  - id: TS-WE
+    mora: "we"
+    kind: syllabic
+    composition: [BASE-W, VOW-E]
+    pua: U+E04D
+  - id: TS-WO
+    mora: "wo"
+    kind: syllabic
+    composition: [BASE-W, VOW-O]
+    pua: U+E04E
+  - id: TS-YA
+    mora: "ya"
+    kind: syllabic
+    composition: [BASE-Y, VOW-A]
+    pua: U+E04F
+  - id: TS-YU
+    mora: "yu"
+    kind: syllabic
+    composition: [BASE-Y, VOW-U]
+    pua: U+E050
+  - id: TS-YE
+    mora: "ye"
+    kind: syllabic
+    composition: [BASE-Y, VOW-E]
+    pua: U+E051
+  - id: TS-YO
+    mora: "yo"
+    kind: syllabic
+    composition: [BASE-Y, VOW-O]
+    pua: U+E052
+  - id: TS-LONG
+    mora: null
+    kind: length
+    composition: [MARK-LONG]
+    pua: U+E053
+  - id: TS-NASAL
+    mora: null
+    kind: nasal
+    composition: [MARK-NASAL]
+    pua: U+E054
+  - id: TS-GEM
+    mora: null
+    kind: gem
+    composition: [MARK-GEM]
+    pua: U+E055

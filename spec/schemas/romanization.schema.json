@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gnanakamalesh-M/tanese/spec/schemas/romanization.schema.json",
+  "title": "Tanese romanization",
+  "description": "The ASCII-safe canonical text form of Tanese (locked decision 12) and the rules for parsing it.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "alphabet",
+    "vowel_graphemes",
+    "consonant_graphemes",
+    "retroflex_digraphs",
+    "long_vowels",
+    "gemination",
+    "moraic_nasal",
+    "ambiguity_cases",
+    "parse_order"
+  ],
+  "$defs": {
+    "prose": { "type": "string", "minLength": 1 },
+    "grapheme": { "type": "string", "minLength": 1, "maxLength": 2, "pattern": "^[a-z]+$" },
+    "mapping": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["grapheme", "phoneme"],
+        "properties": {
+          "grapheme": { "$ref": "#/$defs/grapheme" },
+          "phoneme": { "$ref": "#/$defs/grapheme" }
+        }
+      }
+    },
+    "rule_with_reason": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule", "reason"],
+      "properties": {
+        "rule": { "$ref": "#/$defs/prose" },
+        "reason": { "$ref": "#/$defs/prose" },
+        "disambiguation": { "$ref": "#/$defs/prose" },
+        "problems": { "$ref": "#/$defs/prose" }
+      }
+    }
+  },
+  "properties": {
+    "version": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+$" },
+    "alphabet": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["letters", "separator", "case", "reason"],
+      "properties": {
+        "letters": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "pattern": "^[a-z]$" },
+          "description": "Locked decision 12: ASCII-safe. Single lowercase letters only."
+        },
+        "separator": { "const": "'" },
+        "case": { "const": "lower" },
+        "reason": { "$ref": "#/$defs/prose" },
+        "note": { "$ref": "#/$defs/prose" }
+      }
+    },
+    "vowel_graphemes": { "$ref": "#/$defs/mapping" },
+    "consonant_graphemes": { "$ref": "#/$defs/mapping" },
+    "retroflex_digraphs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["marker", "pairs", "unassigned", "reason", "alternatives", "problems"],
+      "properties": {
+        "marker": { "type": "string", "pattern": "^[a-z]$" },
+        "pairs": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/grapheme" }
+        },
+        "unassigned": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/grapheme" }
+        },
+        "reason": { "$ref": "#/$defs/prose" },
+        "alternatives": { "$ref": "#/$defs/prose" },
+        "problems": { "$ref": "#/$defs/prose" }
+      }
+    },
+    "long_vowels": { "$ref": "#/$defs/rule_with_reason" },
+    "gemination": { "$ref": "#/$defs/rule_with_reason" },
+    "moraic_nasal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["grapheme", "rule", "reason"],
+      "properties": {
+        "grapheme": { "$ref": "#/$defs/grapheme" },
+        "rule": { "$ref": "#/$defs/prose" },
+        "reason": { "$ref": "#/$defs/prose" }
+      }
+    },
+    "ambiguity_cases": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Worked parses, cross-checked against the lexer by tests/unit/test_romanization.py.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["roman", "moras", "why"],
+        "properties": {
+          "roman": { "type": "string", "pattern": "^[a-z']+$" },
+          "moras": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^TS-[A-Z]+$" }
+          },
+          "why": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+    "parse_order": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["steps", "reason"],
+      "properties": {
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": { "$ref": "#/$defs/prose" }
+        },
+        "reason": { "$ref": "#/$defs/prose" }
+      }
+    }
+  }
+}

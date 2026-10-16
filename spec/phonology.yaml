@@ -1,0 +1,294 @@
+# Tanese phonology, v0.1 -- machine-readable source of truth.
+#
+# Derived from the LOCKED decisions 9-11 in docs/SPEC.md. Documentation is generated
+# from this file, never the reverse. Phoneme keys are the ASCII romanization graphemes
+# (locked decision 12: the romanization is the canonical text form), so this file and
+# spec/romanization.yaml share one key space.
+
+version: v0.1
+
+vowels:
+  - id: a
+    ipa: a
+    height: low
+    backness: central
+  - id: i
+    ipa: i
+    height: high
+    backness: front
+  - id: u
+    ipa: u
+    height: high
+    backness: back
+  - id: e
+    ipa: e
+    height: mid
+    backness: front
+  - id: o
+    ipa: o
+    height: mid
+    backness: back
+
+vowel_length:
+  contrastive: true
+  reason: >-
+    Locked decision 9. Length is carried by a separate mora (see mora_kinds.length), not by
+    a distinct vowel phoneme, so the vowel inventory stays at five and the mora count of a
+    word is read directly off its mora sequence.
+
+consonants:
+  - id: p
+    ipa: p
+    place: labial
+    manner: plosive
+    voiced: false
+    geminable: true
+  - id: b
+    ipa: b
+    place: labial
+    manner: plosive
+    voiced: true
+    geminable: true
+  - id: t
+    ipa: t
+    place: alveolar
+    manner: plosive
+    voiced: false
+    geminable: true
+  - id: d
+    ipa: d
+    place: alveolar
+    manner: plosive
+    voiced: true
+    geminable: true
+  - id: th
+    ipa: "ʈ"
+    place: retroflex
+    manner: plosive
+    voiced: false
+    geminable: true
+  - id: dh
+    ipa: "ɖ"
+    place: retroflex
+    manner: plosive
+    voiced: true
+    geminable: true
+  - id: k
+    ipa: k
+    place: velar
+    manner: plosive
+    voiced: false
+    geminable: true
+  - id: g
+    ipa: g
+    place: velar
+    manner: plosive
+    voiced: true
+    geminable: true
+  - id: s
+    ipa: s
+    place: alveolar
+    manner: fricative
+    voiced: false
+    geminable: true
+  - id: m
+    ipa: m
+    place: labial
+    manner: nasal
+    voiced: true
+    geminable: false
+  - id: "n"
+    ipa: n
+    place: alveolar
+    manner: nasal
+    voiced: true
+    geminable: false
+  - id: nh
+    ipa: "ɳ"
+    place: retroflex
+    manner: nasal
+    voiced: true
+    geminable: false
+  - id: r
+    ipa: "ɾ"
+    place: alveolar
+    manner: tap
+    voiced: true
+    geminable: false
+  - id: l
+    ipa: l
+    place: alveolar
+    manner: lateral
+    voiced: true
+    geminable: true
+  - id: w
+    ipa: w
+    place: labial
+    manner: glide
+    voiced: true
+    geminable: false
+  - id: "y"
+    ipa: j
+    place: palatal
+    manner: glide
+    voiced: true
+    geminable: false
+
+gemination:
+  reason: >-
+    Locked decision 10 allows geminates. Which consonants may double is not locked, so it is
+    decided here on one phonetic criterion: a consonant may geminate only if holding it longer
+    is audible. Plosives and /s/ have a closure or frication that can be sustained, and /l/ is
+    a lateral held by continuous tongue-side contact (geminate /ll/ is common cross-
+    linguistically). The nasals /m n nh/ are excluded because a moraic n before a nasal onset
+    is acoustically identical to a geminate nasal, so the contrast would be unlearnable -- and
+    excluding it is what makes the spelling `nn` unambiguously moraic-n + /n/. /r/ is a single
+    tap and a "long tap" is not producible: lengthening it yields either a trill, which is not
+    in this inventory, or nothing audible. /w y/ are excluded for the same reason as /r/.
+  alternatives: >-
+    Allow nasal geminates and disambiguate the moraic-n reading with a mandatory apostrophe
+    (`kan'na` vs `kanna`). Rejected: it makes the apostrophe carry a contrast no speaker can
+    hear, which is the same defect as same-vowel hiatus (see constraint PT-009).
+  problems: >-
+    It costs the lexicon the six non-geminable consonants' worth of geminate moras, and the
+    asymmetry ("why can /t/ double when /n/ cannot?") has to be taught with the phonetic
+    reason above.
+
+mora_kinds:
+  - id: syllabic
+    description: An optional onset consonant plus exactly one short vowel -- (C)V.
+    glyph_role: base
+  - id: length
+    description: The second mora of a long vowel. Carries no segment of its own.
+    glyph_role: mark
+  - id: nasal
+    description: The moraic nasal, written `n`. The only legal coda.
+    glyph_role: mark
+  - id: gem
+    description: The held closure before a geminate onset. Precedes the mora it doubles.
+    glyph_role: mark
+
+syllable:
+  template: (C)V(N)
+  reason: >-
+    Locked decision 10. Stated in moras: a syllable is one syllabic mora, optionally followed
+    by a length mora, optionally followed by a nasal mora. A long vowel therefore makes a
+    two-mora syllable, which is why `CVV` is not a mora kind of its own.
+
+accent:
+  type: fixed
+  position: first_mora
+  contrastive: false
+  reason: >-
+    Locked decision 11. Being fully predictable, accent is not written in the romanization or
+    the script and needs no code: it is recorded here so documentation and any future
+    pronunciation guide have a single source.
+
+allophony:
+  rules: []
+  reason: >-
+    v0.1 has no allophonic rules. The 16-consonant inventory has a phonemic voicing contrast
+    (decision D1 of Phase 1A), so voicing never needs to be predicted from position. Keeping
+    the surface and underlying forms identical means the romanization is a one-to-one mapping
+    and the script converter has no normalisation layer to get wrong.
+
+# Each constraint is emitted verbatim as the `code` of a violation by
+# tanese_nlp.phonology.phonotactics.validate, so rejections are always explainable.
+constraints:
+  - id: PT-001
+    name: unknown character
+    description: Every character must be a romanization grapheme letter or the apostrophe.
+    reason: >-
+      The romanization is the canonical form (locked decision 12), so anything outside its
+      alphabet is not Tanese text at all and must be rejected before phonotactics apply.
+  - id: PT-002
+    name: empty word
+    description: A word must contain at least one mora.
+    reason: Nothing downstream (accent, glyphs, morphology) is defined for the empty string.
+  - id: PT-003
+    name: consonant not followed by a vowel
+    description: >-
+      A word-internal consonant must begin a syllabic mora, be the moraic nasal, or be the
+      first half of a geminate. Anything else is a consonant cluster.
+    reason: >-
+      Locked decision 10 forbids clusters. Stating the constraint positively -- a consonant
+      must be licensed as an onset, a moraic n, or a geminate -- covers every cluster shape
+      without enumerating them.
+  - id: PT-004
+    name: illegal word-final consonant
+    description: A word may end only in a vowel or the moraic nasal.
+    reason: Locked decision 10.
+  - id: PT-005
+    name: illegal word-initial mora
+    description: A word may not begin with a nasal mora or a gemination mora.
+    reason: >-
+      Both are structurally dependent moras: a moraic n is a coda, and a gemination mora
+      copies the onset that follows it. Neither has anything to attach to word-initially.
+  - id: PT-006
+    name: ill-formed geminate
+    description: >-
+      A gemination mora may not be word-final, and the mora after it must be a syllabic mora
+      whose onset is the consonant being doubled.
+    reason: >-
+      A geminate is one consonant held across a mora boundary. If nothing follows, or what
+      follows has a different onset, the held closure has no consonant to belong to.
+  - id: PT-007
+    name: non-geminable consonant doubled
+    description: >-
+      The doubled consonant must be marked `geminable` in the consonant inventory above.
+    reason: See the `gemination` block above for the phonetic criterion and its alternatives.
+  - id: PT-008
+    name: vowel hiatus
+    description: >-
+      A syllabic mora with no onset may appear only as the first mora of a word, or
+      immediately after a nasal mora.
+    reason: >-
+      Two adjacent vowels would make a word re-analysable: `kaia` could be read as several
+      different mora sequences. A moraic n between the vowels is exactly what removes the
+      hiatus, which is why `kan'a` is legal and `kaia` is not.
+    alternatives: >-
+      Allow hiatus as Japanese does. Rejected: it makes the syllabifier ambiguous for very
+      little gain in word space.
+    problems: >-
+      Phase 1C's loanword adaptation must break hiatus with an epenthetic /y/ or /w/, since
+      many source words have vowel sequences. Not implemented in Phase 1A.
+  - id: PT-009
+    name: over-long vowel
+    description: A length mora may not follow another length mora.
+    reason: >-
+      Length is a two-way contrast (short vs long), so there is no third degree for a second
+      length mora to express. Identical adjacent vowels are always read as one long vowel,
+      which is why `kaa` is only /ka:/ and never /ka.a/ -- those two would be the same sound,
+      so offering a spelling for each would be a contrast nobody can hear.
+  - id: PT-010
+    name: missing apostrophe after moraic n
+    description: >-
+      A moraic nasal followed by a vowel, `y`, or `w` must be written with an apostrophe:
+      `kan'a`, `kan'ya`, `kan'wa`.
+    reason: >-
+      Before a vowel the apostrophe resolves a real ambiguity (`kana` is /ka.na/, so /kan.a/
+      needs its own spelling). Before `y` and `w` the parse is already unambiguous, but `nya`
+      and `nwa` read as a single palatal or labialised nasal to most readers, so the
+      apostrophe is required there too and the rule stays easy to state.
+  - id: PT-011
+    name: misplaced apostrophe
+    description: >-
+      An apostrophe is legal only immediately after a moraic nasal and immediately before a
+      vowel, `y`, or `w`.
+    reason: >-
+      The apostrophe is a syllable-boundary marker, not a letter. Allowing it elsewhere would
+      let two spellings denote the same word, breaking the one-to-one romanization.
+  - id: PT-012
+    name: illegal mora
+    description: The mora is not in the legal mora set (see `gaps`).
+    reason: See the `gaps` block below.
+
+gaps:
+  - mora: yi
+    reason: >-
+      /ji/ is near-indistinguishable from /i/: the glide and the following vowel share the
+      same articulation. Japanese has the same gap, for the same reason.
+  - mora: wu
+    reason: >-
+      /wu/ is near-indistinguishable from /u/, both being high back rounded. Japanese has the
+      same gap.
