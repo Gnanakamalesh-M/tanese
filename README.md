@@ -83,18 +83,17 @@ All checks passed.
 `pytest` reports **22 passed** (`.venv\Scripts\python.exe -m pytest`). Those 22 tests cover
 the schema validator and the check-runner wiring only — there is nothing else to test yet.
 
+CI is green: [run #1](https://github.com/Gnanakamalesh-M/tanese/actions) on commit `5f47648`
+ran the same `python scripts/run_checks.py` on Python 3.11 on a clean Ubuntu runner, after a
+fresh `pip install -r requirements.txt`.
+
 ## Not verified
 
 Honest list of things written but not actually demonstrated:
 
-- **CI green on a pushed commit.** The workflow in `.github/workflows/ci.yml` exists and runs
-  the same `python scripts/run_checks.py` command that passes locally, but this repository
-  has **no git remote** and nothing has been pushed, so no CI run has ever executed. The
-  workflow itself — GitHub-side caching, `setup-python`, and install from `requirements.txt`
-  on a clean Ubuntu runner — is therefore unverified.
-- **Installing from `requirements.txt` into a fresh environment.** The pins were read back
-  from the existing `.venv` after installation; a clean `pip install -r requirements.txt` has
-  not been run.
+- **Installing from `requirements.txt` on Windows.** The clean install is verified on the CI
+  runner's Ubuntu + Python 3.11 only; the local pins were read back from an already-populated
+  `.venv`, so a from-scratch install on Windows has not been run.
 - Everything from Phase 1A onward: phonology, script, romanization, grammar rules,
   vocabulary, corpus, tokenizer, morphological analyzer, grammar checker, embeddings, RAG,
   translation, the web app, and all evaluation numbers. None of it exists yet.
