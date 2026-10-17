@@ -1,0 +1,257 @@
+# Tense, aspect and mood. Derived from LOCKED decisions 6 and 7.
+
+- id: GR-TAM-001
+  category: morphology
+  name: aspect suffixes
+  description: >-
+    The aspect slot takes `-ri` (progressive: in progress), `-nhe` (perfect: completed with
+    a result that holds) or `-mu` (perfective: viewed as a single whole event). It sits
+    immediately after the root.
+  reason: >-
+    Three aspects is the smallest set that still distinguishes the contrasts a learner will
+    look for ("I was eating" / "I have eaten" / "I ate"). Perfect and perfective are kept
+    apart because with a two-way tense (LOCKED decision 7) the perfect is the only way to
+    say that a past event still matters now.
+  alternatives: >-
+    Collapse perfect and perfective into one "completed" aspect. Rejected: it would make
+    `mandunheke` ("has eaten") and `mandumudho` ("ate") the same form, and with no third
+    tense there would then be no way to express current relevance at all.
+  problems: >-
+    Perfective plus non-past (`mandumuke`) is close to meaningless -- a bounded whole event
+    in the present is not a natural notion -- but v0.1 does not forbid the combination,
+    because the checker has no semantics to forbid it with. Phase 1C must list it.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      Tamil's compound aspect constructions, which are built from auxiliary verbs
+      (koNDiru-, viDu-) rather than simple suffixes.
+    how_modified: >-
+      Reduced to three plain suffixes in one slot, since GR-VERB-001 forbids auxiliaries
+      outright; none of the Tamil auxiliary forms is reused.
+  pattern: "ROOT + (-ri | -nhe | -mu) + ..."
+  morphemes:
+    - form: ri
+      slot: aspect
+      function: progressive
+      kind: suffix
+      word_class: verb
+    - form: nhe
+      slot: aspect
+      function: perfect
+      kind: suffix
+      word_class: verb
+    - form: mu
+      slot: aspect
+      function: perfective
+      kind: suffix
+      word_class: verb
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-RI.TS-DHO
+      roman: ano dhen sedha do manduridho
+      english: I was eating the food.
+      gloss: mandu-ri-dho / eat-PROG-PST
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-NHE.TS-KE
+      roman: uthe dhen bunko do rubonheke
+      english: He has read the book.
+      gloss: rubo-nhe-ke / read-PERF-NPST
+  invalid:
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-DHO.TS-RI
+      roman: mandudhori
+      why: Aspect follows tense. Aspect is the first suffix slot (GR-VERB-003).
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-RI.TS-NHE
+      roman: mandurinhe
+      why: >-
+        Two aspect suffixes in one verb, `-ri` then `-nhe`. One slot holds one suffix, and
+        the verb also has no tense (GR-VERB-006).
+  status: official
+  since: v0.1
+
+- id: GR-TAM-002
+  category: syntax
+  name: unmarked aspect is habitual or neutral
+  description: >-
+    A verb with an empty aspect slot is aspectually neutral: it reads as a habit, a general
+    truth, or simply an unspecified event.
+  reason: >-
+    The alternative is a fourth suffix for the most frequent reading in the language, which
+    would make the commonest sentences the longest. Leaving it zero also means there is no
+    choice to make when aspect is irrelevant.
+  problems: >-
+    Zero therefore means two different things -- "habitually" and "aspect not specified" --
+    and nothing distinguishes them. `ano dhen manduke` is both "I eat (every day)" and "I
+    eat (now)", which no later phase can resolve.
+  inspiration:
+    source: none
+    original_feature: >-
+      Both source languages use an explicitly marked form for the habitual present.
+    how_modified: >-
+      Not taken: Tanese leaves it unmarked, accepting the ambiguity to keep the common case
+      short.
+  pattern: "ROOT + TENSE (aspect slot empty)"
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-PA.TS-NU TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen panu do manduke
+      english: I eat rice. (habitually)
+    - tanese: TS-KI.TS-NHU TS-DHE.TS-NASAL TS-THO.TS-RA TS-BA.TS-NASAL TS-E.TS-SU.TS-KE
+      roman: kinhu dhen thora ban esuke
+      english: Birds are in trees. (general truth)
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-PA.TS-NU TS-DO TS-MA.TS-NASAL.TS-DU
+      roman: ano dhen panu do mandu
+      why: >-
+        The aspect slot may be empty, but the tense slot may not (GR-VERB-006). This is the
+        citation form, not a habitual.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-PA.TS-NU TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-RI
+      roman: ano dhen panu do mandukeri
+      why: >-
+        Aspect added after tense to repair the unmarked form. The slot order is fixed
+        (GR-VERB-003), and the unmarked form needed no repair.
+  status: official
+  since: v0.1
+
+- id: GR-TAM-003
+  category: morphology
+  name: two-way tense
+  description: >-
+    The tense slot takes `-dho` (past) or `-ke` (non-past). There is no third tense and no
+    future suffix.
+  reason: >-
+    LOCKED decision 7. A two-way split is enough because the only thing a dedicated future
+    would add over non-past is certainty about a time that an adverb states more precisely
+    anyway (GR-TAM-004).
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese past/non-past contrast, with no grammatical future.
+    how_modified: >-
+      The system is taken and the forms are not: Japanese `-ta` and Tamil's three-way
+      past/present/future are both excluded, `-ta` by name in _originality.yaml.
+  pattern: "ROOT [ASPECT] + (-dho | -ke) + ..."
+  morphemes:
+    - form: dho
+      slot: tense
+      function: past
+      kind: suffix
+      word_class: verb
+    - form: ke
+      slot: tense
+      function: non_past
+      kind: suffix
+      word_class: verb
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NE.TS-GEM.TS-BO TS-I.TS-GEM.TS-KE.TS-DHO
+      roman: ano dhen nebbo ikkedho
+      english: I went yesterday.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano dhen ikkeke
+      english: I go. / I am going.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO.TS-KE
+      roman: ano dhen ikkedhoke
+      why: Two tense suffixes in one verb. The slot holds one.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-DHO.TS-MA.TS-NASAL.TS-DU
+      roman: ano dhen sedha do dhomandu
+      why: >-
+        The tense marker is prefixed to the root. Tanese is suffixing only (GR-VERB-001),
+        and the verb is left with no tense suffix (GR-VERB-006).
+  status: official
+  since: v0.1
+
+- id: GR-TAM-004
+  category: syntax
+  name: future is non-past plus an adverb
+  description: >-
+    Future time is expressed by the non-past verb together with a time adverb, or by the
+    desiderative/conditional moods where intention is meant. No suffix marks the future.
+  reason: >-
+    LOCKED decision 7 allows either an adverb or a mood suffix, and the adverb is chosen as
+    the default because it is also how a speaker says *when* -- `dhoka ikkeke` gives both
+    the futurity and the time, where a future suffix would give only the first.
+  problems: >-
+    Without an adverb, `ikkeke` is genuinely ambiguous between present and future, and a
+    translation into a language with a future tense must guess. The Phase 7 report should
+    expect this to be a visible error class.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese expresses future with the non-past plus temporal adverbs.
+    how_modified: Taken unchanged; it follows directly from the two-way tense.
+  pattern: "TIME_ADVERB ... V+-ke"
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-DHO.TS-KA TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano dhen dhoka teku thin ikkeke
+      english: I will go to school tomorrow.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-DHO.TS-KA TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-KE.TS-LE
+      roman: uthe dhen dhoka bunko do rubokele
+      english: He will want to read the book tomorrow.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-DHO.TS-KA TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO
+      roman: ano dhen dhoka teku thin ikkedho
+      why: >-
+        A future adverb with the past tense. `dhoka` ("tomorrow") and `-dho` (past) place the
+        event in opposite directions.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE.TS-DHO.TS-KA
+      roman: ano dhen teku thin ikkekedhoka
+      why: >-
+        The adverb is suffixed to the verb as a future marker. Adverbs are separate words
+        and precede the verb (GR-ORD-003); there is no future slot.
+  status: official
+  since: v0.1
+
+- id: GR-TAM-005
+  category: morphology
+  name: conditional and desiderative moods
+  description: >-
+    The mood slot takes `-bo` (conditional: "if") or `-le` (desiderative: "wants to"). Both
+    require a tense suffix before them.
+  reason: >-
+    These are the two moods whose meaning depends on when the event is located -- "if he
+    went" and "if he goes" differ, and so do "wanted to" and "wants to" -- so both are
+    declared `tense: required`, unlike the three command moods in GR-IMP.
+  problems: >-
+    Because negation occupies the same slot (GR-NEG-001), neither mood can be negated inside
+    the verb; a negative conditional needs the analytic form in GR-NEG-004, and there is no
+    way at all to say "does not want to" in v0.1.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      The Tamil conditional -aal and the desiderative built with veNDum.
+    how_modified: >-
+      Both are reduced to single mood-slot suffixes with original forms; `-aal` is banned in
+      _originality.yaml.
+  pattern: "ROOT [ASPECT] TENSE + (-bo | -le) [POLITENESS]"
+  morphemes:
+    - form: bo
+      slot: mood
+      function: conditional
+      kind: suffix
+      word_class: verb
+      tense: required
+    - form: le
+      slot: mood
+      function: desiderative
+      kind: suffix
+      word_class: verb
+      tense: required
+  valid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO.TS-BO TS-A.TS-NO TS-DHE.TS-NASAL TS-NHO.TS-RU.TS-DHO
+      roman: uthe dhen ikkedhobo ano dhen nhorudho
+      english: If he went, I came.
+      gloss: ikke-dho-bo / go-PST-COND
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-LE
+      roman: ano dhen sedha do mandukele
+      english: I want to eat the food.
+      gloss: mandu-ke-le / eat-NPST-DESID
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-LE
+      roman: ano dhen sedha do mandule
+      why: >-
+        The desiderative with no tense suffix. `-le` is declared `tense: required`
+        (GR-VERB-006).
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-BO.TS-LE
+      roman: ano dhen sedha do mandukebole
+      why: >-
+        Conditional and desiderative stacked. The mood slot holds one suffix, which is also
+        why negation cannot combine with either.
+  status: official
+  since: v0.1

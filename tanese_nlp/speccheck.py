@@ -23,11 +23,20 @@ SCHEMA_DIR = SPEC_DIR / "schemas"
 # Which schema governs which spec file. Keys are glob patterns relative to spec/;
 # values are schema stems in spec/schemas/. Later phases extend this table as they
 # add vocabulary_rules.yaml.
+#
+# The rule glob is deliberately `[0-9]*` and not `*`: spec/grammar_rules/ also holds two
+# support files whose names start with an underscore, and they are not rule lists. A file
+# in spec/ that no pattern here claims is reported as an error further down, so a future
+# rule file named without a numeric prefix fails loudly instead of being skipped.
+RULE_GLOB = "grammar_rules/[0-9]*.yaml"
+
 SCHEMA_MAP: dict[str, str] = {
     "phonology.yaml": "phonology",
     "romanization.yaml": "romanization",
     "script.yaml": "script",
-    "grammar_rules/*.yaml": "grammar_rule",
+    RULE_GLOB: "grammar_rule",
+    "grammar_rules/_example_lexicon.yaml": "example_lexicon",
+    "grammar_rules/_originality.yaml": "originality",
 }
 
 
@@ -66,7 +75,7 @@ def _check_rule_ids_unique(spec_dir: Path) -> list[str]:
     """Rule ids must be unique and stable across every grammar-rule file."""
     seen: dict[str, str] = {}
     errors: list[str] = []
-    for path in sorted(spec_dir.glob("grammar_rules/*.yaml")):
+    for path in sorted(spec_dir.glob(RULE_GLOB)):
         label = str(path.relative_to(spec_dir))
         try:
             document = yaml.safe_load(path.read_text(encoding="utf-8"))

@@ -1,0 +1,204 @@
+# Politeness. Derived from LOCKED decision 8: exactly three levels, marked only on the final
+# verb/copula suffix and not on every word.
+#
+# Only GR-POL-001 introduces forms, so only it carries `morphemes`. The other three rules
+# constrain where politeness may appear rather than adding morphology, which is why their
+# category is `syntax` and they argue from `asserts` instead.
+
+- id: GR-POL-001
+  category: politeness
+  name: three politeness levels
+  description: >-
+    The politeness slot, last in the verb, takes `-mi` (neutral) or `-sun` (formal), or
+    stands empty for the casual level. Exactly three levels exist.
+  reason: >-
+    LOCKED decision 8. The forms are two moras apart in length as well as in shape -- casual
+    is shortest, formal longest -- which matches the usual relationship between politeness
+    and verbosity and gives a learner a mnemonic that is not arbitrary.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese plain/polite (-masu) and honorific registers, where politeness is marked
+      on the verb.
+    how_modified: >-
+      The site is kept, the system is cut down to exactly three levels with no separate
+      honorific/humble vocabulary, and the forms are original -- `masu` and `desu` are both
+      banned in _originality.yaml.
+  pattern: "ROOT [ASPECT] [TENSE] [MOOD] + (-mi | -sun | nothing)"
+  morphemes:
+    - form: mi
+      slot: politeness
+      function: neutral
+      kind: suffix
+      word_class: verb
+    - form: sun
+      slot: politeness
+      function: formal
+      kind: suffix
+      word_class: verb
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-MI
+      roman: ano dhen sedha do mandukemi
+      english: I eat the food. (neutral)
+      gloss: mandu-ke-mi / eat-NPST-NEUTRAL
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-SU.TS-NASAL
+      roman: ano dhen sedha do mandukesun
+      english: I eat the food. (formal)
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-MI.TS-SU.TS-NASAL
+      roman: ano dhen sedha do mandukemisun
+      why: >-
+        Two politeness suffixes in one verb. The slot holds one, and the levels are
+        alternatives, not degrees that stack.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-SU.TS-NASAL.TS-KE
+      roman: ano dhen sedha do mandusunke
+      why: >-
+        Politeness precedes tense. Politeness is the final slot, so nothing may follow it
+        (GR-VERB-003).
+  status: official
+  since: v0.1
+
+- id: GR-POL-002
+  category: syntax
+  name: casual is the empty politeness slot
+  description: >-
+    An empty politeness slot is the casual level. It is a positive value of the feature, not
+    an absence of politeness marking, and a verb with no politeness suffix is a fully
+    well-formed casual verb.
+  reason: >-
+    Casual speech should not be longer than formal speech, which it would be if all three
+    levels were suffixed. The zero is safe only because the tense slot is obligatory on an
+    indicative verb (GR-VERB-006), so the casual non-past `manduke` can never be confused
+    with the citation form `mandu` (GR-VERB-002).
+  alternatives: >-
+    Mark all three levels explicitly, so that a bare tensed verb is ill-formed. Rejected:
+    it makes the most frequent register the most marked one, and it buys only a redundancy
+    check that GR-VERB-006 already provides.
+  problems: >-
+    "No suffix" has to be taught as a choice rather than as an omission, and a learner who
+    forgets the politeness suffix produces a well-formed casual sentence instead of an error
+    -- which is the right grammar but the wrong register, and the checker cannot flag it.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese plain form, which is likewise the unmarked member of the register system.
+    how_modified: >-
+      Taken, with the confusion Japanese tolerates (plain form = dictionary form) explicitly
+      designed out via GR-VERB-006.
+  pattern: "ROOT [ASPECT] TENSE [MOOD] (politeness slot empty)"
+  asserts:
+    requires: [politeness.zero_is_casual]
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen sedha do manduke
+      english: I eat the food. (casual)
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-NE.TS-GEM.TS-BO TS-I.TS-GEM.TS-KE.TS-DHO
+      roman: iri dhen nebbo ikkedho
+      english: You went yesterday. (casual)
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU
+      roman: ano dhen sedha do mandu
+      why: >-
+        The tense suffix is missing too, which makes this the citation form, not a casual
+        verb (GR-VERB-002).
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NE.TS-NASAL
+      roman: ano dhen sedha do mandukenen
+      why: >-
+        The noun plural suffix is used in the politeness slot, as if casual needed a marker.
+        Casual is the empty slot, and `-nen` is a noun suffix (GR-NOUN-001).
+  status: official
+  since: v0.1
+
+- id: GR-POL-003
+  category: syntax
+  name: politeness is marked once per clause
+  description: >-
+    Politeness is marked on the final verb or copula of the clause and nowhere else. Nouns,
+    pronouns and particles never vary by politeness level.
+  reason: >-
+    LOCKED decision 8 says politeness is marked only on the verb, not on every word. The
+    practical payoff is that register costs exactly one suffix per clause, so changing
+    register means changing one morpheme rather than rewriting the sentence.
+  problems: >-
+    In a multi-clause sentence only the clause-final verb of each clause carries a level, so
+    a subordinate clause and its main clause can disagree -- `ikkedhobo` plus `nhorudhosun`
+    is casual inside a formal sentence. v0.1 does not forbid the mismatch, and Phase 1C
+    should decide whether it is an error or a stylistic choice.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese keigo, where politeness also pervades the noun vocabulary (o-/go- prefixes,
+      honorific and humble lexical pairs).
+    how_modified: >-
+      Deliberately narrowed to the verb alone: the prefixes are impossible anyway (LOCKED
+      decision 2) and parallel honorific vocabulary would multiply the Phase 2 lexicon for
+      no grammatical gain.
+  pattern: "... V+POLITENESS (once per clause)"
+  asserts:
+    requires: [politeness.on_final_verb]
+    forbids: [politeness.on_noun, politeness.on_particle]
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-THI.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-DHE.TS-LO.TS-DHO.TS-SU.TS-NASAL
+      roman: ano dhen nanthe thin bunko do dhelodhosun
+      english: I gave the book to a friend. (formal; one marker, on the verb)
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-GO.TS-SU TS-KO.TS-DHU TS-NHO.TS-RU.TS-KE.TS-MI
+      roman: uthe dhen gosu kodhu nhorukemi
+      english: He comes from the city. (neutral)
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE.TS-SU.TS-NASAL TS-THI.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-DHE.TS-LO.TS-DHO.TS-SU.TS-NASAL
+      roman: ano dhen nanthesun thin bunko do dhelodhosun
+      why: >-
+        The formal suffix is also attached to a noun. Politeness is marked on the verb only;
+        there is no honorific noun form.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-THI.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO.TS-SU.TS-NASAL TS-DHE.TS-LO.TS-DHO
+      roman: ano dhen nanthe thin bunko dosun dhelodho
+      why: >-
+        A politeness suffix on a particle. Particles are invariant words and take no
+        suffixes.
+  status: official
+  since: v0.1
+
+- id: GR-POL-004
+  category: syntax
+  name: politeness on the copula and after a clause particle
+  description: >-
+    An equational clause carries its politeness on the copula, like any other verb. Where a
+    clause ends in a particle, the politeness suffix stays on the verb before it and never
+    moves onto the particle.
+  reason: >-
+    GR-VERB-005 makes the copula an ordinary verb, so this follows -- but it has to be said,
+    because the clause particles (`wen`, `thon`, `lun`, `thenu`) stand after the verb and
+    are the obvious place a learner would try to put a sentence-final politeness marker.
+    Keeping politeness on the verb is what makes the analytic prohibitive still carry a
+    register (GR-NEG-003).
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese -masu ka, where the polite ending precedes the question particle.
+    how_modified: >-
+      The ordering is the same, which is unsurprising -- both languages are head-final and
+      put clause particles outside the verb's morphology. Tanese's forms are its own.
+  pattern: "... esu+TENSE[+MOOD]+POLITENESS [CLAUSE_PARTICLE]"
+  asserts:
+    requires: [politeness.on_final_verb]
+    forbids: [politeness.on_particle]
+  valid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE.TS-SU.TS-NASAL TS-WE.TS-NASAL
+      roman: uthe dhen nanthe esukesun wen
+      english: Is he a friend? (formal)
+      gloss: esu-ke-sun wen / be-NPST-FORMAL Q
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NHI.TS-SU.TS-NASAL TS-THO.TS-NASAL
+      roman: sedha do mandukenhisun thon
+      english: Please do not eat the food. (formal prohibitive)
+  invalid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE TS-WE.TS-NASAL.TS-SU.TS-NASAL
+      roman: uthe dhen nanthe esuke wensun
+      why: >-
+        The politeness suffix is attached to the question particle. Particles take no
+        suffixes; politeness belongs to the verb.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE.TS-SU.TS-NASAL TS-E.TS-SU.TS-KE TS-WE.TS-NASAL
+      roman: uthe dhen nanthesun esuke wen
+      why: >-
+        Politeness on the complement noun instead of the copula (GR-POL-003).
+  status: official
+  since: v0.1

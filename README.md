@@ -7,9 +7,11 @@ consistent, and honestly evaluated — not a complete real-world language ecosys
 Tamil and Japanese are inspirations only. Tanese has its own phonology, script, grammar,
 and vocabulary, and nothing in it is a copy of either source language.
 
-> **Status: Phase 1A (phonology, romanization, script) complete.** Tanese now has a sound
-> inventory, a canonical spelling and a writing system, all machine-readable in `spec/`.
-> There is still no grammar and no vocabulary. See [Not verified](#not-verified) below.
+> **Status: Phase 1B (grammar core) complete.** Tanese now has a sound inventory, a
+> canonical spelling, a writing system and a grammar — 54 rules, all machine-readable in
+> `spec/`, checked for self-contradiction by a script. There is still no vocabulary: the
+> words in the grammar examples are explicitly-marked placeholders, not a lexicon. See
+> [Not verified](#not-verified) below.
 
 ## How the project is organised
 
@@ -25,7 +27,9 @@ rules or vocabulary.
 | `spec/` | Machine-readable language rules (YAML) |
 | `spec/schemas/` | JSON Schemas the rule files are validated against |
 | `tanese_nlp/phonology/` | Romanization lexer and phonotactic validator |
+| `spec/grammar_rules/` | The grammar: one YAML file per topic, plus two support files |
 | `tanese_nlp/script/` | Romanization ↔ script converter |
+| `tanese_nlp/grammar/` | Rule loader, tokenizer, contradiction checker |
 | `tanese_nlp/` | Python toolkit (tokenizer, morphology, grammar, embeddings, …) |
 | `data/` | Vocabulary, grammar, translation, conversation, evaluation data |
 | `llm/` | Prompts, RAG, fine-tuning, LLM evaluation |
@@ -33,7 +37,8 @@ rules or vocabulary.
 | `scripts/` | Plain-python entry points; no `make` |
 | `tests/` | Unit and integration tests |
 
-Most of these directories are currently empty placeholders for later phases.
+Most of these directories are currently empty placeholders for later phases. `data/` in
+particular is still entirely empty — Phase 1B added no data files, only spec and code.
 
 ## Install
 
@@ -55,21 +60,24 @@ One command runs everything, and CI runs the same one:
 python scripts/run_checks.py
 ```
 
-It runs three steps and stops at the first failure:
+It runs four steps and stops at the first failure:
 
 1. **lint** — `ruff check .`
 2. **tests** — `pytest`
 3. **yaml-schema** — `scripts/check_yaml_schema.py`, validating every `spec/*.yaml`
    against `spec/schemas/` and checking that grammar-rule ids are globally unique
+4. **grammar** — `scripts/check_grammar.py`, the twelve contradiction checks over
+   `spec/grammar_rules/`, which also prints the rule and example counts
 
-The schema check can also be run on its own, as can the word generator:
+Each can also be run on its own, as can the word generator:
 
 ```
 python scripts/check_yaml_schema.py
+python scripts/check_grammar.py
 python scripts/gen_words.py
 ```
 
-Both scripts work from any working directory.
+All scripts work from any working directory.
 
 ## The language so far (Phase 1A)
 
@@ -115,6 +123,109 @@ kaaa     PT-009  a vowel may be lengthened only once
 The design decisions behind all of this — why 16 consonants, why `h` marks retroflexion, why
 `/n/` cannot geminate, why hiatus is banned — are recorded with their alternatives and known
 problems in the `reason`, `alternatives` and `problems` fields of the spec files themselves.
+
+## The grammar so far (Phase 1B)
+
+`spec/grammar_rules/*.yaml` is the source of truth; this section summarises it.
+
+**Shape of the language.** SOV and head-final: modifiers, relative clauses and subordinate
+clauses all precede what they modify, and the verb closes the clause. Relations are carried
+by postposition particles, not by word order, so arguments may be reordered freely before
+the verb. A root and its suffixes are one word; every particle is a separate word.
+
+**Particles** (13). Eight relations — `dhen` subject, `do` object, `thin` dative/goal,
+`lu` genitive, `ban` locative, `sen` instrumental, `nhu` comitative, `kodhu` ablative — plus
+five clause-level ones: `belu` topic, `wen` yes/no question, `thenu` quotative, `thon`
+prohibitive, `lun` negative conditional. A noun phrase takes exactly one.
+
+**Verbs** are `ROOT - ASPECT - TENSE - MOOD - POLITENESS` (locked decision 6), suffixing
+only, with an invariant root and no agreement for person, number or gender.
+
+```
+mandu              eat (citation form -- not a finite verb)
+manduke            eats                       mandu-ke        eat-NPST
+manduridhosun      was eating (formal)        mandu-ri-dho-sun  eat-PROG-PST-FORMAL
+mandukenhimi       does not eat (neutral)     mandu-ke-nhi-mi   eat-NPST-NEG-NEUTRAL
+manduso            eat!                       mandu-so        eat-IMP
+mandukenhi thon    do not eat                 (two words -- see below)
+```
+
+Three politeness levels, marked once per clause on the final verb: casual is the empty
+slot, `-mi` is neutral, `-sun` is formal. Tense is obligatory on an indicative verb, which
+is what keeps the casual `manduke` distinct from the citation form `mandu`; the three
+command moods (`-so` imperative, `-the` request, `-lo` hortative) are declared tenseless
+and forbid it instead.
+
+**The known wart.** Negation `-nhi` sits in the mood slot, so it cannot combine with another
+mood. The prohibitive and the negative conditional are therefore two words where their
+positive counterparts are one (`manduso` → `mandukenhi thon`; `ikkedhobo` → `ikkedhonhi
+lun`), and "does not want to" has no form at all. Each affected rule says so in its
+`problems` field, and `docs/CHANGES.md` CH-002 records the slot change that would fix it if
+Phase 3 shows the analytic forms do not work.
+
+Every particle and suffix form is checked against `spec/grammar_rules/_originality.yaml`, a
+list of 61 Japanese and Tamil particles, case endings, verbal endings and honorifics that a
+Tanese form may not equal (locked decision 3). That check is what removed three forms from
+the first draft: `kun` (Japanese honorific), `ge` (one vowel from Japanese *ga*) and `maa`
+(colloquial Tamil address particle), replaced by `wen`, `dhen` and `belu`.
+
+## Phase 1B results
+
+Produced by `.venv\Scripts\python.exe scripts\check_grammar.py`:
+
+```
+== counts
+  rules                54 in 10 files
+  valid examples       108
+  invalid examples     108
+  declared morphemes   33 (13 particles, 14 suffixes)
+  demo words           41 (experimental, not vocabulary)
+  banned source forms  61
+
+== checks
+  ok    check 1 form uniqueness
+  ok    check 2 function uniqueness
+  ok    check 3 slot order
+  ok    check 4 assertion conflict
+  ok    check 5 example cross-check
+  ok    check 6 example self-consistency
+  ok    check 7 phonotactics
+  ok    check 8 script fidelity
+  ok    check 9 lexicon closure + originality
+  ok    check 10 demo words legal
+  ok    check 11 demo words experimental
+  ok    check 12 demo words not in vocabulary
+  ok    morpheme declarations by category
+  ok    morpheme-declaring rules are categorised as such
+```
+
+What each check proves is in the module docstring of
+`tanese_nlp/grammar/contradictions.py`; what they do **not** prove is in
+[Not verified](#not-verified). Every check is itself tested by building a rule set that
+breaks it (`tests/unit/test_contradictions.py`), so a green run is not green by accident.
+
+Against `docs/SPEC.md`'s Phase 1B done-criteria:
+
+| Criterion | Evidence |
+| --- | --- |
+| `spec/grammar_rules/*.yaml` covering word order, noun morphology, verb morphology, TAM, negation, questions, commands, pronouns, particles, politeness | ten rule files, one per topic; counts per file printed by `scripts\check_grammar.py` |
+| ≥ 40 rules | **54**, printed by `scripts\check_grammar.py`, which fails below 40 |
+| ≥ 2 valid + 2 invalid examples each | lowest observed is 2 and 2, printed by the same script; also asserted per rule in `tests/unit/test_grammar_rules.py` |
+| Schema check passes | `scripts\check_yaml_schema.py` → `ok`, against an extended `grammar_rule.schema.json` (see `docs/CHANGES.md` CH-001) |
+| No two rules contradict, checked by a script | the twelve checks above |
+
+The example words come from `spec/grammar_rules/_example_lexicon.yaml`: 41 placeholder roots
+that exist only so the examples can be read. They are **not** vocabulary — each is marked
+`status: experimental`, the schema for that file permits no other value, and check 12 fails
+if any of them ever appears in `data/vocabulary/`. Locked decision 14 reserves official
+words for the Phase 2 pipeline, which must re-derive any of these it wants rather than copy
+them.
+
+`pytest` reports **1909 passed** (`.venv\Scripts\python.exe -m pytest`), up from 978 after
+Phase 1A. Most of the growth is parametrised: each of the 216 examples is checked four
+ways. All 33 declared morphemes sit in rules of category `particle` (13), `morphology` (8
+rules declaring 11 suffixes), `pronoun` (2) and `politeness` (1); no rule filed under
+`syntax` declares a form, which is asserted rather than assumed.
 
 ## Phase 1A results
 
@@ -171,8 +282,34 @@ Honest list of things written but not actually demonstrated:
 - **Installing from `requirements.txt` on Windows.** The clean install is verified on the CI
   runner's Ubuntu + Python 3.11 only; the local pins were read back from an already-populated
   `.venv`, so a from-scratch install on Windows has not been run.
-- **CI on the Phase 1A commit.** The numbers above are from a local run on Python 3.11.9.
-  Phase 0's CI run #1 was green on commit `5f47648`; Phase 1A has not been pushed.
+- **CI on the Phase 1A and 1B commits.** All numbers above are from local runs on Python
+  3.11.9. Phase 0's CI run #1 was green on commit `5f47648`; nothing since has been pushed.
+- **Invalid examples are author-asserted.** The 108 invalid examples are labelled
+  ungrammatical by me, with a reason each. Nothing *proves* they are: the rule-based grammar
+  checker that could reject them is Phase 4. What the checks do prove is that each is a
+  legal Tanese word sequence, spelled consistently with the script, tokenizable, and not
+  claimed valid by any other rule. Until Phase 4 runs over them, "invalid" means "I say so,
+  with a reason".
+- **Contradictions that live only in prose.** Checks 5 and 6 compare example strings. Two
+  rules whose `description` or `reason` disagree, while their examples do not overlap, will
+  pass. Only the declared forms, slots, slot order and `asserts` keys are compared
+  semantically; the prose is not.
+- **The originality list is not exhaustive.** `_originality.yaml` holds the 61 Japanese and
+  Tamil forms I could enumerate by hand, with a source and gloss each. A Tanese form that
+  passes check 9 is *not* thereby proven absent from Japanese or Tamil, let alone from any
+  third language — the check proves only that no listed form was reused. The `unspellable`
+  flags in that file are verified against the phonotactic validator; the list's coverage is
+  not verified at all.
+- **The grammar has not been used.** No corpus, no conversation and no translation has been
+  written in Tanese, so whether these 54 rules are usable together — rather than merely
+  non-contradictory — is unknown. That is what Phase 3 is for. Three gaps are already known
+  and recorded in the rules' own `problems` fields: a topicalised argument loses its
+  relation (GR-PART-009), an embedded yes/no question has no form (GR-Q-004), and a
+  negative desiderative has no form (GR-TAM-005).
+- **The demo wordlist has had no collision checking.** The 41 placeholder roots were checked
+  for phonotactic legality and exact duplication only. The collision detector (exact,
+  phonetic, orthographic, semantic) is Phase 2, so two of them may well be confusably
+  similar.
 - **The glyph shapes.** `spec/script.yaml` describes each atom's shape in prose and reserves a
   PUA codepoint per mora, but nothing has been rendered — there is no SVG, no font and no
   image anywhere in the repo. Whether the 86 glyphs are actually legible, and in particular
@@ -181,9 +318,14 @@ Honest list of things written but not actually demonstrated:
 - **Pronounceability.** The phonology is argued from general phonetics (which consonants can
   be audibly held, which contrasts a speaker could learn), not tested with speakers. No one
   has spoken Tanese.
-- Everything from Phase 1B onward: grammar rules, vocabulary, corpus, tokenizer,
-  morphological analyzer, grammar checker, embeddings, RAG, translation, the web app, and all
-  evaluation numbers. None of it exists yet.
+- **The segmenter used by the checks is naive.** `contradictions.legal_readings()` strips
+  declared suffixes with backtracking and asks whether a demo root is left. It has no notion
+  of productivity, semantics or ambiguity resolution, and it is not the morphological
+  analyzer — that is Phase 4. It is good enough to catch a typo or an undeclared form in an
+  example, which is all it is used for.
+- Everything from Phase 1C onward: the generated language specification, vocabulary, corpus,
+  tokenizer, morphological analyzer, grammar checker, embeddings, RAG, translation, the web
+  app, and all evaluation numbers. None of it exists yet.
 
 ## Evaluation and honesty notes
 

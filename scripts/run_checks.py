@@ -24,6 +24,7 @@ STEPS: list[tuple[str, list[str]]] = [
     ("lint", [sys.executable, "-m", "ruff", "check", "."]),
     ("tests", [sys.executable, "-m", "pytest"]),
     ("yaml-schema", [sys.executable, str(REPO_ROOT / "scripts" / "check_yaml_schema.py")]),
+    ("grammar", [sys.executable, str(REPO_ROOT / "scripts" / "check_grammar.py")]),
 ]
 
 

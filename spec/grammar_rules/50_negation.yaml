@@ -1,0 +1,208 @@
+# Negation. Negation occupies the MOOD slot, so LOCKED decision 6 is unchanged -- and
+# prohibition and negative conditionals are therefore analytic. That asymmetry is stated in
+# the `problems` field of GR-NEG-003 and GR-NEG-004 rather than hidden.
+
+- id: GR-NEG-001
+  category: morphology
+  name: verb negation
+  description: >-
+    The mood suffix `-nhi` negates the verb. It follows tense and precedes politeness, and
+    the tense suffix is required before it.
+  reason: >-
+    LOCKED decision 6 fixes the slots as root-aspect-tense-mood-politeness, with no slot for
+    negation. Of the three places negation could then go -- a mood suffix, a new slot
+    (amending a locked decision), or a negative auxiliary word (which GR-VERB-001 forbids) --
+    the mood slot is the only one that changes nothing locked. Negation is declared
+    `tense: required` because "did not eat" and "does not eat" are distinct and both needed.
+  alternatives: >-
+    A dedicated negation slot between root and aspect, which would make negation combine
+    freely with every aspect and mood and remove the analytic forms below entirely. It was
+    considered and rejected for v0.1 because it amends LOCKED decision 6; if the analytic
+    forms prove unworkable in Phase 3 corpus work, that is the change to propose in
+    docs/CHANGES.md.
+  problems: >-
+    Sharing a slot with the moods means negation cannot co-occur with any of them: there is
+    no negative conditional, no prohibitive and no negative desiderative inside the verb.
+    Two of the three are rescued analytically (GR-NEG-003, GR-NEG-004); "does not want to"
+    is simply not expressible in v0.1.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese negative suffix -nai, which fuses with tense (-nakatta).
+    how_modified: >-
+      Tanese keeps negation suffixal but not fused: tense and negation stay in separate
+      slots, so `mandu-dho-nhi` is transparently past plus negative. `-nai` is banned in
+      _originality.yaml.
+  pattern: "ROOT [ASPECT] TENSE + -nhi [POLITENESS]"
+  morphemes:
+    - form: nhi
+      slot: mood
+      function: negative
+      kind: suffix
+      word_class: verb
+      tense: required
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NHI
+      roman: ano dhen sedha do mandukenhi
+      english: I do not eat the food.
+      gloss: mandu-ke-nhi / eat-NPST-NEG
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NE.TS-GEM.TS-BO TS-I.TS-GEM.TS-KE.TS-DHO.TS-NHI.TS-SU.TS-NASAL
+      roman: uthe dhen nebbo ikkedhonhisun
+      english: He did not go yesterday. (formal)
+      gloss: ikke-dho-nhi-sun / go-PST-NEG-FORMAL
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-NHI
+      roman: ano dhen sedha do mandunhi
+      why: >-
+        Negation with no tense suffix. `-nhi` is declared `tense: required`, so the form must
+        be `mandukenhi` or `mandudhonhi`.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-NHI.TS-KE
+      roman: ano dhen sedha do mandunhike
+      why: >-
+        Negation precedes tense. Mood follows tense in the fixed slot order (GR-VERB-003).
+  status: official
+  since: v0.1
+
+- id: GR-NEG-002
+  category: syntax
+  name: copula negation
+  description: >-
+    The copula is negated exactly like any other verb, by `-nhi` in its mood slot. There is
+    no separate negative existential word.
+  reason: >-
+    GR-VERB-005 makes the copula an ordinary verb, so it needs no negation rule of its own --
+    this rule exists to say so explicitly, because both source languages do have a special
+    negative existential and a reader will expect one.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      The Tamil negative existential illai, a separate word rather than an inflected copula.
+    how_modified: >-
+      Not taken: Tanese inflects the copula instead, and `illai` is listed in
+      _originality.yaml so no particle can reuse the form.
+  pattern: "NP dhen NP esu+TENSE+-nhi [POLITENESS]"
+  valid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE.TS-NHI
+      roman: uthe dhen nanthe esukenhi
+      english: He is not a friend.
+      gloss: esu-ke-nhi / be-NPST-NEG
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-WI.TS-RO TS-E.TS-SU.TS-DHO.TS-NHI.TS-MI
+      roman: ano dhen wiro esudhonhimi
+      english: I was not a person. (neutral politeness)
+  invalid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NHI
+      roman: uthe dhen nanthe nhi
+      why: >-
+        The negation suffix is written as a separate negative word. `-nhi` is a suffix, and
+        the copula may not be dropped (GR-VERB-005).
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-NHI.TS-KE
+      roman: uthe dhen nanthe esunhike
+      why: Mood precedes tense, against the fixed slot order (GR-VERB-003).
+  status: official
+  since: v0.1
+
+- id: GR-NEG-003
+  category: particle
+  name: prohibitive (analytic)
+  description: >-
+    A negative command is the negated non-past verb followed by the clause-final particle
+    `thon`. The verb takes no imperative suffix, and politeness stays on the verb.
+  reason: >-
+    The imperative `-so` and negation `-nhi` both sit in the mood slot (LOCKED decision 6),
+    so one word cannot carry both. Rather than amend a locked decision, the prohibitive is
+    built from the pieces that do exist: a negated verb, plus a particle that marks the
+    clause as a command. The non-past is used because a command is never about the past.
+  problems: >-
+    "The positive counterpart is one word and the negative is two. The asymmetry follows from
+    LOCKED decision 6 giving negation and mood the same slot; it is a real wart, not a design
+    feature, and a learner has to memorise that negating an imperative changes the word
+    count."
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese prohibitive, formed with a sentence-final particle (na) or an analytic
+      construction (-nai de kudasai).
+    how_modified: >-
+      The analytic strategy is kept and the forms are not: Japanese `na` is banned in
+      _originality.yaml. Unlike Japanese, Tanese has only one prohibitive, with politeness
+      carried by the verb's own suffix.
+  pattern: "... V+TENSE+-nhi [POLITENESS] + thon"
+  morphemes:
+    - form: thon
+      slot: clause
+      function: prohibitive
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NHI TS-THO.TS-NASAL
+      roman: sedha do mandukenhi thon
+      english: Do not eat the food.
+      gloss: "... mandu-ke-nhi thon / ... eat-NPST-NEG PROH"
+    - tanese: TS-NA.TS-MI TS-BA.TS-NASAL TS-THA.TS-MU.TS-KE.TS-NHI.TS-SU.TS-NASAL TS-THO.TS-NASAL
+      roman: nami ban thamukenhisun thon
+      english: Do not sleep in the house. (formal)
+  invalid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-SO.TS-NHI TS-THO.TS-NASAL
+      roman: sedha do mandusonhi thon
+      why: >-
+        Imperative and negation stacked in the mood slot. The prohibitive uses the plain
+        negated verb, with no `-so`.
+    - tanese: TS-SE.TS-DHA TS-DO TS-THO.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NHI
+      roman: sedha do thon mandukenhi
+      why: >-
+        The prohibitive particle precedes the verb. Clause particles close the clause
+        (GR-ORD-005).
+  status: official
+  since: v0.1
+
+- id: GR-NEG-004
+  category: particle
+  name: negative conditional (analytic)
+  description: >-
+    A negative "if" clause is the negated verb followed by the clause-final particle `lun`.
+    The conditional suffix `-bo` is not used, and the clause precedes the main clause.
+  reason: >-
+    Same cause as the prohibitive: `-bo` and `-nhi` compete for the mood slot. `lun` closes
+    the subordinate clause in the same position `-bo` would have occupied, so the word order
+    is unchanged and only the word count differs.
+  problems: >-
+    "The positive counterpart is one word and the negative is two. The asymmetry follows from
+    LOCKED decision 6 giving negation and mood the same slot; it is a real wart, not a design
+    feature, and a learner has to memorise that negating a conditional changes the word
+    count."
+  inspiration:
+    source: none
+    original_feature: >-
+      Tamil negates a conditional with a dedicated negative conditional form; Japanese uses
+      -nakereba, a fused negative plus conditional.
+    how_modified: >-
+      Neither is available, both being fusional: Tanese has no morphophonemics (GR-VERB-001),
+      so the construction is analytic instead.
+  pattern: "[... V+TENSE+-nhi + lun] MAIN_CLAUSE"
+  morphemes:
+    - form: lun
+      slot: clause
+      function: negative_conditional
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO.TS-NHI TS-LU.TS-NASAL TS-A.TS-NO TS-DHE.TS-NASAL TS-NHO.TS-RU.TS-DHO
+      roman: uthe dhen ikkedhonhi lun ano dhen nhorudho
+      english: If he did not go, I came.
+      gloss: "[ikke-dho-nhi lun] ... / [go-PST-NEG NEG.COND] ..."
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NHI TS-LU.TS-NASAL TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE.TS-LE
+      roman: iri dhen sedha do mandukenhi lun ano dhen mandukele
+      english: If you do not eat the food, I want to eat it.
+  invalid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO.TS-NHI.TS-BO TS-A.TS-NO TS-DHE.TS-NASAL TS-NHO.TS-RU.TS-DHO
+      roman: uthe dhen ikkedhonhibo ano dhen nhorudho
+      why: >-
+        Negation and the conditional suffix stacked in the mood slot. The negative
+        conditional is analytic, with `lun`.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NHO.TS-RU.TS-DHO TS-U.TS-THE TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO.TS-NHI TS-LU.TS-NASAL
+      roman: ano dhen nhorudho uthe dhen ikkedhonhi lun
+      why: >-
+        The conditional clause follows the main clause. A subordinate clause is a modifier
+        and precedes what it modifies (GR-ORD-003).
+  status: official
+  since: v0.1

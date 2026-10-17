@@ -1,0 +1,34 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gnanakamalesh-M/tanese/spec/schemas/originality.schema.json",
+  "title": "Tanese banned-form list",
+  "description": "Japanese and Tamil particles, case endings, verbal endings and honorifics that a Tanese morpheme may not equal. The machine-readable side of LOCKED decision 3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "banned"],
+  "properties": {
+    "version": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+$" },
+    "banned": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["form", "source", "gloss"],
+        "properties": {
+          "form": {
+            "type": "string",
+            "pattern": "^[a-z']+$",
+            "description": "The source-language form in a lowercase ASCII transliteration, compared to Tanese morphemes by whole-form equality."
+          },
+          "source": { "enum": ["japanese", "tamil"] },
+          "gloss": { "type": "string", "minLength": 1 },
+          "unspellable": {
+            "type": "boolean",
+            "description": "True when the form cannot be written in the Tanese romanization at all, so no Tanese morpheme could collide with it. Not a free claim: a check asserts this field agrees with the phonotactic validator for every entry."
+          }
+        }
+      }
+    }
+  }
+}

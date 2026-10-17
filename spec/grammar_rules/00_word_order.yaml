@@ -1,0 +1,287 @@
+# Word order and the definition of "word". Derived from LOCKED decisions 1-3.
+# The `tanese` field of every example is generated from `roman` by the script converter
+# (tanese_nlp.script.convert.roman_to_script); it is never hand-typed.
+
+- id: GR-ORD-001
+  category: word_order
+  name: word boundary
+  description: >-
+    A root and its suffixes are written solid as one word. Every particle is its own word.
+    Words are separated by exactly one space, and nothing else separates them.
+  reason: >-
+    LOCKED decision 2 makes the morphology suffixing and LOCKED decision 3 makes relations
+    postpositional, which leaves one thing undecided: whether a postposition is a clitic on
+    its noun or a separate word. It is a separate word here because that is the only choice
+    that keeps the phonotactic validator usable as-is: constraint PT-004 lets a word end
+    only in a vowel or `n`, and every particle does, so a particle is a legal word on its
+    own. Writing `nami do` as `namido` would also make the particle invisible to a tokenizer
+    without a morphological pass, which Phase 4 would then have to pay for.
+  alternatives: >-
+    Write particles attached, as Tamil case endings and Japanese kana orthography do. It
+    yields one word per noun phrase and is arguably more natural for an agglutinative
+    language, but it collapses the boundary between a case ending and a derivational suffix,
+    and it would force the Phase 4 tokenizer to be a morphological analyzer before it can
+    split anything at all.
+  problems: >-
+    An agglutinative language whose case markers are separate words is unusual, and a
+    speaker used to Tamil or Japanese will write `namido` by habit. The error is caught, but
+    it will be the single most common mistake a learner makes.
+  inspiration:
+    source: none
+    original_feature: >-
+      Neither source language writes case markers as free words: Tamil suffixes them, and
+      Japanese writes particles without spaces at all.
+    how_modified: >-
+      Tanese takes the postpositional syntax from both and the spacing from neither; the
+      space is chosen for tooling reasons, which are stated rather than dressed up as a
+      linguistic argument.
+  pattern: "ROOT+SUFFIX* (space PARTICLE)*"
+  word_boundary:
+    suffixes_attached: true
+    particles_separate: true
+    separator: " "
+  asserts:
+    requires: [word.suffixes_attached, word.particles_separate]
+  valid:
+    - tanese: TS-I.TS-GEM.TS-KE.TS-DHO.TS-SU.TS-NASAL
+      roman: ikkedhosun
+      english: (someone) went (formal)
+      gloss: ikke-dho-sun / go-PST-FORMAL -- one word, three morphemes
+    - tanese: TS-NA.TS-MI TS-DO
+      roman: nami do
+      english: the house (as object)
+      gloss: nami do / house OBJ -- two words, because `do` is a particle
+  invalid:
+    - tanese: TS-I.TS-GEM.TS-KE.TS-DHO TS-SU.TS-NASAL
+      roman: ikkedho sun
+      why: >-
+        The politeness suffix is split off its verb. Suffixes are attached, so `sun` is not a
+        word; it is the tail of `ikkedhosun`.
+    - tanese: TS-NA.TS-MI.TS-DO
+      roman: namido
+      why: >-
+        The object particle is glued to its noun. Particles are separate words, so this is
+        one unknown word rather than a marked noun phrase.
+  status: official
+  since: v0.1
+
+- id: GR-ORD-002
+  category: word_order
+  name: subject-object-verb
+  description: >-
+    The basic order of a transitive clause is subject, object, verb. The verb is last.
+  reason: >-
+    LOCKED decision 1. Stated as its own rule, with examples, so the contradiction checker
+    has something to compare the other order rules against.
+  inspiration:
+    source: tamil
+    original_feature: Both Tamil and Japanese are SOV.
+    how_modified: >-
+      Taken unchanged; it is the one major typological choice the two source languages
+      already agree on, so there was nothing to reconcile.
+  pattern: "S O V"
+  asserts:
+    requires: [clause.verb_final]
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen sedha do manduke
+      english: I eat food.
+      gloss: ano dhen sedha do mandu-ke / I SUBJ food OBJ eat-NPST
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-DHO
+      roman: uthe dhen bunko do rubodho
+      english: He read the book.
+      gloss: uthe dhen bunko do rubo-dho / he SUBJ book OBJ read-PST
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE TS-SE.TS-DHA TS-DO
+      roman: ano dhen manduke sedha do
+      why: >-
+        The verb precedes the object. Tanese is verb-final, so nothing may follow the main
+        verb except a clause particle.
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-KE TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO
+      roman: manduke ano dhen sedha do
+      why: Verb-initial order. The verb must close the clause.
+  status: official
+  since: v0.1
+
+- id: GR-ORD-003
+  category: word_order
+  name: modifier before head
+  description: >-
+    Every modifier precedes its head: numeral before noun, adjectival noun before noun,
+    adverb before verb, genitive phrase before the noun it possesses.
+  reason: >-
+    LOCKED decision 1 makes Tanese head-final. Applying that consistently to every modifier
+    type means there is one order to learn rather than one per construction, and it is what
+    makes the relative clause rule (GR-ORD-006) a special case of a general pattern instead
+    of an exception.
+  inspiration:
+    source: none
+    original_feature: Head-final modification is shared by Tamil and Japanese.
+    how_modified: >-
+      Taken as a general principle and applied without exception, where both source
+      languages have some post-head constructions.
+  pattern: "MODIFIER HEAD"
+  valid:
+    - tanese: TS-SO.TS-LU TS-BU.TS-NASAL.TS-KO
+      roman: solu bunko
+      english: three books
+      gloss: solu bunko / three book
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-THU.TS-RI TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano dhen thuri ikkeke
+      english: I go quickly.
+      gloss: ano dhen thuri ikke-ke / I SUBJ quickly go-NPST
+  invalid:
+    - tanese: TS-BU.TS-NASAL.TS-KO TS-SO.TS-LU
+      roman: bunko solu
+      why: >-
+        The numeral follows the noun. A modifier precedes its head, so this reads as two
+        unrelated noun phrases.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE TS-THU.TS-RI
+      roman: ano dhen ikkeke thuri
+      why: >-
+        The adverb follows the verb. Nothing may follow the main verb except a clause
+        particle, and an adverb is not one.
+  status: official
+  since: v0.1
+
+- id: GR-ORD-004
+  category: word_order
+  name: argument order is free under particle marking
+  description: >-
+    Because every argument carries its own relation particle, arguments may be reordered
+    before the verb without changing who did what. Reordering changes emphasis only.
+  reason: >-
+    If the particles carry the relations, then position is free information, and forbidding
+    reordering would be a rule with nothing behind it. Making it explicit also tells the
+    Phase 4 grammar checker not to flag a non-canonical order as an error.
+  alternatives: >-
+    Require rigid S-O-V. Rejected: it would make the subject particle redundant in the
+    default order, and a redundant marker on the most frequent constituent in the language
+    is a design smell.
+  problems: >-
+    It makes word order unusable as a cue for the Phase 4 checker and for any statistical
+    model: an argument's position predicts nothing, so everything rests on the particles.
+    Drop a particle (which GR-PART-012 permits nowhere) and the sentence is unparseable.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese scrambling: particle-marked arguments can be reordered before the verb.
+    how_modified: >-
+      Kept, but with no topic-position exception -- the topic particle `belu` has its own
+      rule (GR-PART-009) and is not tied to first position by this one.
+  pattern: "ARG* V, where each ARG is NP + particle"
+  asserts:
+    requires: [clause.verb_final]
+    forbids: [clause.order_carries_role]
+  valid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: sedha do ano dhen manduke
+      english: I eat food. (object first, emphasis on the food)
+    - tanese: TS-NA.TS-NASAL.TS-THE TS-THI.TS-NASAL TS-A.TS-NO TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-DHE.TS-LO.TS-DHO
+      roman: nanthe thin ano dhen bunko do dhelodho
+      english: I gave the book to a friend. (recipient first)
+  invalid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE TS-A.TS-NO TS-DHE.TS-NASAL
+      roman: sedha do manduke ano dhen
+      why: >-
+        Free order applies only before the verb. Here the subject follows the verb, which
+        GR-ORD-002 forbids.
+    - tanese: TS-A.TS-NO TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano sedha do manduke
+      why: >-
+        The subject has lost its particle. Order is free only because the particles carry
+        the relations, so an unmarked argument is not licensed by this rule.
+  status: official
+  since: v0.1
+
+- id: GR-ORD-005
+  category: word_order
+  name: clause particles close the clause
+  description: >-
+    The question, prohibitive, negative-conditional and quotative particles stand after the
+    verb, at the very end of their clause. They are the only words that may follow a verb.
+  reason: >-
+    Verb-finality (LOCKED decision 1) is about arguments and modifiers. A particle that
+    marks the whole clause has to attach somewhere, and clause-finally is the only position
+    that scopes over the entire clause in a head-final language. This rule is what makes
+    "nothing follows the verb" precise rather than false.
+  inspiration:
+    source: japanese
+    original_feature: Japanese sentence-final particles (ka, ne, yo) follow the verb.
+    how_modified: >-
+      Tanese keeps the position but not the forms (LOCKED decision 3; the Japanese forms are
+      in spec/grammar_rules/_originality.yaml), and restricts the set to particles with a
+      grammatical function -- there are no attitude or emphasis particles in v0.1.
+  pattern: "... V CLAUSE_PARTICLE"
+  valid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WE.TS-NASAL
+      roman: iri dhen sedha do mandudho wen
+      english: Did you eat the food?
+      gloss: ... mandu-dho wen / ... eat-PST Q
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NHI TS-THO.TS-NASAL
+      roman: iri dhen mandukenhi thon
+      english: Do not eat.
+      gloss: ... mandu-ke-nhi thon / ... eat-NPST-NEG PROH
+  invalid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-WE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: iri dhen wen sedha do mandudho
+      why: >-
+        The question particle sits inside the clause. A clause particle scopes over the whole
+        clause and must follow the verb.
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WE.TS-NASAL TS-THO.TS-NASAL
+      roman: iri dhen mandudho wen thon
+      why: >-
+        Two clause particles stacked. A clause takes at most one, since question and
+        prohibition are different clause types, not combinable features.
+  status: official
+  since: v0.1
+
+- id: GR-ORD-006
+  category: word_order
+  name: relative clause before its head
+  description: >-
+    A relative clause precedes the noun it modifies. Its verb takes the ordinary finite
+    suffixes, and there is no relative pronoun and no complementiser.
+  reason: >-
+    This is GR-ORD-003 (modifier before head) applied to a clause-sized modifier. No
+    relative pronoun is needed because the head noun's role inside the clause is recoverable
+    from which particle is missing there, and adding one would duplicate that information.
+  alternatives: >-
+    A dedicated participial suffix on the relative verb, as Tamil has. Rejected for v0.1:
+    it would add a sixth verb slot (or overload the mood slot) for information the position
+    already gives, and LOCKED decision 6 is not worth amending for it.
+  problems: >-
+    A relative clause and a main clause are then formally identical, so `sedha do mandudho
+    wiro` is parsed as a relative clause only because a bare noun follows the verb. Nested
+    relatives would be genuinely ambiguous; v0.1 does not say what happens then, and the
+    Phase 1C spec must list that as an open question.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese pre-nominal relative clauses with no relative pronoun and a finite verb.
+    how_modified: >-
+      Kept, minus the Japanese distinction between attributive and conclusive verb forms;
+      Tanese uses one finite form in both positions.
+  pattern: "[CLAUSE] HEAD_NOUN"
+  valid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WI.TS-RO
+      roman: sedha do mandudho wiro
+      english: the person who ate the food
+      gloss: "[sedha do mandu-dho] wiro / [food OBJ eat-PST] person"
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-WE.TS-SU.TS-DHO TS-KI.TS-NHU
+      roman: ano dhen wesudho kinhu
+      english: the bird I saw
+      gloss: "[ano dhen wesu-dho] kinhu / [I SUBJ see-PST] bird"
+  invalid:
+    - tanese: TS-WI.TS-RO TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: wiro sedha do mandudho
+      why: >-
+        The head noun precedes the clause. Read as written this is an ordinary main clause
+        with `wiro` as an unmarked argument, not a relative construction.
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WE.TS-NASAL TS-WI.TS-RO
+      roman: sedha do mandudho wen wiro
+      why: >-
+        A clause particle inside a relative clause. Clause particles close a clause
+        (GR-ORD-005); a relative clause is not closed, its head follows.
+  status: official
+  since: v0.1

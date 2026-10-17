@@ -2,7 +2,7 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://github.com/Gnanakamalesh-M/tanese/spec/schemas/grammar_rule.schema.json",
   "title": "Tanese grammar rule file",
-  "description": "A list of grammar rules, per the rule file format locked in docs/SPEC.md.",
+  "description": "A list of grammar rules, per the rule file format locked in docs/SPEC.md, extended in Phase 1B with the machine-readable fields recorded in docs/CHANGES.md.",
   "type": "array",
   "minItems": 1,
   "items": {
@@ -21,19 +21,62 @@
       "status",
       "since"
     ],
+    "allOf": [
+      {
+        "description": "Rules that introduce forms must declare them machine-readably, so the contradiction checker can reason about forms instead of prose.",
+        "if": {
+          "properties": {
+            "category": { "enum": ["particle", "pronoun", "politeness"] }
+          },
+          "required": ["category"]
+        },
+        "then": { "required": ["morphemes"] }
+      },
+      {
+        "description": "A morphology rule either introduces forms (`morphemes`) or states their arrangement (`slot_order`). One of the two is mandatory: a morphology rule with neither would be prose the checker cannot read.",
+        "if": {
+          "properties": { "category": { "const": "morphology" } },
+          "required": ["category"]
+        },
+        "then": {
+          "anyOf": [{ "required": ["morphemes"] }, { "required": ["slot_order"] }]
+        }
+      }
+    ],
     "properties": {
       "id": {
         "type": "string",
         "pattern": "^GR-[A-Z]+-[0-9]{3}$",
         "description": "Unique, stable rule id, e.g. GR-PART-003."
       },
-      "category": { "type": "string", "minLength": 1 },
+      "category": {
+        "enum": [
+          "word_order",
+          "syntax",
+          "morphology",
+          "particle",
+          "pronoun",
+          "politeness",
+          "discourse"
+        ],
+        "description": "The first four of these require `morphemes` (see allOf above): morphology, particle, pronoun, politeness."
+      },
       "name": { "type": "string", "minLength": 1 },
       "description": { "type": "string", "minLength": 1 },
       "reason": {
         "type": "string",
         "minLength": 1,
         "description": "Why this design; alternatives considered."
+      },
+      "alternatives": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Designs considered and rejected. Same role as in spec/phonology.yaml."
+      },
+      "problems": {
+        "type": "string",
+        "minLength": 1,
+        "description": "Known costs and warts of this rule. Same role as in spec/phonology.yaml."
       },
       "inspiration": {
         "type": "object",
@@ -46,6 +89,77 @@
         }
       },
       "pattern": { "type": "string", "minLength": 1 },
+      "morphemes": {
+        "type": "array",
+        "minItems": 1,
+        "description": "Every form this rule introduces. Required for morphology, particle, pronoun and politeness rules.",
+        "items": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["form", "slot", "function", "kind"],
+          "properties": {
+            "form": {
+              "type": "string",
+              "pattern": "^[a-z']+$",
+              "description": "The form itself, with no leading hyphen. Must be a phonotactically legal Tanese word and must not appear in spec/grammar_rules/_originality.yaml."
+            },
+            "slot": {
+              "type": "string",
+              "minLength": 1,
+              "description": "For suffixes, one of the verb slots in `slot_order` (or `number` for the noun plural). For particles and words, a free label for the function family, e.g. `case` or `clause`."
+            },
+            "function": {
+              "type": "string",
+              "minLength": 1,
+              "description": "What the form means grammatically. (slot, function) must be claimed by exactly one form across the whole spec."
+            },
+            "kind": { "enum": ["particle", "suffix", "word"] },
+            "word_class": {
+              "enum": ["verb", "noun", "any"],
+              "description": "What this form attaches to. Suffixes of word_class `verb` must sit in a slot named by `slot_order`; a noun suffix need not."
+            },
+            "tense": {
+              "enum": ["required", "forbidden"],
+              "description": "Mood suffixes only: whether a verb carrying this mood must also carry a tense suffix. Default `required`; `forbidden` marks a tenseless mood (imperative, hortative, polite request)."
+            }
+          }
+        }
+      },
+      "slot_order": {
+        "type": "array",
+        "minItems": 2,
+        "items": { "type": "string", "minLength": 1 },
+        "description": "The verb suffix slot order this rule asserts. Every such list in the spec is merged into one partial order; a cycle or a disagreement is a contradiction."
+      },
+      "word_boundary": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["suffixes_attached", "particles_separate", "separator"],
+        "description": "Declared by exactly one rule (GR-ORD-001). It is the single definition of `word` used by the tokenizer, the phonotactic validator calls and the script conversion.",
+        "properties": {
+          "suffixes_attached": { "type": "boolean" },
+          "particles_separate": { "type": "boolean" },
+          "separator": { "type": "string", "minLength": 1 }
+        }
+      },
+      "asserts": {
+        "type": "object",
+        "additionalProperties": false,
+        "minProperties": 1,
+        "description": "Feature keys this rule requires or forbids. A key required by one rule and forbidden by another is a contradiction.",
+        "properties": {
+          "requires": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$" }
+          },
+          "forbids": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^[a-z0-9_]+(\\.[a-z0-9_]+)+$" }
+          }
+        }
+      },
       "valid": {
         "type": "array",
         "minItems": 2,
@@ -56,7 +170,12 @@
           "properties": {
             "tanese": { "type": "string", "minLength": 1 },
             "roman": { "type": "string", "minLength": 1 },
-            "english": { "type": "string", "minLength": 1 }
+            "english": { "type": "string", "minLength": 1 },
+            "gloss": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Optional morpheme-by-morpheme gloss, for examples whose structure is not obvious."
+            }
           }
         }
       },
@@ -70,7 +189,8 @@
           "properties": {
             "tanese": { "type": "string", "minLength": 1 },
             "roman": { "type": "string", "minLength": 1 },
-            "why": { "type": "string", "minLength": 1 }
+            "why": { "type": "string", "minLength": 1 },
+            "gloss": { "type": "string", "minLength": 1 }
           }
         }
       },

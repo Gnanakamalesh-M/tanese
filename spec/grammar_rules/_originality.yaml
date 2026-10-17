@@ -1,0 +1,236 @@
+# Forms Tanese may not use, v0.1 -- the machine-readable side of LOCKED decision 3
+# ("particle forms must be original: they must NOT equal common Japanese or Tamil
+# particles/case endings").
+#
+# tanese_nlp.grammar.contradictions check 9 compares every declared morpheme form against
+# this list by WHOLE-FORM EQUALITY, not substring: a particle is a word (GR-ORD-001), so
+# `thin` colliding with Tamil `in` in its last two letters is not a collision -- `thin` is
+# not the Tamil case ending, it merely contains those letters. Substring matching would ban
+# most of the mora inventory and tell us nothing.
+#
+# Forms are written in the Tanese romanization (lowercase ASCII) so the comparison is
+# mechanical. Where a source form cannot be written in it at all (Japanese `he`, `ze`:
+# Tanese has no /h/ or /z/), the entry is kept anyway with `unspellable: true` -- it costs
+# nothing and the list then reads as a complete account of the source languages rather than
+# of Tanese's accidental gaps.
+#
+# KNOWN LIMITATION, also recorded in README "Not verified": this list is hand-enumerated.
+# A form that passes check 9 is not thereby proven absent from Japanese or Tamil, let alone
+# from any third language. The check proves only that no listed form was reused.
+
+version: v0.1
+
+banned:
+  # ---- Japanese: case and focus particles -------------------------------------------
+  - form: ga
+    source: japanese
+    gloss: nominative / subject
+  - form: o
+    source: japanese
+    gloss: accusative (kana を, romanized `o`)
+  - form: wo
+    source: japanese
+    gloss: accusative (older romanization of を)
+  - form: ni
+    source: japanese
+    gloss: dative, locative, goal
+  - form: "no"
+    source: japanese
+    gloss: genitive
+  - form: de
+    source: japanese
+    gloss: instrumental, location of action
+  - form: to
+    source: japanese
+    gloss: comitative, quotative
+  - form: wa
+    source: japanese
+    gloss: topic
+  - form: mo
+    source: japanese
+    gloss: additive "also"
+  - form: kara
+    source: japanese
+    gloss: ablative "from"
+  - form: made
+    source: japanese
+    gloss: terminative "until"
+  - form: yori
+    source: japanese
+    gloss: comparative "than"
+  - form: e
+    source: japanese
+    gloss: directional (kana へ)
+  - form: he
+    source: japanese
+    gloss: directional へ, kana spelling
+    unspellable: true
+  - form: ya
+    source: japanese
+    gloss: listing "and"
+  # ---- Japanese: sentence-final and question particles ------------------------------
+  - form: ka
+    source: japanese
+    gloss: question particle
+  - form: kai
+    source: japanese
+    gloss: casual question particle
+    unspellable: true
+  - form: ne
+    source: japanese
+    gloss: confirmation-seeking final particle
+  - form: yo
+    source: japanese
+    gloss: assertive final particle
+  - form: na
+    source: japanese
+    gloss: final particle; also the casual prohibitive
+  - form: sa
+    source: japanese
+    gloss: assertive final particle
+  - form: ze
+    source: japanese
+    gloss: assertive final particle
+    unspellable: true
+  - form: zo
+    source: japanese
+    gloss: assertive final particle
+    unspellable: true
+  # ---- Japanese: honorifics and address suffixes ------------------------------------
+  # Not particles in the strict sense, but they attach to a noun and are the single most
+  # recognisable piece of Japanese morphology there is. A Tanese particle that equals one
+  # would read as borrowed no matter what the spec says.
+  - form: san
+    source: japanese
+    gloss: neutral honorific
+  - form: sama
+    source: japanese
+    gloss: deferential honorific
+  - form: kun
+    source: japanese
+    gloss: familiar honorific (typically for juniors)
+  - form: chan
+    source: japanese
+    gloss: affectionate honorific
+    unspellable: true
+  # ---- Japanese: verbal endings ------------------------------------------------------
+  - form: ta
+    source: japanese
+    gloss: past
+  - form: te
+    source: japanese
+    gloss: gerund / linking form
+  - form: nai
+    source: japanese
+    gloss: negative
+    unspellable: true
+  - form: masu
+    source: japanese
+    gloss: polite non-past
+  - form: desu
+    source: japanese
+    gloss: polite copula
+  - form: ba
+    source: japanese
+    gloss: conditional
+  # ---- Tamil: case endings -----------------------------------------------------------
+  - form: ai
+    source: tamil
+    gloss: accusative -ai
+    unspellable: true
+  - form: ukku
+    source: tamil
+    gloss: dative -ukku
+  - form: ku
+    source: tamil
+    gloss: dative -ku
+  - form: in
+    source: tamil
+    gloss: oblique / genitive -in
+  - form: udaiya
+    source: tamil
+    gloss: genitive -udaiya
+    unspellable: true
+  - form: il
+    source: tamil
+    gloss: locative -il
+    unspellable: true
+  - form: ile
+    source: tamil
+    gloss: locative -ile
+  - form: aal
+    source: tamil
+    gloss: instrumental -aal
+    unspellable: true
+  - form: oodu
+    source: tamil
+    gloss: comitative -oodu
+  - form: udan
+    source: tamil
+    gloss: comitative -udan
+  - form: iliruntu
+    source: tamil
+    gloss: ablative -iliruntu
+  # ---- Tamil: plural, clitics and final particles ------------------------------------
+  - form: kal
+    source: tamil
+    gloss: plural -kaL
+    unspellable: true
+  - form: gal
+    source: tamil
+    gloss: plural -kaL, voiced spelling
+    unspellable: true
+  - form: aa
+    source: tamil
+    gloss: question clitic -aa
+  - form: oo
+    source: tamil
+    gloss: doubt / alternative clitic -oo
+  - form: maa
+    source: tamil
+    gloss: colloquial address particle -maa
+  - form: thaan
+    source: tamil
+    gloss: emphatic -thaan
+  - form: da
+    source: tamil
+    gloss: colloquial familiar address particle -da
+  - form: nga
+    source: tamil
+    gloss: colloquial polite address particle -nga
+    unspellable: true
+  - form: ennu
+    source: tamil
+    gloss: quotative -ennu
+  - form: endru
+    source: tamil
+    gloss: quotative -endru
+    unspellable: true
+  - form: varai
+    source: tamil
+    gloss: terminative "until"
+    unspellable: true
+  - form: kitta
+    source: tamil
+    gloss: colloquial "at, near (a person)"
+  # ---- Tamil: very common words that a particle must not be homophonous with ---------
+  # A grammatical particle is high-frequency by definition. If it happens to be an ordinary
+  # Tamil word, every Tamil speaker reads the language as borrowed, which is the outcome
+  # LOCKED decision 3 exists to prevent.
+  - form: po
+    source: tamil
+    gloss: verb "go" (pō) -- rejected as the yes/no question particle for this reason
+  - form: naan
+    source: tamil
+    gloss: pronoun "I"
+  - form: nee
+    source: tamil
+    gloss: pronoun "you"
+  - form: vaa
+    source: tamil
+    gloss: verb "come"
+    unspellable: true
+  - form: illai
+    source: tamil
+    gloss: negative existential "is not"
+    unspellable: true

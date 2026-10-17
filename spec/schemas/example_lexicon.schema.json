@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gnanakamalesh-M/tanese/spec/schemas/example_lexicon.schema.json",
+  "title": "Tanese grammar-example demo wordlist",
+  "description": "Words that exist only to fill slots in grammar examples. Not vocabulary: LOCKED decisions 14-15 reserve official vocabulary for the Phase 2 pipeline and a separate file, which is why `status` here has exactly one permitted value.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "words"],
+  "properties": {
+    "version": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+$" },
+    "words": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["form", "class", "gloss", "status"],
+        "properties": {
+          "form": {
+            "type": "string",
+            "pattern": "^[a-z']+$",
+            "description": "Citation form in the romanization. Legality is checked by the phonotactic validator, not by this pattern."
+          },
+          "class": {
+            "enum": ["noun", "verb", "copula", "pronoun", "numeral", "adverb", "interrogative"]
+          },
+          "gloss": { "type": "string", "minLength": 1 },
+          "status": {
+            "const": "experimental",
+            "description": "The only permitted value. `official` is unrepresentable here by design."
+          }
+        }
+      }
+    }
+  }
+}

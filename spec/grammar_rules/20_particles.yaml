@@ -1,0 +1,576 @@
+# Relation particles. Derived from LOCKED decision 3: postpositions after the noun, with
+# forms that must not equal any common Japanese or Tamil particle or case ending. Every form
+# below is checked against spec/grammar_rules/_originality.yaml by check 9 of
+# tanese_nlp.grammar.contradictions, and against the phonotactic validator by check 7.
+#
+# The eight case particles share a design: each is one or two moras, ends in a vowel or `n`
+# (so it is a legal word on its own, GR-ORD-001), and no two differ in one feature only --
+# `dhen`/`do`/`thin`/`lu`/`ban`/`sen`/`nhu`/`kodhu` are pairwise distinct in both onset and
+# rhyme. That is deliberate: these are the highest-frequency words in the language, and a
+# minimal pair among them would be the worst possible place for a perception error.
+
+- id: GR-PART-001
+  category: particle
+  name: subject particle
+  description: The particle `dhen` follows a noun phrase to mark it as the subject.
+  reason: >-
+    LOCKED decision 4 removes verb agreement, so the verb says nothing about its subject;
+    the particle is then the only thing that identifies it, and it cannot be optional
+    (GR-PART-012). The retroflex onset was chosen because this is the most frequent particle
+    in the language and the retroflex series is the inventory's most distinctive feature.
+  inspiration:
+    source: japanese
+    original_feature: The Japanese nominative particle ga.
+    how_modified: >-
+      Only the function is taken. `ga` is banned by _originality.yaml, and so is the
+      near-miss `ge` that an earlier draft of this rule used: one vowel from `ga` is too
+      close for the language's commonest word.
+  pattern: "NP + dhen"
+  morphemes:
+    - form: dhen
+      slot: case
+      function: subject
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano dhen ikkeke
+      english: I go.
+      gloss: ano dhen ikke-ke / I SUBJ go-NPST
+    - tanese: TS-RI.TS-GEM.TS-KA TS-DHE.TS-NASAL TS-THA.TS-MU.TS-DHO
+      roman: rikka dhen thamudho
+      english: The dog slept.
+  invalid:
+    - tanese: TS-DHE.TS-NASAL TS-A.TS-NO TS-I.TS-GEM.TS-KE.TS-KE
+      roman: dhen ano ikkeke
+      why: The particle precedes its noun. Particles are postpositions (LOCKED decision 3).
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-RI.TS-GEM.TS-KA TS-DHE.TS-NASAL TS-THA.TS-MU.TS-DHO
+      roman: ano dhen rikka dhen thamudho
+      why: >-
+        Two subjects marked in one clause. A clause has one subject, so two `dhen` phrases
+        leave the verb with no way to choose between them.
+  status: official
+  since: v0.1
+
+- id: GR-PART-002
+  category: particle
+  name: object particle
+  description: The particle `do` follows a noun phrase to mark it as the direct object.
+  reason: >-
+    With free argument order (GR-ORD-004) the object cannot be identified by position, so it
+    needs its own marker. `do` is the shortest form in the set because the object is the
+    second most frequent marked argument and brevity is worth most where frequency is
+    highest.
+  inspiration:
+    source: japanese
+    original_feature: The Japanese accusative particle o / wo.
+    how_modified: >-
+      Function only; both `o` and `wo` are banned by _originality.yaml, as is Tamil `-ai`.
+  pattern: "NP + do"
+  morphemes:
+    - form: do
+      slot: case
+      function: object
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen sedha do manduke
+      english: I eat food.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-SI.TS-GEM.TS-PA.TS-DHO
+      roman: uthe dhen bunko do sippadho
+      english: He wrote a book.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-DO TS-SE.TS-DHA TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen do sedha manduke
+      why: The object particle precedes its noun instead of following it.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen sedha do do manduke
+      why: >-
+        The particle is doubled. One particle marks one relation; a repeated particle marks
+        nothing further.
+  status: official
+  since: v0.1
+
+- id: GR-PART-003
+  category: particle
+  name: dative and goal particle
+  description: >-
+    The particle `thin` marks the recipient of a transfer and the goal of motion -- the
+    indirect object and the destination are the same case.
+  reason: >-
+    Recipient and destination are the same relation seen twice ("give a book to a friend",
+    "go to the city"), and splitting them would mean two particles a learner has to choose
+    between on semantic grounds the grammar does not otherwise care about.
+  problems: >-
+    Merging them makes `teku thin ikkeke` ("go to school") and `nanthe thin dhelodho` ("give
+    to a friend") formally identical, so a semantic-role labeller in a later phase cannot
+    tell goal from recipient without the verb. That is acceptable only because the verb is
+    always present.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese particle ni, which likewise covers both recipient and goal.
+    how_modified: >-
+      The merged function is kept; the form is not, `ni` being banned, along with Tamil
+      `-ukku` and `-ku`.
+  pattern: "NP + thin"
+  morphemes:
+    - form: thin
+      slot: case
+      function: dative_goal
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-THI.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-DHE.TS-LO.TS-DHO
+      roman: ano dhen nanthe thin bunko do dhelodho
+      english: I gave the book to a friend.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE
+      roman: uthe dhen teku thin ikkeke
+      english: He goes to school.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-THI.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-BU.TS-NASAL.TS-KO TS-DO TS-DHE.TS-LO.TS-DHO
+      roman: ano dhen thin nanthe bunko do dhelodho
+      why: The particle precedes its noun.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-THI.TS-NASAL TS-DO TS-BU.TS-NASAL.TS-KO TS-DHE.TS-LO.TS-DHO
+      roman: ano dhen nanthe thin do bunko dhelodho
+      why: >-
+        Two case particles on one noun phrase, `thin` then `do`. A noun phrase bears exactly
+        one relation (GR-PART-013).
+  status: official
+  since: v0.1
+
+- id: GR-PART-004
+  category: particle
+  name: genitive particle
+  description: >-
+    The particle `lu` follows a possessor, and the whole phrase precedes the possessed noun.
+  reason: >-
+    Possession is a modifier relation, so modifier-head order (GR-ORD-003) puts the marked
+    possessor first. A separate particle rather than a possessive pronoun series means
+    `ano lu` ("my") needs no extra lexicon, which matters for a 300-word Phase 2.
+  inspiration:
+    source: japanese
+    original_feature: The Japanese genitive particle no.
+    how_modified: >-
+      Function and position are kept; `no` is banned, as are Tamil `-in` and `-udaiya`.
+  pattern: "NP + lu + NOUN"
+  morphemes:
+    - form: lu
+      slot: case
+      function: genitive
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-LU TS-NA.TS-MI
+      roman: ano lu nami
+      english: my house
+      gloss: ano lu nami / I GEN house
+    - tanese: TS-NA.TS-NASAL.TS-THE TS-LU TS-RI.TS-GEM.TS-KA TS-DHE.TS-NASAL TS-THA.TS-MU.TS-DHO
+      roman: nanthe lu rikka dhen thamudho
+      english: My friend's dog slept.
+  invalid:
+    - tanese: TS-NA.TS-MI TS-A.TS-NO TS-LU
+      roman: nami ano lu
+      why: >-
+        The possessed noun precedes the possessor phrase. The genitive phrase is a modifier
+        and must precede its head (GR-ORD-003).
+    - tanese: TS-A.TS-NO TS-LU
+      roman: ano lu
+      why: >-
+        A genitive phrase with nothing to possess. `lu` marks a modifier, so the head noun is
+        not optional.
+  status: official
+  since: v0.1
+
+- id: GR-PART-005
+  category: particle
+  name: locative particle
+  description: The particle `ban` marks the place where something is or happens.
+  reason: >-
+    Place is kept separate from goal (`thin`) because the two are genuinely different
+    relations that the same verb can take at once ("write in the school", "go to the
+    school"), and one particle for both would make such a sentence unparseable.
+  inspiration:
+    source: tamil
+    original_feature: The Tamil locative -il / -ile.
+    how_modified: >-
+      Function only; both Tamil forms are banned, as is Japanese `de` and the locative use
+      of `ni`.
+  pattern: "NP + ban"
+  morphemes:
+    - form: ban
+      slot: case
+      function: locative
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-MI TS-BA.TS-NASAL TS-THA.TS-MU.TS-DHO
+      roman: ano dhen nami ban thamudho
+      english: I slept in the house.
+    - tanese: TS-KI.TS-NHU TS-DHE.TS-NASAL TS-THO.TS-RA TS-BA.TS-NASAL TS-E.TS-SU.TS-KE
+      roman: kinhu dhen thora ban esuke
+      english: The bird is in the tree.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-BA.TS-NASAL TS-NA.TS-MI TS-THA.TS-MU.TS-DHO
+      roman: ano dhen ban nami thamudho
+      why: The particle precedes its noun.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-MI TS-BA.TS-NASAL TS-THI.TS-NASAL TS-THA.TS-MU.TS-DHO
+      roman: ano dhen nami ban thin thamudho
+      why: Locative and dative particles stacked on one noun phrase (GR-PART-013).
+  status: official
+  since: v0.1
+
+- id: GR-PART-006
+  category: particle
+  name: instrumental particle
+  description: >-
+    The particle `sen` marks the instrument or means by which an action is carried out.
+  reason: >-
+    An instrument is not an agent and not a location, and Tanese has no passive in v0.1, so
+    `sen` never has to compete with an agent-marking use the way Tamil's -aal does.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      The Tamil instrumental -aal, which also marks the agent of a passive.
+    how_modified: >-
+      Only the instrumental half of the function is taken, there being no passive to need the
+      other half. The form `-aal` is banned, as is Japanese `de`.
+  pattern: "NP + sen"
+  morphemes:
+    - form: sen
+      slot: case
+      function: instrumental
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-KA.TS-LU TS-SE.TS-NASAL TS-SI.TS-GEM.TS-PA.TS-DHO
+      roman: ano dhen kalu sen sippadho
+      english: I wrote with a stone.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-WE.TS-LI TS-SE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: uthe dhen weli sen sedha do mandudho
+      english: He ate the food with water.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-NASAL TS-KA.TS-LU TS-SI.TS-GEM.TS-PA.TS-DHO
+      roman: ano dhen sen kalu sippadho
+      why: The particle precedes its noun.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-KA.TS-LU TS-SE.TS-NASAL TS-SE.TS-NASAL TS-SI.TS-GEM.TS-PA.TS-DHO
+      roman: ano dhen kalu sen sen sippadho
+      why: The particle is doubled; one relation is marked once.
+  status: official
+  since: v0.1
+
+- id: GR-PART-007
+  category: particle
+  name: comitative particle
+  description: The particle `nhu` marks the person or thing accompanying the subject.
+  reason: >-
+    "With a friend" and "with a stone" are different relations -- a companion acts, an
+    instrument does not -- so comitative is a separate particle from instrumental `sen`
+    rather than one particle disambiguated by animacy.
+  alternatives: >-
+    Merge comitative and instrumental into one "with" particle, as English does. Rejected:
+    it would make `nanthe nhu` and `kalu sen` the same construction and leave the hearer to
+    infer from animacy, which is exactly the kind of inference the particle system exists to
+    make unnecessary.
+  inspiration:
+    source: tamil
+    original_feature: The Tamil comitative -oodu / -udan.
+    how_modified: Function only; both forms are banned, as is Japanese `to`.
+  pattern: "NP + nhu"
+  morphemes:
+    - form: nhu
+      slot: case
+      function: comitative
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NHU TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano dhen nanthe nhu ikkeke
+      english: I go with a friend.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-RI.TS-GEM.TS-KA TS-NHU TS-NHO.TS-RU.TS-DHO
+      roman: uthe dhen rikka nhu nhorudho
+      english: He came with the dog.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NHU TS-NA.TS-NASAL.TS-THE TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano dhen nhu nanthe ikkeke
+      why: The particle precedes its noun.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NHU TS-SE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano dhen nanthe nhu sen ikkeke
+      why: Comitative and instrumental stacked on one noun phrase (GR-PART-013).
+  status: official
+  since: v0.1
+
+- id: GR-PART-008
+  category: particle
+  name: ablative particle
+  description: The particle `kodhu` marks the source or origin of motion.
+  reason: >-
+    Source is the mirror of goal (`thin`), and keeping both means a single clause can state
+    where motion began and where it ended. `kodhu` is the only two-mora case particle, which
+    is tolerable because source is the least frequent of the eight relations.
+  inspiration:
+    source: japanese
+    original_feature: The Japanese ablative kara.
+    how_modified: Function only; `kara` is banned, as is Tamil `-iliruntu`.
+  pattern: "NP + kodhu"
+  morphemes:
+    - form: kodhu
+      slot: case
+      function: ablative
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-GO.TS-SU TS-KO.TS-DHU TS-NHO.TS-RU.TS-DHO
+      roman: ano dhen gosu kodhu nhorudho
+      english: I came from the city.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-MI TS-KO.TS-DHU TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO
+      roman: uthe dhen nami kodhu teku thin ikkedho
+      english: He went from the house to the school.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-KO.TS-DHU TS-GO.TS-SU TS-NHO.TS-RU.TS-DHO
+      roman: ano dhen kodhu gosu nhorudho
+      why: The particle precedes its noun.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-GO.TS-SU TS-KO.TS-DHU TS-KO.TS-DHU TS-NHO.TS-RU.TS-DHO
+      roman: ano dhen gosu kodhu kodhu nhorudho
+      why: The particle is doubled; one relation is marked once.
+  status: official
+  since: v0.1
+
+- id: GR-PART-009
+  category: particle
+  name: topic particle
+  description: >-
+    The particle `belu` marks what the sentence is about. It replaces the case particle of
+    the phrase it attaches to, rather than stacking with it.
+  reason: >-
+    A topic is a discourse relation, not a grammatical one, so it occupies the same single
+    particle slot and displaces what was there. Replacement rather than stacking is what
+    keeps GR-PART-013 ("one particle per phrase") true without an exception.
+  problems: >-
+    Because `belu` displaces the case particle, topicalising a subject or object erases the
+    relation: `nami belu wesudho` does not say whether the house saw or was seen. Only the
+    verb's meaning disambiguates, and for a verb that takes two animate arguments nothing
+    does. This is a real hole in v0.1 and Phase 1C must list it as an open question.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese topic particle wa, which likewise replaces ga and o rather than stacking.
+    how_modified: >-
+      The replacement behaviour is taken; the form `wa` is banned, as is Tamil `-thaan` and
+      the colloquial `-maa` that an earlier draft of this rule used as `maa`.
+  pattern: "NP + belu (in place of the case particle)"
+  morphemes:
+    - form: belu
+      slot: clause
+      function: topic
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-BE.TS-LU TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano belu teku thin ikkeke
+      english: As for me, I go to school.
+    - tanese: TS-BU.TS-NASAL.TS-KO TS-BE.TS-LU TS-A.TS-NO TS-DHE.TS-NASAL TS-RU.TS-BO.TS-DHO
+      roman: bunko belu ano dhen rubodho
+      english: As for the book, I read it.
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-BE.TS-LU TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano dhen belu teku thin ikkeke
+      why: >-
+        The topic particle stacks on the subject particle. `belu` replaces the case particle,
+        it does not follow it.
+    - tanese: TS-A.TS-NO TS-BE.TS-LU TS-I.TS-RI TS-BE.TS-LU TS-I.TS-GEM.TS-KE.TS-KE
+      roman: ano belu iri belu ikkeke
+      why: >-
+        Two topics in one clause. A sentence is about one thing; a second topic leaves no
+        predication for the first.
+  status: official
+  since: v0.1
+
+- id: GR-PART-010
+  category: particle
+  name: yes/no question particle
+  description: >-
+    The clause-final particle `wen` turns a statement into a yes/no question. Nothing else
+    changes: no word order shift, no verb form change.
+  reason: >-
+    A single clause-final marker is the cheapest possible question formation in a head-final
+    language -- the statement is left intact and one word is added, which also means the
+    Phase 4 checker can detect a question without reparsing the clause.
+  inspiration:
+    source: japanese
+    original_feature: The Japanese question particle ka.
+    how_modified: >-
+      Position and function are kept. The forms `ka` and `kai` are banned; so are Tamil
+      `-aa` and `-oo`, and so is `kun`, which an earlier draft of this rule used before it
+      was identified as the Japanese honorific. `po` was also rejected, being the Tamil verb
+      "go".
+  pattern: "CLAUSE + wen"
+  morphemes:
+    - form: wen
+      slot: clause
+      function: question_yes_no
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WE.TS-NASAL
+      roman: iri dhen sedha do mandudho wen
+      english: Did you eat the food?
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE TS-WE.TS-NASAL
+      roman: uthe dhen nanthe esuke wen
+      english: Is he a friend?
+  invalid:
+    - tanese: TS-WE.TS-NASAL TS-I.TS-RI TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: wen iri dhen sedha do mandudho
+      why: >-
+        The question particle is clause-initial. Clause particles close the clause
+        (GR-ORD-005).
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-KE.TS-NA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WE.TS-NASAL
+      roman: iri dhen kena do mandudho wen
+      why: >-
+        A yes/no particle on a wh-question. `wen` asks for yes or no, and `kena` already asks
+        for a value, so the two requests conflict (GR-Q-002).
+  status: official
+  since: v0.1
+
+- id: GR-PART-011
+  category: particle
+  name: quotative particle
+  description: >-
+    The clause-final particle `thenu` closes a quoted or reported clause, which then serves
+    as the complement of a speech or cognition verb.
+  reason: >-
+    A head-final language needs a right bracket on an embedded clause, or the main verb
+    cannot tell where the embedded one ended. `thenu` is that bracket, and using one particle
+    for direct and indirect speech alike avoids a tense-shifting rule of the English kind.
+  problems: >-
+    Nothing distinguishes a quotation from a paraphrase, so `ano dhoka ikkeke thenu uthe dhen
+    kathidho` is both "he said 'I go tomorrow'" and "he said that he goes tomorrow" -- and
+    the embedded `ano` ("I") is then ambiguous between the speaker and the reporter. v0.1
+    does not resolve this.
+  inspiration:
+    source: tamil
+    original_feature: The Tamil quotative -ennu / endru.
+    how_modified: >-
+      Function and position are kept; both Tamil forms are banned, as is Japanese quotative
+      `to`.
+  pattern: "[CLAUSE] + thenu + ... SPEECH_VERB"
+  morphemes:
+    - form: thenu
+      slot: clause
+      function: quotative
+      kind: particle
+      word_class: any
+  valid:
+    - tanese: TS-A.TS-NO TS-DHO.TS-KA TS-I.TS-GEM.TS-KE.TS-KE TS-THE.TS-NU TS-U.TS-THE TS-DHE.TS-NASAL TS-KA.TS-THI.TS-DHO
+      roman: ano dhoka ikkeke thenu uthe dhen kathidho
+      english: He said that he goes tomorrow.
+      gloss: "[ano dhoka ikke-ke] thenu uthe dhen kathi-dho / [I tomorrow go-NPST] QUOT he SUBJ speak-PST"
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE TS-THE.TS-NU TS-A.TS-NO TS-DHE.TS-NASAL TS-BE.TS-KI.TS-KE
+      roman: iri dhen nanthe esuke thenu ano dhen bekike
+      english: I know that you are a friend.
+  invalid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-KA.TS-THI.TS-DHO TS-A.TS-NO TS-DHO.TS-KA TS-I.TS-GEM.TS-KE.TS-KE TS-THE.TS-NU
+      roman: uthe dhen kathidho ano dhoka ikkeke thenu
+      why: >-
+        The quoted clause follows the main verb. Tanese is verb-final, so a complement clause
+        precedes its verb, and only the quotative particle may close it.
+    - tanese: TS-A.TS-NO TS-DHO.TS-KA TS-I.TS-GEM.TS-KE.TS-KE TS-WE.TS-NASAL TS-THE.TS-NU TS-U.TS-THE TS-DHE.TS-NASAL TS-KA.TS-THI.TS-DHO
+      roman: ano dhoka ikkeke wen thenu uthe dhen kathidho
+      why: >-
+        Two clause particles on one clause, `wen` then `thenu` (GR-ORD-005). A reported
+        question is not expressible in v0.1.
+  status: official
+  since: v0.1
+
+- id: GR-PART-012
+  category: syntax
+  name: core arguments must be particle-marked
+  description: >-
+    Every noun phrase acting as subject, object or any other argument of the verb carries a
+    particle. A bare noun phrase may only be a modifier (compound, genitive head, numeral
+    head) or a relative-clause head.
+  reason: >-
+    This is the premise free argument order (GR-ORD-004) rests on. If a bare noun could be
+    an argument, position would have to disambiguate, and position is exactly what the
+    design gave away.
+  problems: >-
+    It makes the language wordier than either source language: Tamil drops case endings
+    freely in speech and Japanese drops particles constantly, and both stay intelligible.
+    Tanese cannot, so colloquial-register particle dropping cannot be added later without
+    reintroducing positional syntax.
+  inspiration:
+    source: none
+    original_feature: >-
+      Tamil and Japanese both permit extensive case/particle dropping in casual speech.
+    how_modified: >-
+      Explicitly not taken: dropping is forbidden, and the cost in verbosity is accepted so
+      that parsing stays deterministic.
+  pattern: "ARG = NP + particle (never bare)"
+  asserts:
+    requires: [argument.particle_marked]
+    forbids: [argument.bare]
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen sedha do manduke
+      english: I eat food. (both arguments marked)
+    - tanese: TS-A.TS-NO TS-LU TS-NA.TS-NASAL.TS-THE TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-DHO
+      roman: ano lu nanthe dhen bunko do rubodho
+      english: My friend read the book. (the bare `nanthe` is the genitive head, not an argument)
+  invalid:
+    - tanese: TS-A.TS-NO TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano sedha do manduke
+      why: The subject is unmarked. Arguments are never bare.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen sedha manduke
+      why: The object is unmarked, leaving `sedha` with no stated relation to the verb.
+  status: official
+  since: v0.1
+
+- id: GR-PART-013
+  category: syntax
+  name: one particle per noun phrase
+  description: >-
+    A noun phrase bears exactly one particle. Case particles do not stack, and the topic
+    particle replaces a case particle rather than following it.
+  reason: >-
+    Stacked particles would assert two relations for one phrase, which is not a meaning the
+    clause has room for. Making this a rule in its own right is what lets the other particle
+    rules state only their own positive case and lets the contradiction checker enforce the
+    restriction once.
+  alternatives: >-
+    Allow a case particle plus a discourse particle, as Japanese does with `ni wa`. Rejected
+    for v0.1: it is useful, but it requires a fixed order and a statement of which
+    combinations are legal, which is a rule table this phase does not need.
+  problems: >-
+    Combined with GR-PART-009 this is what loses the relation of a topicalised argument. The
+    two rules are consistent, but together they cost the language a distinction it has no
+    other way to express.
+  inspiration:
+    source: none
+    original_feature: >-
+      Japanese permits certain particle sequences (ni wa, kara mo); Tamil permits a case
+      ending plus a clitic.
+    how_modified: >-
+      Not taken: v0.1 allows exactly one particle, which is stricter than either source.
+  pattern: "NP + exactly one particle"
+  asserts:
+    forbids: [case.double_marking]
+  valid:
+    - tanese: TS-NA.TS-MI TS-BA.TS-NASAL TS-A.TS-NO TS-DHE.TS-NASAL TS-THA.TS-MU.TS-DHO
+      roman: nami ban ano dhen thamudho
+      english: I slept in the house. (one particle per phrase)
+    - tanese: TS-NA.TS-MI TS-BE.TS-LU TS-A.TS-NO TS-DHE.TS-NASAL TS-WE.TS-SU.TS-DHO
+      roman: nami belu ano dhen wesudho
+      english: As for the house, I saw it. (`belu` in place of `do`, not after it)
+  invalid:
+    - tanese: TS-NA.TS-MI TS-BA.TS-NASAL TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-THA.TS-MU.TS-DHO
+      roman: nami ban do ano dhen thamudho
+      why: Two case particles on one noun phrase.
+    - tanese: TS-NA.TS-MI TS-DO TS-BE.TS-LU TS-A.TS-NO TS-DHE.TS-NASAL TS-WE.TS-SU.TS-DHO
+      roman: nami do belu ano dhen wesudho
+      why: >-
+        A case particle followed by the topic particle. `belu` replaces the case particle
+        (GR-PART-009); it never follows one.
+  status: official
+  since: v0.1

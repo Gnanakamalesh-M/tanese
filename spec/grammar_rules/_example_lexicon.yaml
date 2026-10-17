@@ -1,0 +1,197 @@
+# Demo words for grammar examples, v0.1 -- NOT vocabulary.
+#
+# Phase 1B needs words to show grammar with, but LOCKED decisions 14-15 reserve official
+# vocabulary for the Phase 2 pipeline (phonotactic check -> morphology check -> collision
+# check -> rank -> human approve) and a separate file. So these are citation forms invented
+# to fill example slots, nothing more:
+#
+#   * every entry is `status: experimental`, and the schema allows no other value here, so
+#     `official` is literally unrepresentable in this file;
+#   * nothing here may be copied into data/vocabulary/ -- check 12 in
+#     tanese_nlp.grammar.contradictions fails if any of these forms turns up there. Phase 2
+#     must re-derive a word through the pipeline if it wants it, which may well reject it;
+#   * no collision detection has been run on them (that tool is Phase 2), so two of these
+#     may well be confusably similar. They were checked for phonotactic legality and exact
+#     duplication only.
+#
+# Grammar examples may use ONLY these roots (check 9: lexicon closure). That is the point of
+# the file: it stops the same form meaning "house" in one rule and "to eat" in another.
+#
+# `class` is the word class the grammar rules expect: noun, verb, pronoun, numeral, adverb,
+# interrogative, copula. Verbs and the copula are listed in their citation form (bare root,
+# non-finite -- see GR-VERB-002).
+
+version: v0.1
+
+words:
+  # ---- nouns -------------------------------------------------------------------------
+  - form: nami
+    class: noun
+    gloss: house
+    status: experimental
+  - form: weli
+    class: noun
+    gloss: water
+    status: experimental
+  - form: thora
+    class: noun
+    gloss: tree
+    status: experimental
+  - form: bunko
+    class: noun
+    gloss: book
+    status: experimental
+  - form: sedha
+    class: noun
+    gloss: food
+    status: experimental
+  - form: kalu
+    class: noun
+    gloss: stone
+    status: experimental
+  - form: dhimi
+    class: noun
+    gloss: river
+    status: experimental
+  - form: nanthe
+    class: noun
+    gloss: friend
+    status: experimental
+  - form: gosu
+    class: noun
+    gloss: city
+    status: experimental
+  - form: rikka
+    class: noun
+    gloss: dog
+    status: experimental
+  - form: mothu
+    class: noun
+    gloss: cat
+    status: experimental
+  - form: panu
+    class: noun
+    gloss: rice
+    status: experimental
+  - form: wiro
+    class: noun
+    gloss: person
+    status: experimental
+  - form: teku
+    class: noun
+    gloss: school
+    status: experimental
+  - form: kinhu
+    class: noun
+    gloss: bird
+    status: experimental
+  - form: sabo
+    class: noun
+    gloss: fish
+    status: experimental
+  - form: thunga
+    class: noun
+    gloss: mountain
+    status: experimental
+  - form: nelo
+    class: noun
+    gloss: day
+    status: experimental
+  - form: bandhi
+    class: noun
+    gloss: night
+    status: experimental
+  # ---- verbs (citation form) ---------------------------------------------------------
+  - form: ikke
+    class: verb
+    gloss: go
+    status: experimental
+  - form: mandu
+    class: verb
+    gloss: eat
+    status: experimental
+  - form: wesu
+    class: verb
+    gloss: see
+    status: experimental
+  - form: kathi
+    class: verb
+    gloss: speak
+    status: experimental
+  - form: dhelo
+    class: verb
+    gloss: give
+    status: experimental
+  - form: nhoru
+    class: verb
+    gloss: come
+    status: experimental
+  - form: sippa
+    class: verb
+    gloss: write
+    status: experimental
+  - form: rubo
+    class: verb
+    gloss: read
+    status: experimental
+  - form: thamu
+    class: verb
+    gloss: sleep
+    status: experimental
+  - form: beki
+    class: verb
+    gloss: know
+    status: experimental
+  # ---- copula ------------------------------------------------------------------------
+  - form: esu
+    class: copula
+    gloss: be (equational copula; takes the same suffix slots as a verb)
+    status: experimental
+  # ---- pronouns ----------------------------------------------------------------------
+  - form: ano
+    class: pronoun
+    gloss: I (1st person singular)
+    status: experimental
+  - form: iri
+    class: pronoun
+    gloss: you (2nd person singular)
+    status: experimental
+  - form: uthe
+    class: pronoun
+    gloss: he / she / it (3rd person singular, no gender -- LOCKED decision 5)
+    status: experimental
+  # ---- numerals ----------------------------------------------------------------------
+  - form: ethi
+    class: numeral
+    gloss: one
+    status: experimental
+  - form: nira
+    class: numeral
+    gloss: two
+    status: experimental
+  - form: solu
+    class: numeral
+    gloss: three
+    status: experimental
+  # ---- adverbs -----------------------------------------------------------------------
+  - form: dhoka
+    class: adverb
+    gloss: tomorrow (the future adverb used by GR-TAM-004)
+    status: experimental
+  - form: nebbo
+    class: adverb
+    gloss: yesterday
+    status: experimental
+  - form: thuri
+    class: adverb
+    gloss: quickly
+    status: experimental
+  # ---- interrogatives ----------------------------------------------------------------
+  - form: kena
+    class: interrogative
+    gloss: what
+    status: experimental
+  - form: kewa
+    class: interrogative
+    gloss: who
+    status: experimental

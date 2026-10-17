@@ -1,0 +1,173 @@
+# Questions. The yes/no particle itself is declared in GR-PART-010; these rules govern how
+# questions are formed and what may not be combined.
+
+- id: GR-Q-001
+  category: syntax
+  name: yes/no questions add a particle only
+  description: >-
+    A yes/no question is a statement plus the clause-final particle `wen`. Word order,
+    verb form and politeness are unchanged.
+  reason: >-
+    Nothing else has to change, so nothing else does. Keeping the statement intact means a
+    question and its answer share every word but one, which is both easy to learn and easy
+    for the Phase 4 checker to analyse: strip the final particle and the clause is an
+    ordinary declarative.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese yes/no questions, formed by adding ka with no change to the clause.
+    how_modified: >-
+      The strategy is taken; the form `ka` is banned, and Tanese has no rising-intonation
+      alternative because intonation is not part of the written language (LOCKED decision 11
+      makes accent fixed and non-contrastive).
+  pattern: "DECLARATIVE + wen"
+  asserts:
+    forbids: [question.inversion, question.verb_form_change]
+  valid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-DHO TS-WE.TS-NASAL
+      roman: iri dhen bunko do rubodho wen
+      english: Did you read the book?
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-DHO.TS-KA TS-NHO.TS-RU.TS-KE.TS-SU.TS-NASAL TS-WE.TS-NASAL
+      roman: uthe dhen dhoka nhorukesun wen
+      english: Will he come tomorrow? (formal)
+  invalid:
+    - tanese: TS-RU.TS-BO.TS-DHO TS-I.TS-RI TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-WE.TS-NASAL
+      roman: rubodho iri dhen bunko do wen
+      why: >-
+        The verb has been moved to the front, on the model of English inversion. Question
+        formation changes nothing but the added particle.
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-DHO.TS-WE.TS-NASAL
+      roman: iri dhen bunko do rubodhowen
+      why: >-
+        The question particle is attached to the verb. Particles are separate words
+        (GR-ORD-001).
+  status: official
+  since: v0.1
+
+- id: GR-Q-002
+  category: syntax
+  name: wh-words stay in place and take no question particle
+  description: >-
+    An interrogative word (`kena` "what", `kewa` "who") occupies the ordinary position of the
+    phrase it questions, with the ordinary particle for that role. A wh-question does not
+    take `wen`.
+  reason: >-
+    The interrogative word already marks the clause as a question and says what is being
+    asked for, so `wen` would be redundant -- and worse than redundant: `wen` requests a
+    yes/no answer, which a wh-question cannot be answered with. Keeping the wh-word in place
+    follows from free argument order (GR-ORD-004): there is no fronting position to move it
+    to.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese wh-in-situ. Japanese does, however, allow ka on a wh-question.
+    how_modified: >-
+      The in-situ position is taken and the particle is forbidden, because `wen` is defined
+      narrowly as a yes/no request (GR-PART-010) rather than as a general question marker.
+  pattern: "... WH + particle ... V"
+  asserts:
+    forbids: [question.wh_fronting, question.wh_with_yes_no_particle]
+  valid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-KE.TS-NA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: iri dhen kena do mandudho
+      english: What did you eat?
+      gloss: iri dhen kena do mandu-dho / you SUBJ what OBJ eat-PST
+    - tanese: TS-KE.TS-WA TS-DHE.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-DHO
+      roman: kewa dhen bunko do rubodho
+      english: Who read the book?
+  invalid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-KE.TS-NA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WE.TS-NASAL
+      roman: iri dhen kena do mandudho wen
+      why: >-
+        A wh-question with the yes/no particle. `wen` asks for yes or no; `kena` asks for a
+        value. The two requests cannot both be made.
+    - tanese: TS-KE.TS-NA TS-DO TS-I.TS-RI TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-DHO TS-KE.TS-NA
+      roman: kena do iri dhen mandudho kena
+      why: >-
+        The interrogative is fronted and then repeated in place. Wh-words stay in position,
+        and nothing may follow the verb except a clause particle (GR-ORD-005).
+  status: official
+  since: v0.1
+
+- id: GR-Q-003
+  category: syntax
+  name: wh-words are ordinary noun phrases
+  description: >-
+    An interrogative word takes whichever particle its role requires -- `dhen` as subject,
+    `do` as object, `ban` as location -- and may head a genitive phrase like any noun.
+  reason: >-
+    If wh-words took no particle, GR-PART-012 (arguments are always marked) would need an
+    exception, and the role being asked about -- precisely the information the question is
+    seeking -- would be the one thing left unstated.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      Tamil interrogatives take the normal case endings (yaar, yaarai, yaarukku).
+    how_modified: >-
+      Taken unchanged in principle; the Tanese forms are its own, and the case particles are
+      separate words rather than endings (GR-ORD-001).
+  pattern: "WH + particle"
+  valid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-KE.TS-WA TS-THI.TS-NASAL TS-BU.TS-NASAL.TS-KO TS-DO TS-DHE.TS-LO.TS-DHO
+      roman: iri dhen kewa thin bunko do dhelodho
+      english: To whom did you give the book?
+    - tanese: TS-KE.TS-WA TS-LU TS-RI.TS-GEM.TS-KA TS-DHE.TS-NASAL TS-THA.TS-MU.TS-DHO
+      roman: kewa lu rikka dhen thamudho
+      english: Whose dog slept?
+  invalid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-KE.TS-WA TS-BU.TS-NASAL.TS-KO TS-DO TS-DHE.TS-LO.TS-DHO
+      roman: iri dhen kewa bunko do dhelodho
+      why: >-
+        The interrogative has no particle, so the question does not say which role is being
+        asked about (GR-PART-012).
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-KE.TS-WA TS-THI.TS-NASAL TS-DO TS-BU.TS-NASAL.TS-KO TS-DHE.TS-LO.TS-DHO
+      roman: iri dhen kewa thin do bunko dhelodho
+      why: Two case particles on the interrogative phrase (GR-PART-013).
+  status: official
+  since: v0.1
+
+- id: GR-Q-004
+  category: syntax
+  name: embedded questions use the quotative particle
+  description: >-
+    A question inside a larger clause is closed by `thenu`, like any reported clause, and
+    loses its own clause particle. An embedded yes/no question is not expressible in v0.1.
+  reason: >-
+    One clause takes one clause particle (GR-ORD-005), so an embedded question cannot carry
+    both its own `wen` and the `thenu` that subordinates it. Wh-questions embed cleanly
+    because they never take `wen` in the first place (GR-Q-002), which is a direct benefit of
+    defining `wen` narrowly.
+  problems: >-
+    "I know whether he went" therefore has no form. The gap is a consequence of GR-ORD-005
+    and is listed here rather than patched, since patching it would mean either a second
+    clause-particle slot or a subordinating suffix -- both larger changes than v0.1 should
+    make.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese embeds both wh- and yes/no questions with ka plus a complementiser.
+    how_modified: >-
+      Only the wh- case is supported, because Tanese allows one clause particle where
+      Japanese allows a sequence.
+  pattern: "[... WH ... V] + thenu ... V"
+  valid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-KE.TS-NA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-THE.TS-NU TS-A.TS-NO TS-DHE.TS-NASAL TS-BE.TS-KI.TS-KE.TS-NHI
+      roman: uthe dhen kena do mandudho thenu ano dhen bekikenhi
+      english: I do not know what he ate.
+      gloss: "[uthe dhen kena do mandu-dho] thenu ano dhen beki-ke-nhi"
+    - tanese: TS-KE.TS-WA TS-DHE.TS-NASAL TS-NHO.TS-RU.TS-DHO TS-THE.TS-NU TS-A.TS-NO TS-DHE.TS-NASAL TS-BE.TS-KI.TS-KE
+      roman: kewa dhen nhorudho thenu ano dhen bekike
+      english: I know who came.
+  invalid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-KE.TS-NA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WE.TS-NASAL TS-THE.TS-NU TS-A.TS-NO TS-DHE.TS-NASAL TS-BE.TS-KI.TS-KE
+      roman: uthe dhen kena do mandudho wen thenu ano dhen bekike
+      why: >-
+        Two clause particles on the embedded clause (GR-ORD-005), and `wen` on a wh-question
+        (GR-Q-002).
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-BE.TS-KI.TS-KE TS-U.TS-THE TS-DHE.TS-NASAL TS-KE.TS-NA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-THE.TS-NU
+      roman: ano dhen bekike uthe dhen kena do mandudho thenu
+      why: >-
+        The embedded clause follows the main verb. Complement clauses precede their verb
+        (GR-PART-011).
+  status: official
+  since: v0.1

@@ -24,9 +24,14 @@ def load_script(name: str):
     return module
 
 
-def test_run_checks_has_the_three_spec_steps() -> None:
+def test_run_checks_has_the_four_spec_steps() -> None:
     run_checks = load_script("run_checks")
-    assert [name for name, _ in run_checks.STEPS] == ["lint", "tests", "yaml-schema"]
+    assert [name for name, _ in run_checks.STEPS] == [
+        "lint",
+        "tests",
+        "yaml-schema",
+        "grammar",
+    ]
 
 
 def test_run_checks_resolves_the_repo_root() -> None:

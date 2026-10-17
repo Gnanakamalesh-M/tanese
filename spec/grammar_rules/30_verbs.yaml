@@ -1,0 +1,281 @@
+# Verb structure. Derived from LOCKED decisions 2, 4 and 6.
+
+- id: GR-VERB-001
+  category: syntax
+  name: verbs are suffixing only
+  description: >-
+    A verb is a root followed by zero or more suffixes, in the order fixed by GR-VERB-003.
+    There are no prefixes, no infixes, no auxiliary verbs and no stem changes: the root is
+    identical in every form.
+  reason: >-
+    LOCKED decision 2. An invariant root is worth stating as a rule because it is what makes
+    the Phase 4 morphological analyzer a suffix stripper rather than a lexicon of stem
+    allomorphs, and what lets the dictionary list one form per verb.
+  problems: >-
+    The price is that nothing can be expressed by a stem change, so every distinction costs
+    a suffix and a slot. The analytic prohibitive and negative conditional (GR-NEG-003,
+    GR-NEG-004) exist precisely because the slots ran out.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      Tamil agglutinative suffixing, but with stem changes and sandhi at the joins.
+    how_modified: >-
+      The suffixing is kept and the stem changes are removed: spec/phonology.yaml declares no
+      allophony and no morphophonemics, so a suffix joint never alters either side.
+  pattern: "ROOT + SUFFIX*"
+  asserts:
+    requires: [verb.suffixing_only]
+    forbids: [verb.prefix, verb.stem_change, verb.auxiliary]
+  valid:
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: manduke
+      english: eats
+      gloss: mandu-ke / eat-NPST -- the root is unchanged
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-RI.TS-DHO.TS-SU.TS-NASAL
+      roman: manduridhosun
+      english: was eating (formal)
+      gloss: mandu-ri-dho-sun / eat-PROG-PST-FORMAL
+  invalid:
+    - tanese: TS-KE.TS-MA.TS-NASAL.TS-DU
+      roman: kemandu
+      why: >-
+        The tense marker is prefixed. Tanese has no prefixes (LOCKED decision 2), so this is
+        an unknown word.
+    - tanese: TS-MA.TS-NASAL.TS-DE.TS-KE
+      roman: mandeke
+      why: >-
+        The root vowel has changed (`mandu` to `mande`) to carry tense. The root is invariant;
+        only suffixes mark anything.
+  status: official
+  since: v0.1
+
+- id: GR-VERB-002
+  category: syntax
+  name: the citation form is non-finite
+  description: >-
+    The bare root -- no suffix of any kind -- is the citation form: the dictionary headword
+    and the form quoted when talking about the verb. It is not a finite verb and cannot be
+    the predicate of a sentence.
+  reason: >-
+    Something has to be the dictionary form, and with zero politeness marking legal
+    (GR-POL-002) the bare root would otherwise be confusable with a casual finite verb. It
+    is not, because the tense slot is obligatory on an indicative verb (GR-VERB-006): the
+    casual non-past is `manduke`, never `mandu`. The three forms are told apart by what is
+    present -- citation has no suffix, the imperative has a mood suffix, the indicative has a
+    tense suffix -- never by what is absent.
+  problems: >-
+    A reader coming from Japanese will expect the dictionary form to be a usable present
+    tense, as `taberu` is, and will write `mandu` for "eats". The error is caught, but the
+    expectation is natural.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese dictionary form, which is simultaneously the plain non-past predicate.
+    how_modified: >-
+      Deliberately split apart: Tanese's citation form is inflectionally empty and cannot
+      predicate, so "dictionary form" and "casual present" are never the same string.
+  pattern: "ROOT (no suffix)"
+  asserts:
+    forbids: [predicate.bare_root]
+  valid:
+    - tanese: TS-MA.TS-NASAL.TS-DU
+      roman: mandu
+      english: "eat (citation form, as it appears in the dictionary)"
+    - tanese: TS-I.TS-GEM.TS-KE
+      roman: ikke
+      english: "go (citation form)"
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU
+      roman: ano dhen sedha do mandu
+      why: >-
+        The bare root is used as the predicate. A finite indicative verb must carry a tense
+        suffix (GR-VERB-006); the casual non-past is `manduke`.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE
+      roman: ano dhen ikke
+      why: >-
+        Same error with an intransitive verb: `ikke` is the citation form, and the sentence
+        needs `ikkeke` or `ikkedho`.
+  status: official
+  since: v0.1
+
+- id: GR-VERB-003
+  category: morphology
+  name: verb suffix slot order
+  description: >-
+    Verb suffixes occur in exactly this order after the root: aspect, tense, mood,
+    politeness. Every slot is independently skippable except as GR-VERB-006 and the mood
+    entries' `tense` field require.
+  reason: >-
+    LOCKED decision 6. The order is stated here as a machine-readable `slot_order` so the
+    contradiction checker can merge it with every other rule's claim and reject any
+    disagreement, rather than trusting prose.
+  problems: >-
+    Four slots plus a root reach five or six moras in a fully specified verb
+    (`manduridhonhisun`, eight moras), and because negation shares the mood slot there is no
+    room for a negative conditional or a negative command. Those are analytic instead, which
+    is an asymmetry recorded in GR-NEG-003 and GR-NEG-004.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      The Tamil verb's ordered suffix chain (aspect, tense, then agreement).
+    how_modified: >-
+      The ordering principle is kept and the agreement slot is deleted (LOCKED decision 4),
+      with politeness taking the final position instead.
+  pattern: "ROOT - ASPECT - TENSE - MOOD - POLITENESS"
+  slot_order: [root, aspect, tense, mood, politeness]
+  valid:
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-RI.TS-DHO.TS-SU.TS-NASAL
+      roman: manduridhosun
+      english: was eating (formal)
+      gloss: mandu-ri-dho-sun / eat-PROG-PST-FORMAL -- aspect, tense, politeness
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NHI.TS-MI
+      roman: mandukenhimi
+      english: does not eat (neutral politeness)
+      gloss: mandu-ke-nhi-mi / eat-NPST-NEG-NEUTRAL -- tense, mood, politeness
+  invalid:
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-DHO.TS-RI.TS-SU.TS-NASAL
+      roman: mandudhorisun
+      why: >-
+        Tense precedes aspect (`-dho-ri` instead of `-ri-dho`), against the fixed slot order.
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-SU.TS-NASAL.TS-KE
+      roman: mandusunke
+      why: >-
+        Politeness precedes tense. Politeness is the final slot, so nothing may follow it.
+  status: official
+  since: v0.1
+
+- id: GR-VERB-004
+  category: syntax
+  name: no verb agreement
+  description: >-
+    The verb never varies with the person, number or gender of any argument. The same verb
+    form serves every subject.
+  reason: >-
+    LOCKED decision 4; person is carried by the pronouns instead (GR-PRON-002). Stating it as
+    a rule with examples means a later phase that invents an agreement suffix will fail a
+    test rather than quietly contradict the spec.
+  problems: >-
+    With no agreement and optional plural (GR-NOUN-001), a clause whose subject has been
+    dropped (GR-PRON-003) gives no clue at all about who acted. Recovery is entirely
+    contextual, which will cost accuracy in Phase 5 translation.
+  inspiration:
+    source: japanese
+    original_feature: Japanese verbs show no person, number or gender agreement.
+    how_modified: >-
+      Followed rather than Tamil, which marks person, number and gender on the finite verb.
+      That deleted slot is what leaves room for politeness as the final suffix.
+  pattern: "V (invariant across subjects)"
+  asserts:
+    forbids: [verb.agreement]
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen manduke
+      english: I eat.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: uthe dhen manduke
+      english: He eats. (the verb is identical)
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE.TS-DHE.TS-NASAL
+      roman: ano dhen mandukedhen
+      why: >-
+        The subject particle is suffixed to the verb as an agreement marker. There is no
+        agreement slot (LOCKED decision 4), and `dhen` is a separate word (GR-ORD-001).
+    - tanese: TS-WI.TS-RO.TS-NE.TS-NASAL TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NE.TS-NASAL
+      roman: wironen dhen mandukenen
+      why: >-
+        The plural suffix is copied onto the verb to agree with the subject. `-nen` is a noun
+        suffix only (GR-NOUN-001).
+  status: official
+  since: v0.1
+
+- id: GR-VERB-005
+  category: syntax
+  name: the copula is an ordinary verb
+  description: >-
+    Equation and location use the copula root `esu`, which takes the same four suffix slots
+    as any other verb and stands in the same clause-final position.
+  reason: >-
+    Making the copula a regular verb rather than a special particle or a zero means
+    politeness, tense, aspect and negation all work on it with no extra rules -- which is
+    the whole reason this rule can be four lines long.
+  alternatives: >-
+    A zero copula, as in Tamil equational sentences ("avan nanban"). Rejected: with no
+    copula there is no verb to carry politeness, and LOCKED decision 8 marks politeness only
+    on the verb or copula, so an equational sentence would have no politeness level at all.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      Tamil equational sentences, which normally have no copula in the present tense.
+    how_modified: >-
+      Inverted: Tanese always has one. The Japanese copula `desu`/`da` is closer in spirit,
+      but both forms are banned in _originality.yaml.
+  pattern: "NP dhen NP esu+SUFFIX*"
+  valid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE
+      roman: uthe dhen nanthe esuke
+      english: He is a friend.
+      gloss: uthe dhen nanthe esu-ke / he SUBJ friend be-NPST
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-WI.TS-RO TS-E.TS-SU.TS-DHO.TS-SU.TS-NASAL
+      roman: ano dhen wiro esudhosun
+      english: I was a person. (formal)
+  invalid:
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE
+      roman: uthe dhen nanthe
+      why: >-
+        The copula is omitted. There is no zero copula; without `esu` the clause has no verb
+        and no politeness level.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-E.TS-SU.TS-KE TS-NA.TS-NASAL.TS-THE
+      roman: uthe dhen esuke nanthe
+      why: >-
+        The copula precedes its complement. It is a verb, so it is clause-final
+        (GR-ORD-002).
+  status: official
+  since: v0.1
+
+- id: GR-VERB-006
+  category: syntax
+  name: tense is obligatory on an indicative verb
+  description: >-
+    A verb with no mood suffix, or with a mood whose `tense` is `required`, must carry a
+    tense suffix. Only the three tenseless moods -- imperative, hortative, polite request --
+    license a verb with no tense.
+  reason: >-
+    This is what keeps the citation form (GR-VERB-002) distinct from the casual non-past when
+    politeness may be zero. It is stated as a condition on moods rather than as a blanket
+    rule because a command genuinely cannot be located in time, and pretending otherwise
+    would mean inventing a tense for `manduso`.
+  problems: >-
+    It makes "tense is obligatory" a rule with three exceptions, which has to be learned.
+    The exceptions are at least mechanical: they are exactly the moods declared
+    `tense: forbidden` in their morpheme entries, so the checker enforces them without any
+    separate list.
+  inspiration:
+    source: none
+    original_feature: >-
+      Tamil and Japanese both have tenseless imperatives, but neither needs this rule
+      stated, since neither has a zero-marked politeness level to confuse it with.
+    how_modified: >-
+      Made explicit because Tanese does have one (LOCKED decision 8 plus GR-POL-002).
+  pattern: "ROOT [ASPECT] TENSE [MOOD] [POLITENESS]  |  ROOT [ASPECT] TENSELESS_MOOD [POLITENESS]"
+  asserts:
+    requires: [verb.tense_on_indicative]
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen manduke
+      english: "I eat. (casual: tense present, politeness absent)"
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-SO
+      roman: manduso
+      english: "Eat! (imperative: a tenseless mood, so no tense suffix)"
+  invalid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-MI
+      roman: ano dhen mandumi
+      why: >-
+        An indicative verb with politeness but no tense. The neutral casual-register form is
+        `mandukemi`.
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-KE.TS-SO
+      roman: mandukeso
+      why: >-
+        Tense on the imperative. `-so` is declared `tense: forbidden`, so a tense suffix may
+        not co-occur with it.
+  status: official
+  since: v0.1

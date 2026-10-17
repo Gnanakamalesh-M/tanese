@@ -1,0 +1,234 @@
+# Noun morphology. Derived from LOCKED decisions 2, 4 and 5.
+
+- id: GR-NOUN-001
+  category: morphology
+  name: optional plural suffix
+  description: >-
+    Plurality is marked by the suffix `-nen` on the noun. It is optional: a bare noun is
+    unspecified for number, not singular.
+  reason: >-
+    LOCKED decision 4 makes plural an optional noun suffix. Optional means the bare form is
+    genuinely neutral, so `bunko` covers "book" and "books" and `bunkonen` is used only when
+    plurality matters. This keeps the suffix informative instead of obligatory agreement
+    machinery, which decision 4 also rules out on the verb.
+  alternatives: >-
+    Obligatory number marking, as in English. Rejected: it would force a choice on every
+    noun in the language for the sake of information that the numeral or the context usually
+    supplies anyway.
+  problems: >-
+    Ambiguity is the price: `wiro dhen ikkedho` does not say whether one person or several
+    went, and no later phase can recover it. Translation into a number-marking language
+    therefore has to guess, which will show up as noise in the Phase 5 metrics.
+  inspiration:
+    source: tamil
+    original_feature: The Tamil plural suffix -kaL, which is also often omitted.
+    how_modified: >-
+      The optionality is kept and the form is not: `-kaL`/`-kal`/`-gal` are banned in
+      spec/grammar_rules/_originality.yaml. `-nen` is unrelated to it and to Japanese, which
+      has no plural suffix at all.
+  pattern: "NOUN + -nen"
+  morphemes:
+    - form: nen
+      slot: number
+      function: plural
+      kind: suffix
+      word_class: noun
+  valid:
+    - tanese: TS-NA.TS-MI.TS-NE.TS-NASAL
+      roman: naminen
+      english: houses
+      gloss: nami-nen / house-PL
+    - tanese: TS-WI.TS-RO.TS-NE.TS-NASAL TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO
+      roman: wironen dhen ikkedho
+      english: The people went.
+      gloss: wiro-nen dhen ikke-dho / person-PL SUBJ go-PST
+  invalid:
+    - tanese: TS-NE.TS-NASAL TS-NA.TS-MI
+      roman: nen nami
+      why: >-
+        The plural marker is written before the noun as a separate word. It is a suffix
+        (LOCKED decision 2 allows suffixes only), so it attaches to the end of its host.
+    - tanese: TS-NA.TS-MI.TS-NE.TS-NASAL.TS-NE.TS-NASAL
+      roman: naminennen
+      why: >-
+        The plural suffix is doubled. Number is a single two-way feature; there is no second
+        degree of plurality for a second `-nen` to express.
+  status: official
+  since: v0.1
+
+- id: GR-NOUN-002
+  category: syntax
+  name: no grammatical gender
+  description: >-
+    Nouns have no gender class. Nothing in the language -- no particle, suffix, pronoun or
+    agreement -- varies by the gender of a noun.
+  reason: >-
+    LOCKED decision 5. Recorded as a rule, with examples, because "there is no X" is exactly
+    the kind of claim that quietly stops being true once vocabulary arrives: a test over
+    these examples will fail if a later phase introduces a gendered form.
+  inspiration:
+    source: none
+    original_feature: >-
+      Tamil has a rational/irrational and masculine/feminine distinction that surfaces in
+      verb agreement; Japanese has no grammatical gender.
+    how_modified: >-
+      Tanese follows Japanese here, and goes further: LOCKED decision 4 removes verb
+      agreement entirely, so there is no site where gender could surface even if it existed.
+  pattern: "NOUN (no gender class)"
+  asserts:
+    forbids: [noun.gender, verb.agreement]
+  valid:
+    - tanese: TS-NA.TS-NASAL.TS-THE TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO
+      roman: nanthe dhen ikkedho
+      english: The friend went. (no indication of the friend's gender, and none is possible)
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO
+      roman: uthe dhen ikkedho
+      english: He/she/it went. (the third-person pronoun is itself genderless)
+  invalid:
+    - tanese: TS-NA.TS-NASAL.TS-THE TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO.TS-NHE
+      roman: nanthe dhen ikkedhonhe
+      why: >-
+        `-nhe` is the perfect aspect suffix, not a gender agreement marker; there is no
+        agreement slot in the verb for a form like this to occupy.
+    - tanese: TS-NA.TS-NASAL.TS-THE TS-DHE.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO TS-U.TS-THE
+      roman: nanthe dhen ikkedho uthe
+      why: >-
+        A pronoun after the verb, as a gender-resuming tag. Nothing follows the verb except a
+        clause particle (GR-ORD-005), and gender is not a feature the language tracks.
+  status: official
+  since: v0.1
+
+- id: GR-NOUN-003
+  category: syntax
+  name: no articles
+  description: >-
+    There is no definite or indefinite article. Definiteness is not marked grammatically.
+  reason: >-
+    Neither source language has articles, and nothing else in the design needs them: the
+    topic particle `belu` already covers the one job articles most often do in translation,
+    which is marking what the sentence is about.
+  problems: >-
+    Translation into English must invent "the" or "a" on every noun, with no evidence to
+    choose from. BLEU and chrF against English references will be penalised for that, and
+    the Phase 7 report has to attribute the loss to this rule rather than to the model.
+  inspiration:
+    source: none
+    original_feature: Neither Tamil nor Japanese has articles.
+    how_modified: Taken unchanged.
+  pattern: "NOUN (bare)"
+  asserts:
+    forbids: [noun.article]
+  valid:
+    - tanese: TS-BU.TS-NASAL.TS-KO TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-RU.TS-BO.TS-DHO
+      roman: bunko do ano dhen rubodho
+      english: I read the book. / I read a book. (both; the distinction is not expressed)
+    - tanese: TS-MO.TS-THU TS-DHE.TS-NASAL TS-WE.TS-LI TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: mothu dhen weli do mandudho
+      english: The cat drank the water. (lit. ate the water)
+  invalid:
+    - tanese: TS-E.TS-THI TS-BU.TS-NASAL.TS-KO TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-RU.TS-BO.TS-DHO TS-E.TS-THI
+      roman: ethi bunko do ano dhen rubodho ethi
+      why: >-
+        The numeral `ethi` is repeated after the verb as an indefinite article. There is no
+        article slot, and nothing may follow the verb (GR-ORD-005).
+    - tanese: TS-LU TS-BU.TS-NASAL.TS-KO TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-RU.TS-BO.TS-DHO
+      roman: lu bunko do ano dhen rubodho
+      why: >-
+        The genitive particle `lu` is used as a prenominal definite article. `lu` is a
+        postposition: it follows a possessor noun (GR-PART-004), and it is not an article.
+  status: official
+  since: v0.1
+
+- id: GR-NOUN-004
+  category: syntax
+  name: noun-noun compounding
+  description: >-
+    Two nouns may be written as separate words in modifier-head order to form a compound
+    meaning. No linking particle and no fusion of the two forms occurs.
+  reason: >-
+    Compounding is how a small lexicon covers a large meaning space, which matters because
+    Phase 2 builds only about 300 words. Keeping the parts as separate words follows
+    GR-ORD-001: nothing is glued except suffixes, so a compound stays segmentable and the
+    Phase 4 tokenizer needs no compound-splitting logic.
+  alternatives: >-
+    Fuse the two roots into a single word, as both source languages do. Rejected for v0.1:
+    fusion raises sandhi questions (what happens at the join) that the phonology deliberately
+    has no answer to -- spec/phonology.yaml declares no allophony and no morphophonemics.
+  problems: >-
+    A compound is then formally identical to an unmarked noun sequence, so `kalu nami`
+    ("stone house") and a mistakenly unmarked argument look the same. Only the missing
+    particle distinguishes them, which is weak evidence.
+  inspiration:
+    source: none
+    original_feature: >-
+      Tamil and Japanese both compound productively, and both fuse the parts, often with
+      sandhi (Tamil) or voicing changes (Japanese rendaku).
+    how_modified: >-
+      The productivity is kept and the fusion is dropped, because Tanese has no
+      morphophonemics to govern the join.
+  pattern: "NOUN NOUN (modifier head)"
+  valid:
+    - tanese: TS-KA.TS-LU TS-NA.TS-MI
+      roman: kalu nami
+      english: stone house
+      gloss: kalu nami / stone house
+    - tanese: TS-BU.TS-NASAL.TS-KO TS-TE.TS-KU TS-BA.TS-NASAL TS-A.TS-NO TS-DHE.TS-NASAL TS-SI.TS-GEM.TS-PA.TS-DHO
+      roman: bunko teku ban ano dhen sippadho
+      english: I wrote in the book school (library-school).
+      gloss: "[bunko teku] ban ... / [book school] LOC ..."
+  invalid:
+    - tanese: TS-KA.TS-LU.TS-NA.TS-MI
+      roman: kalunami
+      why: >-
+        The two nouns are fused into one word. Only suffixes attach (GR-ORD-001); a compound
+        keeps its parts as separate words.
+    - tanese: TS-KA.TS-LU TS-LU TS-NA.TS-MI
+      roman: kalu lu nami
+      why: >-
+        A genitive particle between the parts. That is a possessive phrase ("the stone's
+        house"), not a compound; a compound takes no linking particle.
+  status: official
+  since: v0.1
+
+- id: GR-NOUN-005
+  category: syntax
+  name: numeral before noun, no classifier
+  description: >-
+    A numeral precedes the noun it counts, with no classifier or measure word, and the noun
+    does not have to take the plural suffix.
+  reason: >-
+    Modifier-head order (GR-ORD-003) puts the numeral first. No classifier system is
+    introduced because classifiers are a large closed class that has to be learned per noun,
+    and that cost buys nothing the number itself does not already say.
+  alternatives: >-
+    A Japanese-style classifier system. Rejected: it would roughly double the Phase 2
+    lexicon work for the counted nouns and add a rule per classifier, in a v0.1 whose point
+    is to be finishable.
+  inspiration:
+    source: japanese
+    original_feature: Japanese numeral + classifier constructions.
+    how_modified: >-
+      The position is Japanese-like but the classifier is removed entirely, and unlike
+      Japanese the counted noun needs no plural marking either, since plural is optional
+      (GR-NOUN-001).
+  pattern: "NUMERAL NOUN"
+  valid:
+    - tanese: TS-SO.TS-LU TS-BU.TS-NASAL.TS-KO TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-RU.TS-BO.TS-DHO
+      roman: solu bunko do ano dhen rubodho
+      english: I read three books.
+      gloss: solu bunko do ... / three book OBJ ...
+    - tanese: TS-NI.TS-RA TS-WI.TS-RO TS-DHE.TS-NASAL TS-NHO.TS-RU.TS-DHO
+      roman: nira wiro dhen nhorudho
+      english: Two people came.
+  invalid:
+    - tanese: TS-BU.TS-NASAL.TS-KO TS-SO.TS-LU TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-RU.TS-BO.TS-DHO
+      roman: bunko solu do ano dhen rubodho
+      why: >-
+        The numeral follows the noun, against modifier-head order (GR-ORD-003).
+    - tanese: TS-SO.TS-LU TS-LU TS-BU.TS-NASAL.TS-KO TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-RU.TS-BO.TS-DHO
+      roman: solu lu bunko do ano dhen rubodho
+      why: >-
+        A genitive particle between numeral and noun, as a classifier-like link. There is no
+        classifier construction, and `lu` marks possession (GR-PART-004).
+  status: official
+  since: v0.1

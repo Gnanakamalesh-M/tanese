@@ -1,0 +1,212 @@
+# Pronouns. Derived from LOCKED decisions 4 and 5: pronouns carry person, the verb does not.
+
+- id: GR-PRON-001
+  category: pronoun
+  name: pronoun inventory
+  description: >-
+    Three pronouns: `ano` (1st person), `iri` (2nd person), `uthe` (3rd person). None of
+    them marks gender, and none of them has a separate plural form.
+  reason: >-
+    LOCKED decision 4 puts person on the pronouns, and three is the minimum that covers the
+    speech roles. They are declared as `word`-kind morphemes rather than left to the lexicon
+    because they are grammar: the person system is a closed class, and the contradiction
+    checker should own it the way it owns the particles.
+  problems: >-
+    One third-person pronoun for every non-participant means a two-person narrative has no
+    way to keep them apart: `uthe dhen uthe do wesudho` ("he saw him") cannot say who saw
+    whom. Neither source language has this problem to the same degree, and v0.1 does not
+    solve it.
+  inspiration:
+    source: none
+    original_feature: >-
+      Tamil distinguishes gender and an inclusive/exclusive "we"; Japanese has a large open
+      set of pronouns graded by register.
+    how_modified: >-
+      Neither is taken: Tanese has exactly three, with no gender (LOCKED decision 5) and no
+      register variation, because politeness is marked only on the verb (LOCKED decision 8).
+  pattern: "PRONOUN + particle"
+  morphemes:
+    - form: ano
+      slot: person
+      function: first_person
+      kind: word
+      word_class: noun
+    - form: iri
+      slot: person
+      function: second_person
+      kind: word
+      word_class: noun
+    - form: uthe
+      slot: person
+      function: third_person
+      kind: word
+      word_class: noun
+  valid:
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-I.TS-RI TS-DO TS-WE.TS-SU.TS-DHO
+      roman: ano dhen iri do wesudho
+      english: I saw you.
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-MI TS-BA.TS-NASAL TS-THA.TS-MU.TS-KE
+      roman: uthe dhen nami ban thamuke
+      english: He sleeps in the house.
+  invalid:
+    - tanese: TS-A.TS-NO TS-I.TS-RI TS-DO TS-WE.TS-SU.TS-DHO
+      roman: ano iri do wesudho
+      why: >-
+        The pronoun subject has no particle. Pronouns are ordinary noun phrases and are
+        marked like any argument (GR-PART-012).
+    - tanese: TS-A.TS-NO.TS-NHU TS-I.TS-RI TS-DHE.TS-NASAL TS-WE.TS-SU.TS-DHO
+      roman: anonhu iri dhen wesudho
+      why: >-
+        The comitative particle is glued to the pronoun. Pronouns are ordinary noun phrases
+        and their particles are separate words (GR-ORD-001): `ano nhu iri dhen wesudho`.
+  status: official
+  since: v0.1
+
+- id: GR-PRON-002
+  category: syntax
+  name: pronouns carry person, verbs do not
+  description: >-
+    Person information lives entirely in the pronoun. The verb form is identical for first,
+    second and third person.
+  reason: >-
+    LOCKED decision 4 again, stated from the other direction than GR-VERB-004: that rule says
+    the verb does not agree, this one says where the information went instead. Both are
+    needed, because the pair is what makes the dropped-subject problem in GR-PRON-003
+    visible.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese, where the verb carries no person and pronouns are the only source of it.
+    how_modified: >-
+      Followed rather than Tamil, whose verb endings encode person, number and gender and
+      make the pronoun redundant.
+  pattern: "PRONOUN + particle ... V (invariant)"
+  asserts:
+    requires: [person.on_pronoun]
+    forbids: [person.on_verb]
+  valid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: iri dhen manduke
+      english: You eat.
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: ano dhen manduke
+      english: I eat. (same verb form)
+  invalid:
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE.TS-WI.TS-RO
+      roman: iri dhen mandukewiro
+      why: >-
+        A noun is suffixed to the verb as a person marker. There is no person slot on the
+        verb (GR-VERB-004), and `wiro` is a word, not a suffix.
+    - tanese: TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NA.TS-NO
+      roman: mandukenano
+      why: >-
+        An invented first-person ending on the verb. Person is expressed by a separate
+        pronoun word or not at all (GR-VERB-004); the politeness slot is the last one, and
+        it holds only `-mi` or `-sun`.
+  status: official
+  since: v0.1
+
+- id: GR-PRON-003
+  category: syntax
+  name: pronoun dropping
+  description: >-
+    A pronoun argument may be omitted entirely when it is clear from context. What is left
+    is a verb with no subject phrase, which is a complete sentence.
+  reason: >-
+    Dropping is allowed because the alternative is repeating `ano dhen` in every sentence of
+    a first-person narrative. It is restricted to pronouns: a full noun phrase may not be
+    dropped, and no argument may appear bare (GR-PART-012), so the only legal omission is
+    total.
+  problems: >-
+    With no verb agreement (GR-VERB-004), a dropped pronoun leaves no trace at all --
+    `mandudho` alone could be any person -- so the recovery is purely contextual. This
+    interacts badly with the single third-person pronoun (GR-PRON-001) and will be a
+    measurable error source in Phase 5 translation.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      Japanese pro-drop, which is also agreement-free and relies entirely on context.
+    how_modified: >-
+      Taken as-is. Tamil also drops pronouns, but recovers them from the verb ending, which
+      Tanese cannot do.
+  pattern: "[no subject] ... V"
+  valid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: sedha do mandudho
+      english: (I/you/he) ate the food.
+    - tanese: TS-NE.TS-GEM.TS-BO TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-DHO.TS-SU.TS-NASAL
+      roman: nebbo teku thin ikkedhosun
+      english: (I) went to school yesterday. (formal)
+  invalid:
+    - tanese: TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: dhen sedha do mandudho
+      why: >-
+        The particle is left behind without its pronoun. Omission is total: the particle goes
+        with the phrase it marks.
+    - tanese: TS-SE.TS-DHA TS-MA.TS-NASAL.TS-DU.TS-DHO
+      roman: sedha mandudho
+      why: >-
+        The object has been kept but stripped of its particle. Only a whole pronoun phrase
+        may be dropped; arguments are never bare (GR-PART-012).
+  status: official
+  since: v0.1
+
+- id: GR-PRON-004
+  category: pronoun
+  name: pronoun plural
+  description: >-
+    Plural pronouns use the ordinary noun plural suffix: `anonen` ("we"), `irinen` ("you"
+    plural), `uthenen` ("they"). There are no dedicated plural pronoun stems.
+  reason: >-
+    Pronouns are ordinary noun phrases everywhere else in the grammar (GR-PRON-001,
+    GR-PRON-003), so they take the ordinary plural suffix too. Three dedicated stems would be
+    three irregular forms bought for nothing.
+  problems: >-
+    Plural is optional on nouns (GR-NOUN-001), and that carries over: `ano dhen` can mean
+    "we" in context, so "I" and "we" are not reliably distinguished. There is also no
+    inclusive/exclusive distinction, so `anonen` cannot say whether the addressee is
+    included -- which is a real gap next to the hortative `-lo`, whose whole meaning is that
+    they are.
+  inspiration:
+    source: tamil
+    original_feature: >-
+      Tamil's naam / naangaL inclusive-exclusive distinction in the first person plural.
+    how_modified: >-
+      Not taken: the distinction is dropped and the plural is built regularly instead, with
+      the cost recorded above.
+  pattern: "PRONOUN + -nen"
+  morphemes:
+    - form: anonen
+      slot: person
+      function: first_person_plural
+      kind: word
+      word_class: noun
+    - form: irinen
+      slot: person
+      function: second_person_plural
+      kind: word
+      word_class: noun
+    - form: uthenen
+      slot: person
+      function: third_person_plural
+      kind: word
+      word_class: noun
+  valid:
+    - tanese: TS-A.TS-NO.TS-NE.TS-NASAL TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: anonen dhen sedha do manduke
+      english: We eat the food.
+      gloss: ano-nen dhen ... / I-PL SUBJ ...
+    - tanese: TS-U.TS-THE.TS-NE.TS-NASAL TS-DHE.TS-NASAL TS-NE.TS-GEM.TS-BO TS-NHO.TS-RU.TS-DHO
+      roman: uthenen dhen nebbo nhorudho
+      english: They came yesterday.
+  invalid:
+    - tanese: TS-A.TS-NO.TS-NE.TS-NASAL.TS-NE.TS-NASAL TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: anonennen dhen manduke
+      why: The plural suffix is doubled (GR-NOUN-001).
+    - tanese: TS-NE.TS-NASAL TS-A.TS-NO TS-DHE.TS-NASAL TS-MA.TS-NASAL.TS-DU.TS-KE
+      roman: nen ano dhen manduke
+      why: >-
+        The plural marker is written as a separate word before the pronoun. It is a suffix
+        (LOCKED decision 2).
+  status: official
+  since: v0.1

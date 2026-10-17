@@ -1,0 +1,163 @@
+# Commands. All three moods here are tenseless: their morpheme entries declare
+# `tense: forbidden`, which is the exception GR-VERB-006 is stated around.
+
+- id: GR-IMP-001
+  category: morphology
+  name: imperative
+  description: >-
+    The mood suffix `-so` makes a direct command. It takes no tense suffix, and the subject
+    is normally dropped.
+  reason: >-
+    A command cannot be located in time -- there is no such thing as ordering someone to have
+    done something yesterday -- so the imperative is declared `tense: forbidden` rather than
+    being given an arbitrary default tense. The subject is droppable under GR-PRON-003 and
+    is usually dropped because the addressee is present by definition.
+  problems: >-
+    Because negation shares the mood slot (GR-NEG-001), `-so` has no negative counterpart;
+    the prohibitive is analytic (GR-NEG-003) and does not use this suffix at all.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese imperative, which is a stem change or a dedicated form (tabero, ike)
+      rather than an added suffix.
+    how_modified: >-
+      Tanese cannot use a stem change (GR-VERB-001), so the imperative is a plain mood
+      suffix. This is also what makes it tenseless in a machine-checkable way, where the
+      Japanese form is simply irregular.
+  pattern: "ROOT [ASPECT] + -so [POLITENESS]"
+  morphemes:
+    - form: so
+      slot: mood
+      function: imperative
+      kind: suffix
+      word_class: verb
+      tense: forbidden
+  valid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-SO
+      roman: sedha do manduso
+      english: Eat the food!
+      gloss: sedha do mandu-so / food OBJ eat-IMP
+    - tanese: TS-TE.TS-KU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-SO
+      roman: teku thin ikkeso
+      english: Go to school!
+  invalid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-SO
+      roman: sedha do mandukeso
+      why: >-
+        Tense on the imperative. `-so` is declared `tense: forbidden` (GR-VERB-006).
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-SO.TS-NHI
+      roman: sedha do mandusonhi
+      why: >-
+        A negated imperative. Imperative and negation share the mood slot; the prohibitive
+        is `mandukenhi thon` (GR-NEG-003).
+  status: official
+  since: v0.1
+
+- id: GR-IMP-002
+  category: morphology
+  name: polite request
+  description: >-
+    The mood suffix `-the` makes a request rather than a command. It is tenseless, and it
+    takes a politeness suffix independently of its own politeness as a mood.
+  reason: >-
+    Request is a separate mood from imperative, not just an imperative with formal
+    politeness. Keeping them apart is what allows a casual request between friends
+    (`manduthe`) and a brusque formal order to a subordinate (`mandusosun`) -- two
+    combinations that would be impossible if politeness level alone distinguished a command
+    from a request.
+  alternatives: >-
+    Express requests as imperative plus formal politeness, with no separate mood. Rejected
+    for the reason above: it ties register and speech act together, which are independent in
+    practice.
+  problems: >-
+    Two dimensions of politeness now sit on one verb -- the mood and the politeness suffix --
+    and some pairings read oddly (`manduthe` is a casual request, which is fine, but
+    `mandusosun` is a formally-worded order and will feel contradictory to a learner). v0.1
+    does not restrict the combinations.
+  inspiration:
+    source: japanese
+    original_feature: >-
+      The Japanese request construction -te kudasai, built from a gerund plus an honorific
+      verb.
+    how_modified: >-
+      Reduced to a single mood suffix, since GR-VERB-001 forbids auxiliaries. The Japanese
+      gerund `-te` is banned in _originality.yaml; `-the` is a retroflex form and a distinct
+      string, but the resemblance is recorded here deliberately so it is not discovered later
+      and mistaken for a borrowing.
+  pattern: "ROOT [ASPECT] + -the [POLITENESS]"
+  morphemes:
+    - form: the
+      slot: mood
+      function: polite_request
+      kind: suffix
+      word_class: verb
+      tense: forbidden
+  valid:
+    - tanese: TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-THE.TS-SU.TS-NASAL
+      roman: bunko do rubothesun
+      english: Please read the book. (formal)
+      gloss: rubo-the-sun / read-REQ-FORMAL
+    - tanese: TS-WE.TS-LI TS-DO TS-DHE.TS-LO.TS-THE
+      roman: weli do dhelothe
+      english: Please give me water. (casual request)
+  invalid:
+    - tanese: TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-KE.TS-THE
+      roman: bunko do rubokethe
+      why: "Tense on a request: `-the` is declared tense-forbidden (GR-VERB-006)."
+    - tanese: TS-BU.TS-NASAL.TS-KO TS-DO TS-RU.TS-BO.TS-SO.TS-THE
+      roman: bunko do rubosothe
+      why: >-
+        Imperative and request stacked. They are two moods competing for one slot; a verb
+        makes either a command or a request, not both.
+  status: official
+  since: v0.1
+
+- id: GR-IMP-003
+  category: morphology
+  name: hortative
+  description: >-
+    The mood suffix `-lo` proposes a joint action ("let us ..."). It is tenseless and
+    includes the speaker, so no subject is stated.
+  reason: >-
+    A proposal is neither a statement about the world nor an order to someone else, so it is
+    its own mood. It is tenseless for the same reason as the imperative, and it is listed
+    among the commands rather than the moods of GR-TAM-005 because it is a speech act, not a
+    temporal or epistemic category.
+  problems: >-
+    The hortative necessarily includes the addressee, so a first-person-exclusive proposal
+    ("let us go, but not you") is not expressible. Nor is a negative one ("let us not go"),
+    since negation shares the slot.
+  inspiration:
+    source: japanese
+    original_feature: The Japanese volitional/hortative -ou / -mashou.
+    how_modified: >-
+      Reduced to one invariant suffix with no politeness fused into it: where Japanese has a
+      plain and a polite volitional, Tanese takes its politeness from the ordinary politeness
+      slot, so `-lo` combines with all three levels.
+  pattern: "ROOT [ASPECT] + -lo [POLITENESS]"
+  morphemes:
+    - form: lo
+      slot: mood
+      function: hortative
+      kind: suffix
+      word_class: verb
+      tense: forbidden
+  valid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-LO
+      roman: sedha do mandulo
+      english: Let us eat the food.
+      gloss: mandu-lo / eat-HORT
+    - tanese: TS-GO.TS-SU TS-THI.TS-NASAL TS-I.TS-GEM.TS-KE.TS-LO.TS-MI
+      roman: gosu thin ikkelomi
+      english: Let us go to the city. (neutral politeness)
+  invalid:
+    - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-LO
+      roman: sedha do mandukelo
+      why: "Tense on the hortative: `-lo` is declared tense-forbidden (GR-VERB-006)."
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-LO
+      roman: ano dhen sedha do mandulo
+      why: >-
+        A stated subject with the hortative. The mood already includes the speaker and the
+        addressee, so a subject phrase contradicts it.
+  status: official
+  since: v0.1
