@@ -192,9 +192,10 @@ originality:
     retroactive: false
   new_root_gate_reason: >-
     Exact equality alone lets through a form one segment from its source, which is the real
-    failure mode: a root `wesu` is not `desu`, but nobody would believe it was coined
-    independently. An absolute distance of 2 rules out exactly that -- one substitution, one
-    insertion or one deletion -- while staying achievable.
+    failure mode and was not a hypothetical one: the demo root `wesu` was not `desu`, but
+    nobody would have believed it was coined independently, and it has been retired for
+    exactly that reason. An absolute distance of 2 rules out that case -- one substitution,
+    one insertion or one deletion -- while staying achievable.
   alternatives: >-
     A normalised edit distance (distance divided by the longer length), which was the first
     proposal. Rejected after measuring it: normalised distance is length-biased against
@@ -203,17 +204,18 @@ originality:
     because a two-letter morpheme cannot be far from a two-letter particle in relative
     terms. A gate that condemns the existing official spec is measuring the wrong thing.
   problems: >-
-    Being non-retroactive, the gate leaves standing 21 existing forms it would have
+    Being non-retroactive, the gate leaves standing 19 existing forms it would have
     rejected, all at distance 1 and all listed by scripts/check_vocabulary.py so the
     exemption is visible rather than implied. Eighteen are Phase 1B particles and suffixes,
     and ten of those are two letters long, where distance 1 from a two-letter source
     particle is close to unavoidable -- which is the honest reason the gate is scoped to
-    roots and not to morphemes.
-    The other three are demo roots, and two of those are a real problem rather than a
-    technicality: `esu`, the copula, is one edit from Japanese *desu* AND has the same
-    grammatical function, and `wesu` ("see") is one edit from it as well. They are demo
-    words, not vocabulary, so nothing official is affected -- but Phase 2 must not re-derive
-    either, and the Phase 1C report recommends retiring both.
+    roots and not to morphemes. The nineteenth is the demo pronoun root `ano`, one edit from
+    Japanese *no*.
+    Two further demo roots were spared by the same exemption and have since been retired
+    rather than left standing: `esu`, the demo copula, was one edit from Japanese *desu* AND
+    shared its grammatical function, and `wesu` ("see") was one edit from it too. They are
+    now `nutu` and `bitu`, both at distance 3. Keeping them out needs no special record: at
+    distance 1 this gate rejects either form outright if Phase 2 ever proposes it.
     More fundamentally, passing this gate proves only that no *listed* form was reused. The
     list is 61 hand-enumerated items; absence from Japanese and Tamil as a whole, let alone
     from any third language, is not proven and cannot be by this method.
@@ -1338,14 +1340,15 @@ rules:
       morphemes, because a two-letter morpheme cannot be relatively far from a two-letter
       particle. The measurement is in the originality block above.
     problems: >-
-      Not retroactive, so it leaves standing 21 existing forms at distance 1, which
+      Not retroactive, so it leaves standing 19 existing forms at distance 1, which
       scripts/check_vocabulary.py prints in full. Eighteen are Phase 1B morphemes, where the
       measure means little because a two-letter suffix cannot be far from a two-letter
-      particle; that is why this gate is scoped to roots. The remaining three are demo
-      roots, and two are a genuine problem: `esu`, the copula, is one edit from Japanese
-      *desu* and shares its grammatical function, and `wesu` is one edit from it as well.
-      Both are experimental demo words rather than vocabulary, but Phase 2 must not re-derive
-      either, and the Phase 1C report recommends retiring them.
+      particle; that is why this gate is scoped to roots. The nineteenth is the demo pronoun
+      root `ano`.
+      The two demo roots that were a genuine problem rather than a measurement artefact --
+      `esu`, the copula, one edit from Japanese *desu* and sharing its grammatical function,
+      and `wesu`, one edit from it too -- have been retired in favour of `nutu` and
+      `bitu`.
     inspiration:
       source: none
       original_feature: none
@@ -1362,8 +1365,9 @@ rules:
       - tanese: TS-WE.TS-SU
         roman: wesu
         why: >-
-          Distance 1 from Japanese *desu*. It is an existing demo word, which is why the gate
-          is declared non-retroactive -- and why this rule names it rather than hiding it.
+          Distance 1 from Japanese *desu*. It was a demo word until this rule was applied to
+          the demo lexicon and it was retired in favour of `bitu`; it is kept here as the
+          example that motivated the gate.
       - tanese: TS-MA.TS-DO
         roman: mado
         why: >-

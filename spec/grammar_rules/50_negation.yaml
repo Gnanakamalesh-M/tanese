@@ -80,14 +80,14 @@
     how_modified: >-
       Not taken: Tanese inflects the copula instead, and `illai` is listed in
       _originality.yaml so no particle can reuse the form.
-  pattern: "NP dhen NP esu+TENSE+-nhi [POLITENESS]"
+  pattern: "NP dhen NP nutu+TENSE+-nhi [POLITENESS]"
   valid:
-    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE.TS-NHI
-      roman: uthe dhen nanthe esukenhi
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NU.TS-TU.TS-KE.TS-NHI
+      roman: uthe dhen nanthe nutukenhi
       english: He is not a friend.
-      gloss: esu-ke-nhi / be-NPST-NEG
-    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-WI.TS-RO TS-E.TS-SU.TS-DHO.TS-NHI.TS-MI
-      roman: ano dhen wiro esudhonhimi
+      gloss: nutu-ke-nhi / be-NPST-NEG
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-WI.TS-RO TS-NU.TS-TU.TS-DHO.TS-NHI.TS-MI
+      roman: ano dhen wiro nutudhonhimi
       english: I was not a person. (neutral politeness)
   invalid:
     - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NHI
@@ -95,8 +95,8 @@
       why: >-
         The negation suffix is written as a separate negative word. `-nhi` is a suffix, and
         the copula may not be dropped (GR-VERB-005).
-    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-NHI.TS-KE
-      roman: uthe dhen nanthe esunhike
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NU.TS-TU.TS-NHI.TS-KE
+      roman: uthe dhen nanthe nutunhike
       why: Mood precedes tense, against the fixed slot order (GR-VERB-003).
   status: official
   since: v0.1

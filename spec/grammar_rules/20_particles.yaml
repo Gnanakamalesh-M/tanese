@@ -208,8 +208,8 @@
     - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-NA.TS-MI TS-BA.TS-NASAL TS-THA.TS-MU.TS-DHO
       roman: ano dhen nami ban thamudho
       english: I slept in the house.
-    - tanese: TS-KI.TS-NHU TS-DHE.TS-NASAL TS-THO.TS-RA TS-BA.TS-NASAL TS-E.TS-SU.TS-KE
-      roman: kinhu dhen thora ban esuke
+    - tanese: TS-KI.TS-NHU TS-DHE.TS-NASAL TS-THO.TS-RA TS-BA.TS-NASAL TS-NU.TS-TU.TS-KE
+      roman: kinhu dhen thora ban nutuke
       english: The bird is in the tree.
   invalid:
     - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-BA.TS-NASAL TS-NA.TS-MI TS-THA.TS-MU.TS-DHO
@@ -416,8 +416,8 @@
     - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO TS-WE.TS-NASAL
       roman: iri dhen sedha do mandudho wen
       english: Did you eat the food?
-    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE TS-WE.TS-NASAL
-      roman: uthe dhen nanthe esuke wen
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NU.TS-TU.TS-KE TS-WE.TS-NASAL
+      roman: uthe dhen nanthe nutuke wen
       english: Is he a friend?
   invalid:
     - tanese: TS-WE.TS-NASAL TS-I.TS-RI TS-DHE.TS-NASAL TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
@@ -466,8 +466,8 @@
       roman: ano dhoka ikkeke thenu uthe dhen kathidho
       english: He said that he goes tomorrow.
       gloss: "[ano dhoka ikke-ke] thenu uthe dhen kathi-dho / [I tomorrow go-NPST] QUOT he SUBJ speak-PST"
-    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE TS-THE.TS-NU TS-A.TS-NO TS-DHE.TS-NASAL TS-BE.TS-KI.TS-KE
-      roman: iri dhen nanthe esuke thenu ano dhen bekike
+    - tanese: TS-I.TS-RI TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NU.TS-TU.TS-KE TS-THE.TS-NU TS-A.TS-NO TS-DHE.TS-NASAL TS-BE.TS-KI.TS-KE
+      roman: iri dhen nanthe nutuke thenu ano dhen bekike
       english: I know that you are a friend.
   invalid:
     - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-KA.TS-THI.TS-DHO TS-A.TS-NO TS-DHO.TS-KA TS-I.TS-GEM.TS-KE.TS-KE TS-THE.TS-NU
@@ -560,15 +560,15 @@
     - tanese: TS-NA.TS-MI TS-BA.TS-NASAL TS-A.TS-NO TS-DHE.TS-NASAL TS-THA.TS-MU.TS-DHO
       roman: nami ban ano dhen thamudho
       english: I slept in the house. (one particle per phrase)
-    - tanese: TS-NA.TS-MI TS-BE.TS-LU TS-A.TS-NO TS-DHE.TS-NASAL TS-WE.TS-SU.TS-DHO
-      roman: nami belu ano dhen wesudho
+    - tanese: TS-NA.TS-MI TS-BE.TS-LU TS-A.TS-NO TS-DHE.TS-NASAL TS-BI.TS-TU.TS-DHO
+      roman: nami belu ano dhen bitudho
       english: As for the house, I saw it. (`belu` in place of `do`, not after it)
   invalid:
     - tanese: TS-NA.TS-MI TS-BA.TS-NASAL TS-DO TS-A.TS-NO TS-DHE.TS-NASAL TS-THA.TS-MU.TS-DHO
       roman: nami ban do ano dhen thamudho
       why: Two case particles on one noun phrase.
-    - tanese: TS-NA.TS-MI TS-DO TS-BE.TS-LU TS-A.TS-NO TS-DHE.TS-NASAL TS-WE.TS-SU.TS-DHO
-      roman: nami do belu ano dhen wesudho
+    - tanese: TS-NA.TS-MI TS-DO TS-BE.TS-LU TS-A.TS-NO TS-DHE.TS-NASAL TS-BI.TS-TU.TS-DHO
+      roman: nami do belu ano dhen bitudho
       why: >-
         A case particle followed by the topic particle. `belu` replaces the case particle
         (GR-PART-009); it never follows one.

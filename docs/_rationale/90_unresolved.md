@@ -71,21 +71,7 @@ project tries to avoid.
 **Cost if taken.** New morphemes, new slots, and a rewrite of the word-boundary and
 segmentation story, since a derived word is one word carrying two kinds of suffix.
 
-### U-5. The two demo roots that are one edit from Japanese *desu*
-
-**The question.** `esu`, the demo copula, is one edit from Japanese *desu* **and** has the
-same grammatical function. `wesu` ("see") is one edit from it as well. Both pass the hard
-gate, because the hard gate is exact equality; both would fail the new-root gate, which is
-declared non-retroactive.
-
-**Trigger: now, for Phase 2.** These are demo words rather than vocabulary, so nothing
-official is affected, but Phase 2 must not re-derive either of them. The Phase 1C report
-recommends retiring both outright.
-
-**Cost.** Low: replacing them means rewriting the grammar examples that use them, and the
-copula in particular appears in a fair number of them.
-
-### U-6. Whether the stratum shares are the right shares
+### U-5. Whether the stratum shares are the right shares
 
 **The question.** The five share targets (0.60 native, 0.12 and 0.12 inspired, 0.10 compound,
 0.06 loan) are a judgement with nothing behind them. They are the only mechanism restraining
@@ -96,3 +82,20 @@ either direction is evidence that the target was wrong rather than that the lexi
 
 **Cost.** None to change the numbers. The point of recording them is to make the comparison
 possible at all.
+
+---
+
+### Closed since v0.1
+
+**The two demo roots one edit from Japanese *desu*.** `esu`, the demo copula, was one edit
+from *desu* and shared its grammatical function, which made it the worst originality case in
+the project; `wesu` ("see") was one edit from the same form. Both passed the hard gate,
+because the hard gate is exact equality, and both were spared by the new-root gate only
+because that gate is declared non-retroactive.
+
+They have been retired, in favour of `nutu` and `bitu`, and every grammar example that used
+them was rewritten. No list of forbidden forms was added, because none is needed: at
+distance 1 the new-root gate now rejects either spelling outright, so a Phase 2 candidate
+spelled `esu` or `wesu` fails `VR-ORIG-002` with no further machinery. What remains spared by
+the non-retroactivity is 19 forms at distance 1 — eighteen Phase 1B morphemes, where the
+measure means little, and the demo pronoun root `ano`.

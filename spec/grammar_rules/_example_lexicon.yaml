@@ -20,6 +20,14 @@
 # `class` is the word class the grammar rules expect: noun, verb, pronoun, numeral, adverb,
 # interrogative, copula. Verbs and the copula are listed in their citation form (bare root,
 # non-finite -- see GR-VERB-002).
+#
+# Two roots were retired after Phase 1C measured them against the originality gate in
+# spec/vocabulary_rules.yaml: the copula `esu` (one edit from Japanese *desu*, and sharing
+# its grammatical function, which made it the worst case in the file) and `wesu` "see" (one
+# edit from the same form). They are now `nutu` and `bitu`, at distance 3. No list is needed
+# to keep the old pair out: at distance 1 the gate rejects either outright, so a Phase 2
+# candidate spelled `esu` or `wesu` fails VR-ORIG-002 without anything further being written
+# down.
 
 version: v0.1
 
@@ -110,7 +118,7 @@ words:
     class: verb
     gloss: eat
     status: experimental
-  - form: wesu
+  - form: bitu
     class: verb
     gloss: see
     status: experimental
@@ -143,7 +151,7 @@ words:
     gloss: know
     status: experimental
   # ---- copula ------------------------------------------------------------------------
-  - form: esu
+  - form: nutu
     class: copula
     gloss: be (equational copula; takes the same suffix slots as a verb)
     status: experimental

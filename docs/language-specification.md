@@ -581,11 +581,11 @@ Verb suffix order (locked decision 6), as declared by GR-VERB-003:
 | GR-VERB-001 | verbs are suffixing only | `ROOT + SUFFIX*` | A verb is a root followed by zero or more suffixes, in the order fixed by GR-VERB-003. There are no prefixes, no infixes, no auxiliary verbs and no stem changes: the root is identical in every form. |
 | GR-VERB-002 | the citation form is non-finite | `ROOT (no suffix)` | The bare root -- no suffix of any kind -- is the citation form: the dictionary headword and the form quoted when talking about the verb. It is not a finite verb and cannot be the predicate of a sentence. |
 | GR-VERB-004 | no verb agreement | `V (invariant across subjects)` | The verb never varies with the person, number or gender of any argument. The same verb form serves every subject. |
-| GR-VERB-005 | the copula is an ordinary verb | `NP dhen NP esu+SUFFIX*` | Equation and location use the copula root `esu`, which takes the same four suffix slots as any other verb and stands in the same clause-final position. |
+| GR-VERB-005 | the copula is an ordinary verb | `NP dhen NP nutu+SUFFIX*` | Equation and location use the copula root `nutu`, which takes the same four suffix slots as any other verb and stands in the same clause-final position. |
 | GR-VERB-006 | tense is obligatory on an indicative verb | `ROOT [ASPECT] TENSE [MOOD] [POLITENESS]  \|  ROOT [ASPECT] TENSELESS_MOOD [POLITENESS]` | A verb with no mood suffix, or with a mood whose `tense` is `required`, must carry a tense suffix. Only the three tenseless moods -- imperative, hortative, polite request -- license a verb with no tense. |
 | GR-TAM-002 | unmarked aspect is habitual or neutral | `ROOT + TENSE (aspect slot empty)` | A verb with an empty aspect slot is aspectually neutral: it reads as a habit, a general truth, or simply an unspecified event. |
 | GR-TAM-004 | future is non-past plus an adverb | `TIME_ADVERB ... V+-ke` | Future time is expressed by the non-past verb together with a time adverb, or by the desiderative/conditional moods where intention is meant. No suffix marks the future. |
-| GR-NEG-002 | copula negation | `NP dhen NP esu+TENSE+-nhi [POLITENESS]` | The copula is negated exactly like any other verb, by `-nhi` in its mood slot. There is no separate negative existential word. |
+| GR-NEG-002 | copula negation | `NP dhen NP nutu+TENSE+-nhi [POLITENESS]` | The copula is negated exactly like any other verb, by `-nhi` in its mood slot. There is no separate negative existential word. |
 | GR-Q-001 | yes/no questions add a particle only | `DECLARATIVE + wen` | A yes/no question is a statement plus the clause-final particle `wen`. Word order, verb form and politeness are unchanged. |
 | GR-Q-002 | wh-words stay in place and take no question particle | `... WH + particle ... V` | An interrogative word (`kena` "what", `kewa` "who") occupies the ordinary position of the phrase it questions, with the ordinary particle for that role. A wh-question does not take `wen`. |
 | GR-Q-003 | wh-words are ordinary noun phrases | `WH + particle` | An interrogative word takes whichever particle its role requires -- `dhen` as subject, `do` as object, `ban` as location -- and may head a genitive phrase like any noun. |
@@ -594,7 +594,7 @@ Verb suffix order (locked decision 6), as declared by GR-VERB-003:
 | GR-PRON-003 | pronoun dropping | `[no subject] ... V` | A pronoun argument may be omitted entirely when it is clear from context. What is left is a verb with no subject phrase, which is a complete sentence. |
 | GR-POL-002 | casual is the empty politeness slot | `ROOT [ASPECT] TENSE [MOOD] (politeness slot empty)` | An empty politeness slot is the casual level. It is a positive value of the feature, not an absence of politeness marking, and a verb with no politeness suffix is a fully well-formed casual verb. |
 | GR-POL-003 | politeness is marked once per clause | `... V+POLITENESS (once per clause)` | Politeness is marked on the final verb or copula of the clause and nowhere else. Nouns, pronouns and particles never vary by politeness level. |
-| GR-POL-004 | politeness on the copula and after a clause particle | `... esu+TENSE[+MOOD]+POLITENESS [CLAUSE_PARTICLE]` | An equational clause carries its politeness on the copula, like any other verb. Where a clause ends in a particle, the politeness suffix stays on the verb before it and never moves onto the particle. |
+| GR-POL-004 | politeness on the copula and after a clause particle | `... nutu+TENSE[+MOOD]+POLITENESS [CLAUSE_PARTICLE]` | An equational clause carries its politeness on the copula, like any other verb. Where a clause ends in a particle, the politeness suffix stays on the verb before it and never moves onto the particle. |
 
 **word order**
 
@@ -728,9 +728,9 @@ A root is 2 to 4 moras long and ends in `a` or `i` or `u` or `e` or `o` or `n`.
 - **Hard gate**: `not_equal`. LOCKED decision 3 says a form must NOT equal a common Japanese or Tamil particle or case ending. Exact equality against the spellable entries of spec/grammar_rules/_originality.yaml is the gate Phase 1B already applies to every particle and suffix; Phase 1C applies the same gate to roots.
 - **New-root gate**: levenshtein absolute of at least 2, measured against the spellable entries of spec/grammar_rules/_originality.yaml, applying to roots coined from v0.1 onward. Retroactive: no.
 
-Exact equality alone lets through a form one segment from its source, which is the real failure mode: a root `wesu` is not `desu`, but nobody would believe it was coined independently. An absolute distance of 2 rules out exactly that -- one substitution, one insertion or one deletion -- while staying achievable.
+Exact equality alone lets through a form one segment from its source, which is the real failure mode and was not a hypothetical one: the demo root `wesu` was not `desu`, but nobody would have believed it was coined independently, and it has been retired for exactly that reason. An absolute distance of 2 rules out that case -- one substitution, one insertion or one deletion -- while staying achievable.
 
-Known costs: Being non-retroactive, the gate leaves standing 21 existing forms it would have rejected, all at distance 1 and all listed by scripts/check_vocabulary.py so the exemption is visible rather than implied. Eighteen are Phase 1B particles and suffixes, and ten of those are two letters long, where distance 1 from a two-letter source particle is close to unavoidable -- which is the honest reason the gate is scoped to roots and not to morphemes. The other three are demo roots, and two of those are a real problem rather than a technicality: `esu`, the copula, is one edit from Japanese *desu* AND has the same grammatical function, and `wesu` ("see") is one edit from it as well. They are demo words, not vocabulary, so nothing official is affected -- but Phase 2 must not re-derive either, and the Phase 1C report recommends retiring both. More fundamentally, passing this gate proves only that no *listed* form was reused. The list is 61 hand-enumerated items; absence from Japanese and Tamil as a whole, let alone from any third language, is not proven and cannot be by this method.
+Known costs: Being non-retroactive, the gate leaves standing 19 existing forms it would have rejected, all at distance 1 and all listed by scripts/check_vocabulary.py so the exemption is visible rather than implied. Eighteen are Phase 1B particles and suffixes, and ten of those are two letters long, where distance 1 from a two-letter source particle is close to unavoidable -- which is the honest reason the gate is scoped to roots and not to morphemes. The nineteenth is the demo pronoun root `ano`, one edit from Japanese *no*. Two further demo roots were spared by the same exemption and have since been retired rather than left standing: `esu`, the demo copula, was one edit from Japanese *desu* AND shared its grammatical function, and `wesu` ("see") was one edit from it too. They are now `nutu` and `bitu`, both at distance 3. Keeping them out needs no special record: at distance 1 this gate rejects either form outright if Phase 2 ever proposes it. More fundamentally, passing this gate proves only that no *listed* form was reused. The list is 61 hand-enumerated items; absence from Japanese and Tamil as a whole, let alone from any third language, is not proven and cannot be by this method.
 
 ### 5.4 Semantic fields
 
@@ -1012,14 +1012,14 @@ A root coined from v0.1 onward must be at least edit distance 2 (absolute Levens
 - Pattern: `min edit distance to banned list >= 2`
 - Why: Exact equality alone admits a form one segment from its source, which is the real failure mode rather than a theoretical one: a root `wesu` is not `desu`, but no reader would accept that it was coined independently. Distance 2 excludes precisely the one-edit cases -- one substitution, one insertion, one deletion -- and is achievable for a coined root, which a stricter gate is not.
 - Considered and rejected: A normalised edit distance floor of 0.5, which was the original proposal. Rejected after measuring it against the existing spec: it fails twelve already-official Phase 1B morphemes, because a two-letter morpheme cannot be relatively far from a two-letter particle. The measurement is in the originality block above.
-- Known costs: Not retroactive, so it leaves standing 21 existing forms at distance 1, which scripts/check_vocabulary.py prints in full. Eighteen are Phase 1B morphemes, where the measure means little because a two-letter suffix cannot be far from a two-letter particle; that is why this gate is scoped to roots. The remaining three are demo roots, and two are a genuine problem: `esu`, the copula, is one edit from Japanese *desu* and shares its grammatical function, and `wesu` is one edit from it as well. Both are experimental demo words rather than vocabulary, but Phase 2 must not re-derive either, and the Phase 1C report recommends retiring them.
+- Known costs: Not retroactive, so it leaves standing 19 existing forms at distance 1, which scripts/check_vocabulary.py prints in full. Eighteen are Phase 1B morphemes, where the measure means little because a two-letter suffix cannot be far from a two-letter particle; that is why this gate is scoped to roots. The nineteenth is the demo pronoun root `ano`. The two demo roots that were a genuine problem rather than a measurement artefact -- `esu`, the copula, one edit from Japanese *desu* and sharing its grammatical function, and `wesu`, one edit from it too -- have been retired in favour of `nutu` and `bitu`.
 - Inspiration (none): none How Tanese differs: An internal originality gate; no source feature involved.
 
 |  | Form | Note |
 | --- | --- | --- |
 | yes | `nhodi` | an illustrative minimal root, distance 3 from the nearest listed form |
 | yes | `welugan` | an illustrative n-final root, distance 4 from the nearest listed form |
-| no | `wesu` | Distance 1 from Japanese *desu*. It is an existing demo word, which is why the gate is declared non-retroactive -- and why this rule names it rather than hiding it. |
+| no | `wesu` | Distance 1 from Japanese *desu*. It was a demo word until this rule was applied to the demo lexicon and it was retired in favour of `bitu`; it is kept here as the example that motivated the gate. |
 | no | `mado` | Distance 1 from the Japanese particle *made*: one deletion. It clears the exact equality gate in VR-ORIG-001 and is exactly the case this rule exists to stop. |
 
 **pipeline**
@@ -1287,21 +1287,7 @@ project tries to avoid.
 **Cost if taken.** New morphemes, new slots, and a rewrite of the word-boundary and
 segmentation story, since a derived word is one word carrying two kinds of suffix.
 
-### U-5. The two demo roots that are one edit from Japanese *desu*
-
-**The question.** `esu`, the demo copula, is one edit from Japanese *desu* **and** has the
-same grammatical function. `wesu` ("see") is one edit from it as well. Both pass the hard
-gate, because the hard gate is exact equality; both would fail the new-root gate, which is
-declared non-retroactive.
-
-**Trigger: now, for Phase 2.** These are demo words rather than vocabulary, so nothing
-official is affected, but Phase 2 must not re-derive either of them. The Phase 1C report
-recommends retiring both outright.
-
-**Cost.** Low: replacing them means rewriting the grammar examples that use them, and the
-copula in particular appears in a fair number of them.
-
-### U-6. Whether the stratum shares are the right shares
+### U-5. Whether the stratum shares are the right shares
 
 **The question.** The five share targets (0.60 native, 0.12 and 0.12 inspired, 0.10 compound,
 0.06 loan) are a judgement with nothing behind them. They are the only mechanism restraining
@@ -1312,6 +1298,23 @@ either direction is evidence that the target was wrong rather than that the lexi
 
 **Cost.** None to change the numbers. The point of recording them is to make the comparison
 possible at all.
+
+---
+
+### Closed since v0.1
+
+**The two demo roots one edit from Japanese *desu*.** `esu`, the demo copula, was one edit
+from *desu* and shared its grammatical function, which made it the worst originality case in
+the project; `wesu` ("see") was one edit from the same form. Both passed the hard gate,
+because the hard gate is exact equality, and both were spared by the new-root gate only
+because that gate is declared non-retroactive.
+
+They have been retired, in favour of `nutu` and `bitu`, and every grammar example that used
+them was rewritten. No list of forbidden forms was added, because none is needed: at
+distance 1 the new-root gate now rejects either spelling outright, so a Phase 2 candidate
+spelled `esu` or `wesu` fails `VR-ORIG-002` with no further machinery. What remains spared by
+the non-retroactivity is 19 forms at distance 1 — eighteen Phase 1B morphemes, where the
+measure means little, and the demo pronoun root `ano`.
 
 ## 7. Limitations
 
@@ -1337,7 +1340,9 @@ evidence that Tanese is pronounceable, only that it is not obviously unpronounce
 The 41 words in the grammar examples and the 12 forms this document introduces are
 placeholders and illustrations. All are marked experimental, none has been through the
 collision detector (which is Phase 2), and a check fails if any of them turns up in the
-lexicon. Two are specifically known to be too close to a Japanese form — see U-5.
+lexicon. Two of the demo roots were replaced for being one edit from a Japanese form — see
+"Closed since v0.1" in section 6 — but no demo word has had any collision checking, so two
+of them may well be confusably similar to each other.
 
 ### The originality claim is bounded
 
@@ -1347,10 +1352,12 @@ at least two edits from any of them. The list is hand-enumerated. Passing both g
 **only** that no listed form was reused or closely approached. It is not evidence of absence
 from Japanese or Tamil as wholes, and still less from any third language.
 
-The new-root gate is also non-retroactive, and what it spares is on the record: 21 existing
+The new-root gate is also non-retroactive, and what it spares is on the record: 19 existing
 forms sit one edit from a listed source form. Eighteen are Phase 1B particles and suffixes,
 where the measure means little — a two-letter suffix cannot be far from a two-letter particle
-— and that is the honest reason the gate applies to roots rather than to morphemes.
+— and that is the honest reason the gate applies to roots rather than to morphemes. The
+nineteenth is the demo pronoun root `ano`. The two cases that were a real problem rather
+than an artefact of the measure have been retired instead of spared.
 
 ### Checks compare declarations, not prose
 

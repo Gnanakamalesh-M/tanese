@@ -192,7 +192,7 @@
   category: syntax
   name: the copula is an ordinary verb
   description: >-
-    Equation and location use the copula root `esu`, which takes the same four suffix slots
+    Equation and location use the copula root `nutu`, which takes the same four suffix slots
     as any other verb and stands in the same clause-final position.
   reason: >-
     Making the copula a regular verb rather than a special particle or a zero means
@@ -209,23 +209,23 @@
     how_modified: >-
       Inverted: Tanese always has one. The Japanese copula `desu`/`da` is closer in spirit,
       but both forms are banned in _originality.yaml.
-  pattern: "NP dhen NP esu+SUFFIX*"
+  pattern: "NP dhen NP nutu+SUFFIX*"
   valid:
-    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE
-      roman: uthe dhen nanthe esuke
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NU.TS-TU.TS-KE
+      roman: uthe dhen nanthe nutuke
       english: He is a friend.
-      gloss: uthe dhen nanthe esu-ke / he SUBJ friend be-NPST
-    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-WI.TS-RO TS-E.TS-SU.TS-DHO.TS-SU.TS-NASAL
-      roman: ano dhen wiro esudhosun
+      gloss: uthe dhen nanthe nutu-ke / he SUBJ friend be-NPST
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-WI.TS-RO TS-NU.TS-TU.TS-DHO.TS-SU.TS-NASAL
+      roman: ano dhen wiro nutudhosun
       english: I was a person. (formal)
   invalid:
     - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE
       roman: uthe dhen nanthe
       why: >-
-        The copula is omitted. There is no zero copula; without `esu` the clause has no verb
+        The copula is omitted. There is no zero copula; without `nutu` the clause has no verb
         and no politeness level.
-    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-E.TS-SU.TS-KE TS-NA.TS-NASAL.TS-THE
-      roman: uthe dhen esuke nanthe
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NU.TS-TU.TS-KE TS-NA.TS-NASAL.TS-THE
+      roman: uthe dhen nutuke nanthe
       why: >-
         The copula precedes its complement. It is a verb, so it is clause-final
         (GR-ORD-002).

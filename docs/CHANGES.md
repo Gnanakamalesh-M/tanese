@@ -138,3 +138,62 @@ the wrong thing, so the implemented gate is instead:
 
 This is a decision about a new Phase 1C gate, not a change to LOCKED decision 3, which is
 still enforced exactly as worded.
+
+---
+
+## CH-004 — Two demo roots retired for originality (follow-up to Phase 1C, U-5)
+
+**Status: applied with approval, 2026-10-17. No LOCKED decision changed, and no official
+rule or official vocabulary changed.**
+
+**What.** Two roots in `spec/grammar_rules/_example_lexicon.yaml` were replaced:
+
+| Retired | Replacement | Class | Distance to the nearest listed source form |
+| --- | --- | --- | --- |
+| `esu` | `nutu` | copula ("be") | was 1 (Japanese *desu*), now 3 |
+| `wesu` | `bitu` | verb ("see") | was 1 (Japanese *desu*), now 3 |
+
+Every grammar example that used them was rewritten — 8 rule files, 49 lines — including the
+`tanese` script field of each affected example, which was regenerated from the romanization
+by `tanese_nlp.script.convert` rather than retyped.
+
+**Why.** `esu` was the worst originality case in the project: one edit from Japanese *desu*
+**and** carrying the same grammatical function, which is the combination no reader would
+accept as independent coinage. `wesu` was one edit from the same form. Both passed the hard
+gate of LOCKED decision 3, because that gate is exact equality; both would have failed the
+Phase 1C new-root gate (absolute edit distance 2, `VR-ORIG-002`), and were spared only
+because that gate is declared non-retroactive. Phase 1C recorded them as unresolved decision
+U-5 and recommended retirement; this applies it.
+
+**Alternatives considered.** Leave them and add `esu`/`wesu` to a list of forms Phase 2 may
+not re-derive. Rejected as redundant machinery: at distance 1 from *desu*, `VR-ORIG-002`
+already rejects either spelling outright, so a Phase 2 candidate spelled `esu` or `wesu`
+fails the gate with nothing further written down. A list would have been a second, weaker
+statement of a rule that already exists.
+
+**How the replacements were chosen.** Generated and filtered mechanically against every gate
+rather than picked by ear: legal under `spec/phonology.yaml`, two moras, ending in a
+permitted final, not equal to any declared particle, suffix, pronoun or demo root, not
+ending in any declared suffix form, legal in combination with all fourteen suffixes, at
+edit distance 3 or more from every spellable entry of `_originality.yaml`, and at edit
+distance 3 or more from every existing demo root. The surviving pool was then narrowed to
+forms using only single-letter consonants, on the grounds that a copula is the most frequent
+verb in the language and should not be the heaviest word in it.
+
+**Impact.** `spec/grammar_rules/` only, plus the prose that described these two forms as
+standing exceptions: the `problems` and `new_root_gate_reason` fields of
+`spec/vocabulary_rules.yaml`, the `docs/_rationale/` files behind sections 6 and 7 of the
+specification, and the README. The demo wordlist still holds 41 words, and the specification
+was regenerated.
+
+U-5 is closed. The former U-6 (whether the stratum share targets are right) is renumbered
+U-5, and the closed item is recorded under "Closed since v0.1" in section 6 of the
+specification rather than deleted, so the reasoning stays on the record.
+
+**What is NOT changed.** No LOCKED decision. No official rule: the demo wordlist is
+`status: experimental` throughout and the schema permits no other value there, so this
+changes illustrations, not the language. `VR-ORIG-002` keeps its `wesu` invalid example,
+which is now the form that motivated the gate rather than a form the gate spares. 19 forms
+remain spared by non-retroactivity — eighteen Phase 1B morphemes, where distance 1 from a
+two-letter particle means little, and the demo pronoun root `ano` — and
+`scripts/check_vocabulary.py` still prints all of them.

@@ -92,8 +92,8 @@
     - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-PA.TS-NU TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE
       roman: ano dhen panu do manduke
       english: I eat rice. (habitually)
-    - tanese: TS-KI.TS-NHU TS-DHE.TS-NASAL TS-THO.TS-RA TS-BA.TS-NASAL TS-E.TS-SU.TS-KE
-      roman: kinhu dhen thora ban esuke
+    - tanese: TS-KI.TS-NHU TS-DHE.TS-NASAL TS-THO.TS-RA TS-BA.TS-NASAL TS-NU.TS-TU.TS-KE
+      roman: kinhu dhen thora ban nutuke
       english: Birds are in trees. (general truth)
   invalid:
     - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-PA.TS-NU TS-DO TS-MA.TS-NASAL.TS-DU

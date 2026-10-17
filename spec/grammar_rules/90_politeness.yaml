@@ -178,26 +178,26 @@
     how_modified: >-
       The ordering is the same, which is unsurprising -- both languages are head-final and
       put clause particles outside the verb's morphology. Tanese's forms are its own.
-  pattern: "... esu+TENSE[+MOOD]+POLITENESS [CLAUSE_PARTICLE]"
+  pattern: "... nutu+TENSE[+MOOD]+POLITENESS [CLAUSE_PARTICLE]"
   asserts:
     requires: [politeness.on_final_verb]
     forbids: [politeness.on_particle]
   valid:
-    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE.TS-SU.TS-NASAL TS-WE.TS-NASAL
-      roman: uthe dhen nanthe esukesun wen
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NU.TS-TU.TS-KE.TS-SU.TS-NASAL TS-WE.TS-NASAL
+      roman: uthe dhen nanthe nutukesun wen
       english: Is he a friend? (formal)
-      gloss: esu-ke-sun wen / be-NPST-FORMAL Q
+      gloss: nutu-ke-sun wen / be-NPST-FORMAL Q
     - tanese: TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-KE.TS-NHI.TS-SU.TS-NASAL TS-THO.TS-NASAL
       roman: sedha do mandukenhisun thon
       english: Please do not eat the food. (formal prohibitive)
   invalid:
-    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-E.TS-SU.TS-KE TS-WE.TS-NASAL.TS-SU.TS-NASAL
-      roman: uthe dhen nanthe esuke wensun
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE TS-NU.TS-TU.TS-KE TS-WE.TS-NASAL.TS-SU.TS-NASAL
+      roman: uthe dhen nanthe nutuke wensun
       why: >-
         The politeness suffix is attached to the question particle. Particles take no
         suffixes; politeness belongs to the verb.
-    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE.TS-SU.TS-NASAL TS-E.TS-SU.TS-KE TS-WE.TS-NASAL
-      roman: uthe dhen nanthesun esuke wen
+    - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-NASAL.TS-THE.TS-SU.TS-NASAL TS-NU.TS-TU.TS-KE TS-WE.TS-NASAL
+      roman: uthe dhen nanthesun nutuke wen
       why: >-
         Politeness on the complement noun instead of the copula (GR-POL-003).
   status: official

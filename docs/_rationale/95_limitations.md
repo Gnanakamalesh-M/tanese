@@ -20,7 +20,9 @@ evidence that Tanese is pronounceable, only that it is not obviously unpronounce
 The 41 words in the grammar examples and the 12 forms this document introduces are
 placeholders and illustrations. All are marked experimental, none has been through the
 collision detector (which is Phase 2), and a check fails if any of them turns up in the
-lexicon. Two are specifically known to be too close to a Japanese form — see U-5.
+lexicon. Two of the demo roots were replaced for being one edit from a Japanese form — see
+"Closed since v0.1" in section 6 — but no demo word has had any collision checking, so two
+of them may well be confusably similar to each other.
 
 ### The originality claim is bounded
 
@@ -30,10 +32,12 @@ at least two edits from any of them. The list is hand-enumerated. Passing both g
 **only** that no listed form was reused or closely approached. It is not evidence of absence
 from Japanese or Tamil as wholes, and still less from any third language.
 
-The new-root gate is also non-retroactive, and what it spares is on the record: 21 existing
+The new-root gate is also non-retroactive, and what it spares is on the record: 19 existing
 forms sit one edit from a listed source form. Eighteen are Phase 1B particles and suffixes,
 where the measure means little — a two-letter suffix cannot be far from a two-letter particle
-— and that is the honest reason the gate applies to roots rather than to morphemes.
+— and that is the honest reason the gate applies to roots rather than to morphemes. The
+nineteenth is the demo pronoun root `ano`. The two cases that were a real problem rather
+than an artefact of the measure have been retired instead of spared.
 
 ### Checks compare declarations, not prose
 

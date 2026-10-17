@@ -268,10 +268,10 @@
       roman: sedha do mandudho wiro
       english: the person who ate the food
       gloss: "[sedha do mandu-dho] wiro / [food OBJ eat-PST] person"
-    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-WE.TS-SU.TS-DHO TS-KI.TS-NHU
-      roman: ano dhen wesudho kinhu
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-BI.TS-TU.TS-DHO TS-KI.TS-NHU
+      roman: ano dhen bitudho kinhu
       english: the bird I saw
-      gloss: "[ano dhen wesu-dho] kinhu / [I SUBJ see-PST] bird"
+      gloss: "[ano dhen bitu-dho] kinhu / [I SUBJ see-PST] bird"
   invalid:
     - tanese: TS-WI.TS-RO TS-SE.TS-DHA TS-DO TS-MA.TS-NASAL.TS-DU.TS-DHO
       roman: wiro sedha do mandudho

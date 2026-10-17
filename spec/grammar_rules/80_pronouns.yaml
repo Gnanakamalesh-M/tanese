@@ -42,20 +42,20 @@
       kind: word
       word_class: noun
   valid:
-    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-I.TS-RI TS-DO TS-WE.TS-SU.TS-DHO
-      roman: ano dhen iri do wesudho
+    - tanese: TS-A.TS-NO TS-DHE.TS-NASAL TS-I.TS-RI TS-DO TS-BI.TS-TU.TS-DHO
+      roman: ano dhen iri do bitudho
       english: I saw you.
     - tanese: TS-U.TS-THE TS-DHE.TS-NASAL TS-NA.TS-MI TS-BA.TS-NASAL TS-THA.TS-MU.TS-KE
       roman: uthe dhen nami ban thamuke
       english: He sleeps in the house.
   invalid:
-    - tanese: TS-A.TS-NO TS-I.TS-RI TS-DO TS-WE.TS-SU.TS-DHO
-      roman: ano iri do wesudho
+    - tanese: TS-A.TS-NO TS-I.TS-RI TS-DO TS-BI.TS-TU.TS-DHO
+      roman: ano iri do bitudho
       why: >-
         The pronoun subject has no particle. Pronouns are ordinary noun phrases and are
         marked like any argument (GR-PART-012).
-    - tanese: TS-A.TS-NO.TS-NHU TS-I.TS-RI TS-DHE.TS-NASAL TS-WE.TS-SU.TS-DHO
-      roman: anonhu iri dhen wesudho
+    - tanese: TS-A.TS-NO.TS-NHU TS-I.TS-RI TS-DHE.TS-NASAL TS-BI.TS-TU.TS-DHO
+      roman: anonhu iri dhen bitudho
       why: >-
         The comitative particle is glued to the pronoun. Pronouns are ordinary noun phrases
         and their particles are separate words (GR-ORD-001): `ano nhu iri dhen wesudho`.

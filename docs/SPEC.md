@@ -2,7 +2,7 @@
 
 Read docs/VISION.md for context only. Work ONLY on the current phase below.
 
-**CURRENT PHASE: 1C (vocabulary rules + spec document)**
+**CURRENT PHASE: 2 (lexicon)**
 
 ## LOCKED decisions (do not change without docs/CHANGES.md + approval)
 1. Word order: SOV, head-final (modifier before head).
