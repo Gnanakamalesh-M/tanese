@@ -1,0 +1,423 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Gnanakamalesh-M/tanese/spec/schemas/vocabulary_rules.schema.json",
+  "title": "Tanese vocabulary rules",
+  "description": "How a Tanese word may be shaped and where new words may come from: strata, root shapes, originality gates, semantic fields, compound patterns, the loanword adaptation table and the Phase 2 pipeline, plus a list of VR-* rules in the Phase 1B grammar-rule format. Contains no vocabulary -- LOCKED decisions 14-15 reserve that for the Phase 2 pipeline and a separate file. Recorded in docs/CHANGES.md CH-003.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "strata",
+    "root_shapes",
+    "mora_counts",
+    "permitted_finals",
+    "originality",
+    "semantic_fields",
+    "compound_patterns",
+    "loan_substitutions",
+    "unmapped",
+    "loan_repairs",
+    "adaptation_examples",
+    "adaptation_rejections",
+    "pipeline",
+    "illustrative_forms",
+    "rules"
+  ],
+  "$defs": {
+    "prose": { "type": "string", "minLength": 1 },
+    "form": {
+      "type": "string",
+      "pattern": "^[a-z']+$",
+      "description": "A form in the canonical romanization. Legality is checked by the phonotactic validator, not by this pattern."
+    },
+    "example": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["roman"],
+      "properties": {
+        "tanese": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The script form, one dot-joined mora-id sequence per word. Absent exactly when `phonotactics` is `illegal`: an illegal word has no script form, because the converter refuses to produce one."
+        },
+        "roman": { "type": "string", "minLength": 1 },
+        "english": { "$ref": "#/$defs/prose" },
+        "why": { "$ref": "#/$defs/prose" },
+        "gloss": { "$ref": "#/$defs/prose" },
+        "phonotactics": {
+          "enum": ["legal", "illegal"],
+          "description": "Default `legal`. `illegal` asserts the form is deliberately not a legal Tanese word; check 9 then requires the validator to reject it, so a mislabelled example fails either way."
+        }
+      }
+    }
+  },
+  "properties": {
+    "version": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+$" },
+
+    "strata": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "borrows", "borrows_form", "share_target", "reason"],
+        "properties": {
+          "id": { "enum": ["native", "tamil_inspired", "japanese_inspired", "compound", "loan"] },
+          "description": { "$ref": "#/$defs/prose" },
+          "borrows": { "type": "array", "items": { "type": "string", "pattern": "^[a-z_]+$" } },
+          "borrows_form": {
+            "type": "boolean",
+            "description": "True only for `loan`. A stratum that borrows structure but not form sets this false, which is the machine-readable half of VR-STR-002."
+          },
+          "share_target": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1,
+            "description": "Target fraction of the official lexicon. The sum across strata may not exceed 1 (check 10)."
+          },
+          "reason": { "$ref": "#/$defs/prose" },
+          "alternatives": { "$ref": "#/$defs/prose" },
+          "problems": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "root_shapes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "description", "reason"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^RS-[A-Z]+$" },
+          "description": { "$ref": "#/$defs/prose" },
+          "reason": { "$ref": "#/$defs/prose" },
+          "alternatives": { "$ref": "#/$defs/prose" },
+          "problems": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "mora_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min", "max", "reason"],
+      "properties": {
+        "min": { "type": "integer", "minimum": 1 },
+        "max": { "type": "integer", "minimum": 1 },
+        "reason": { "$ref": "#/$defs/prose" }
+      }
+    },
+
+    "permitted_finals": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["kind", "graphemes"],
+        "properties": {
+          "kind": { "enum": ["vowel", "moraic_nasal"] },
+          "graphemes": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "minLength": 1 },
+            "description": "Every grapheme here must exist in spec/phonology.yaml (check 11)."
+          }
+        }
+      }
+    },
+
+    "originality": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["hard_gate", "hard_gate_reason", "new_root_gate", "new_root_gate_reason"],
+      "properties": {
+        "hard_gate": {
+          "const": "not_equal",
+          "description": "LOCKED decision 3's own wording. The only permitted value: a weaker hard gate would change a locked decision."
+        },
+        "hard_gate_reason": { "$ref": "#/$defs/prose" },
+        "new_root_gate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["metric", "min_edit_distance", "measured_against", "applies_to", "retroactive"],
+          "properties": {
+            "metric": { "const": "levenshtein_absolute" },
+            "min_edit_distance": { "type": "integer", "minimum": 1 },
+            "measured_against": { "$ref": "#/$defs/prose" },
+            "applies_to": { "$ref": "#/$defs/prose" },
+            "retroactive": { "type": "boolean" }
+          }
+        },
+        "new_root_gate_reason": { "$ref": "#/$defs/prose" },
+        "alternatives": { "$ref": "#/$defs/prose" },
+        "problems": { "$ref": "#/$defs/prose" }
+      }
+    },
+
+    "semantic_fields": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "stratum", "habit", "distinctions", "reason"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z_]+$" },
+          "stratum": {
+            "enum": ["native", "tamil_inspired", "japanese_inspired", "compound", "loan"],
+            "description": "Must name a declared stratum (check 11)."
+          },
+          "habit": { "$ref": "#/$defs/prose" },
+          "distinctions": { "type": "array", "items": { "type": "string", "pattern": "^[a-z_]+$" } },
+          "reason": { "$ref": "#/$defs/prose" },
+          "problems": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "compound_patterns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "pattern", "head", "written", "description", "reason"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^CP-[A-Z]+$" },
+          "pattern": { "$ref": "#/$defs/prose" },
+          "head": { "enum": ["final", "none"] },
+          "written": {
+            "const": "separate_words",
+            "description": "The only permitted value. GR-NOUN-004 (official) declares compounds unfused and lists the fused spelling as invalid, so a fusing pattern would contradict an official rule rather than extend it."
+          },
+          "description": { "$ref": "#/$defs/prose" },
+          "reason": { "$ref": "#/$defs/prose" },
+          "lexicalize_when": { "type": "string", "minLength": 1 },
+          "inspiration_note": { "$ref": "#/$defs/prose" },
+          "problems": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "loan_substitutions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "tanese", "source_examples", "reason"],
+        "properties": {
+          "source": {
+            "type": "string",
+            "minLength": 1,
+            "description": "The source-sound key. Unique across this table and `unmapped` (check 6)."
+          },
+          "tanese": {
+            "type": "string",
+            "pattern": "^[a-z]*$",
+            "description": "The Tanese graphemes it becomes. Empty string means deletion (source /h/). Every grapheme must exist in spec/phonology.yaml (check 6)."
+          },
+          "source_examples": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "reason": { "$ref": "#/$defs/prose" },
+          "problems": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "unmapped": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "code", "reason"],
+        "properties": {
+          "source": { "type": "string", "minLength": 1 },
+          "code": { "const": "VL-UNMAPPED" },
+          "reason": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "loan_repairs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "step", "name", "description", "reason"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^LR-[0-9]+-[A-Z]+$" },
+          "step": { "type": "integer", "minimum": 1 },
+          "name": { "$ref": "#/$defs/prose" },
+          "description": { "$ref": "#/$defs/prose" },
+          "reason": { "$ref": "#/$defs/prose" },
+          "exceptions": { "$ref": "#/$defs/prose" },
+          "alternatives": { "$ref": "#/$defs/prose" },
+          "problems": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "adaptation_examples": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Hand-derived expected outputs. The expectation lives in the spec so the test cannot be satisfied by recording whatever the code happens to do.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_word", "segments", "expect", "steps_fired", "tests"],
+        "properties": {
+          "source_word": { "type": "string", "minLength": 1 },
+          "segments": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "expect": { "$ref": "#/$defs/form" },
+          "steps_fired": {
+            "type": "array",
+            "minItems": 1,
+            "items": { "type": "string", "pattern": "^LR-[0-9]+-[A-Z]+$" },
+            "description": "Must name declared repair steps (check 6)."
+          },
+          "tests": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "adaptation_rejections": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source_word", "segments", "code", "offending", "reason"],
+        "properties": {
+          "source_word": { "type": "string", "minLength": 1 },
+          "segments": { "type": "array", "minItems": 1, "items": { "type": "string", "minLength": 1 } },
+          "code": { "enum": ["VL-UNMAPPED", "VL-UNKNOWN", "VL-RESIDUE"] },
+          "offending": { "type": "string", "minLength": 1 },
+          "reason": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "pipeline": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "stage", "automated", "llm_allowed", "description", "reason"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^PL-[0-9]+$" },
+          "stage": {
+            "enum": [
+              "candidate_generation",
+              "phonotactic_check",
+              "morphology_check",
+              "collision_check",
+              "rank",
+              "human_approve"
+            ],
+            "description": "The stages of LOCKED decision 14, closed to an enum so a stage cannot be renamed away."
+          },
+          "automated": { "type": "boolean" },
+          "llm_allowed": {
+            "type": "boolean",
+            "description": "LOCKED decision 14 allows the LLM to propose candidates and nothing else, so this may be true only at candidate_generation (check 6)."
+          },
+          "description": { "$ref": "#/$defs/prose" },
+          "reason": { "$ref": "#/$defs/prose" },
+          "problems": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "illustrative_forms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["form", "shape", "status", "why_needed"],
+        "properties": {
+          "form": { "$ref": "#/$defs/form" },
+          "shape": { "type": "string", "minLength": 1 },
+          "status": {
+            "const": "experimental",
+            "description": "The only permitted value, as in spec/grammar_rules/_example_lexicon.yaml. `official` is unrepresentable here by design (LOCKED decisions 14-15)."
+          },
+          "why_needed": { "$ref": "#/$defs/prose" }
+        }
+      }
+    },
+
+    "rules": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "category",
+          "name",
+          "description",
+          "reason",
+          "inspiration",
+          "pattern",
+          "valid",
+          "invalid",
+          "status",
+          "since"
+        ],
+        "properties": {
+          "id": { "type": "string", "pattern": "^VR-[A-Z]+-[0-9]{3}$" },
+          "category": {
+            "enum": ["stratum", "root_shape", "originality", "compound", "loan", "semantics", "pipeline"],
+            "description": "Closed to an enum for the reason recorded in docs/CHANGES.md CH-001: a typo'd category must not silently skip a category-conditional check."
+          },
+          "name": { "$ref": "#/$defs/prose" },
+          "description": { "$ref": "#/$defs/prose" },
+          "reason": { "$ref": "#/$defs/prose" },
+          "alternatives": { "$ref": "#/$defs/prose" },
+          "problems": { "$ref": "#/$defs/prose" },
+          "inspiration": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["source", "original_feature", "how_modified"],
+            "properties": {
+              "source": { "enum": ["tamil", "japanese", "none"] },
+              "original_feature": { "$ref": "#/$defs/prose" },
+              "how_modified": { "$ref": "#/$defs/prose" }
+            }
+          },
+          "pattern": { "$ref": "#/$defs/prose" },
+          "valid": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "allOf": [
+                { "$ref": "#/$defs/example" },
+                { "required": ["english"] }
+              ]
+            }
+          },
+          "invalid": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "allOf": [
+                { "$ref": "#/$defs/example" },
+                { "required": ["why"] }
+              ]
+            }
+          },
+          "status": { "enum": ["official", "experimental"] },
+          "since": { "type": "string", "pattern": "^v[0-9]+\\.[0-9]+$" }
+        }
+      }
+    }
+  }
+}

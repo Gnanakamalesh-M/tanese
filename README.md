@@ -7,11 +7,15 @@ consistent, and honestly evaluated — not a complete real-world language ecosys
 Tamil and Japanese are inspirations only. Tanese has its own phonology, script, grammar,
 and vocabulary, and nothing in it is a copy of either source language.
 
-> **Status: Phase 1B (grammar core) complete.** Tanese now has a sound inventory, a
-> canonical spelling, a writing system and a grammar — 54 rules, all machine-readable in
-> `spec/`, checked for self-contradiction by a script. There is still no vocabulary: the
-> words in the grammar examples are explicitly-marked placeholders, not a lexicon. See
-> [Not verified](#not-verified) below.
+> **Status: Phase 1C (vocabulary rules + specification document) complete.** Tanese now has
+> a sound inventory, a canonical spelling, a writing system, a grammar of 54 rules, and 20
+> rules saying how a word may be formed — all machine-readable in `spec/` and checked for
+> self-contradiction by scripts. The whole language is published as one generated document,
+> [the Tanese Language Specification](docs/language-specification.md).
+>
+> There is still **no vocabulary**. The words in the examples are explicitly-marked
+> placeholders and illustrations, not a lexicon, and a check fails if any of them reaches
+> `data/vocabulary/`. See [Not verified](#not-verified) below.
 
 ## How the project is organised
 
@@ -24,12 +28,15 @@ rules or vocabulary.
 | `docs/SPEC.md` | Locked decisions, current phase, per-phase done-criteria |
 | `docs/VISION.md` | Long-form context (not built from directly) |
 | `docs/CHANGES.md` | Proposed changes to locked decisions |
+| `docs/language-specification.md` | **The Tanese Language Specification v0.1** — generated, do not edit |
+| `docs/_rationale/` | Hand-written narrative the specification splices in |
 | `spec/` | Machine-readable language rules (YAML) |
 | `spec/schemas/` | JSON Schemas the rule files are validated against |
 | `tanese_nlp/phonology/` | Romanization lexer and phonotactic validator |
 | `spec/grammar_rules/` | The grammar: one YAML file per topic, plus two support files |
 | `tanese_nlp/script/` | Romanization ↔ script converter |
 | `tanese_nlp/grammar/` | Rule loader, tokenizer, contradiction checker |
+| `tanese_nlp/vocabulary/` | Vocabulary rule loader, loanword adapter, consistency checker |
 | `tanese_nlp/` | Python toolkit (tokenizer, morphology, grammar, embeddings, …) |
 | `data/` | Vocabulary, grammar, translation, conversation, evaluation data |
 | `llm/` | Prompts, RAG, fine-tuning, LLM evaluation |
@@ -60,7 +67,7 @@ One command runs everything, and CI runs the same one:
 python scripts/run_checks.py
 ```
 
-It runs four steps and stops at the first failure:
+It runs six steps and stops at the first failure:
 
 1. **lint** — `ruff check .`
 2. **tests** — `pytest`
@@ -68,13 +75,20 @@ It runs four steps and stops at the first failure:
    against `spec/schemas/` and checking that grammar-rule ids are globally unique
 4. **grammar** — `scripts/check_grammar.py`, the twelve contradiction checks over
    `spec/grammar_rules/`, which also prints the rule and example counts
+5. **vocabulary** — `scripts/check_vocabulary.py`, the thirteen consistency checks over
+   `spec/vocabulary_rules.yaml`, which also prints the Phase 1C counts and three
+   measurement reports
+6. **spec-doc** — `scripts/gen_spec_doc.py --check`, which fails if
+   `docs/language-specification.md` has drifted from `spec/`. It writes nothing
 
-Each can also be run on its own, as can the word generator:
+Each can also be run on its own, as can the word generator and the document build:
 
 ```
 python scripts/check_yaml_schema.py
 python scripts/check_grammar.py
+python scripts/check_vocabulary.py
 python scripts/gen_words.py
+python scripts/gen_spec_doc.py
 ```
 
 All scripts work from any working directory.
@@ -168,6 +182,130 @@ list of 61 Japanese and Tamil particles, case endings, verbal endings and honori
 Tanese form may not equal (locked decision 3). That check is what removed three forms from
 the first draft: `kun` (Japanese honorific), `ge` (one vowel from Japanese *ga*) and `maa`
 (colloquial Tamil address particle), replaced by `wen`, `dhen` and `belu`.
+
+## The vocabulary rules (Phase 1C)
+
+`spec/vocabulary_rules.yaml` is the source of truth; this section summarises it, and
+[the Tanese Language Specification](docs/language-specification.md) is the full generated
+document.
+
+Phase 1C says how a Tanese *word* may be formed. It deliberately adds **no vocabulary**:
+locked decisions 14–15 reserve official words for the Phase 2 pipeline and a separate file.
+
+**Where words come from.** Five strata, and what separates them is *how a word was coined*,
+not how it sounds. A `tamil_inspired` word borrows a Tamil habit — fine semantic
+granularity, a separate root where English uses a word plus a modifier — and its form is
+coined natively. A `japanese_inspired` word borrows the habit of covering a large meaning
+space by compounding a small stock of roots, and its form is coined natively too. Locked
+decision 3 forbids a Tanese particle from equalling a common Japanese or Tamil one; Phase 1C
+applies the same gate to content words. Only the `loan` stratum borrows a form, and it is
+confined to one semantic field with a 0.06 share target.
+
+The honest cost: the two inspired strata are invisible in the words themselves, and the
+stratum label is unverifiable from a form. No check can catch a native root mislabelled
+`tamil_inspired`.
+
+**Root shapes.** Two to four moras, ending in a vowel or the moraic `n`. The permitted
+finals are not a taste decision — every suffix in `spec/grammar_rules/` is consonant-initial,
+so those two finals concatenate legally with all fourteen of them and need no morphophonemic
+rule at the join, which matters because the phonology declares no morphophonemics at all.
+Check 2 proves it by concatenating every permitted final with every declared suffix on every
+run, so a vowel-initial suffix added later fails loudly instead of making the rule quietly
+wrong.
+
+**Compounds are two words.** `GR-NOUN-004` is already official and lists the fused spelling
+as invalid, so Phase 1C specifies compounds as multi-word lexical entries — `sedha nami` is
+the entry "restaurant" — and check 3 fails if a pattern declares itself fused or
+head-initial. Fusion was reconsidered and not proposed: a seam raises hiatus and sandhi
+questions the phonology has no answers to. See `docs/CHANGES.md` CH-003.
+
+**Loanwords** go through a deterministic, table-driven adapter. One input gives exactly one
+output, or an explicit rejection naming the sound responsible; the code holds no
+sound-specific knowledge at all.
+
+```
+film    [f i l m]            -> pilun       f->p, final nasal -> moraic n, stranded l takes u
+bank    [b a n k]            -> banku       nasal before a stop becomes the coda, no vowel added
+coat    [k o t_retro]        -> kotha       a, not u, after a final retroflex
+silk    [p a t_retro t_retro u] -> paththu  a geminable pair stays a geminate
+strike  [s t r a i k]        -> suturawiku  epenthesis twice; a+i would give the gap mora `yi`
+shop    [sh O p]             -> rejected VL-UNMAPPED on 'sh'
+```
+
+Fourteen source sounds are listed as **unmapped** and a word containing one is refused, not
+approximated — each has at least two equally defensible substitutes, and picking one silently
+would mean a second person adapting the same word by hand would get a different answer. The
+intended consequence is that Tanese currently cannot borrow *thing*, *chair* or *shop*.
+
+**Originality** has two gates. The hard gate is locked decision 3's own wording, exact
+equality against the 61-form list. On top of it, a root coined from v0.1 onward must be at
+least edit distance 2 from any listed form — the real failure mode being a form one segment
+from its source, like `wesu` beside Japanese *desu*. A normalised-distance floor was tried
+first and dropped: measured against the existing spec it fails twelve already-official
+Phase 1B morphemes, because a two-letter suffix cannot be relatively far from a two-letter
+particle. The absolute gate is declared non-retroactive, and the 21 existing forms it spares
+are printed in full by the check script rather than left implied.
+
+## Phase 1C results
+
+Produced by `.venv\Scripts\python.exe scripts\check_vocabulary.py`:
+
+```
+== counts
+  rules                20
+  valid examples       40
+  invalid examples     40 (7 deliberately not legal Tanese)
+  strata               5
+  root shapes          4
+  semantic fields      5
+  compound patterns    3
+  loan substitutions   38 (14 sounds deliberately unmapped)
+  loan repair steps    7
+  adaptation examples  9 expected outputs, 5 expected rejections
+  pipeline stages      6
+  forms introduced     12 (3 illustrative roots + adapted loans, all experimental)
+
+== checks
+  ok    check 1 root shapes
+  ok    check 2 suffix concatenation
+  ok    check 3 compounds unfused
+  ok    check 4 reserved collisions
+  ok    check 5 originality gates
+  ok    check 6 loan tables well formed
+  ok    check 7 adapter matches spec
+  ok    check 8 example closure
+  ok    check 9 example legality + script
+  ok    check 10 share targets reachable
+  ok    check 11 cross-spec references
+  ok    check 12 rule shape
+  ok    check 13 illustrations are not vocabulary
+```
+
+The same script then prints three reports that never cause a failure, because they are
+measurements rather than requirements: the distance from every form the file introduces to
+its nearest listed source form (lowest 2, highest 7), the 21 existing forms the
+non-retroactive originality gate spares, and the one adapted loan that is a legal word but
+exceeds the four-mora root cap (`suturawiku`, 5 moras, from *strike* — predicted by the
+`problems` field of the epenthesis rule).
+
+What each check proves, and what it does **not**, is in the module docstring of
+`tanese_nlp/vocabulary/consistency.py`. Every check is itself tested by breaking the thing it
+checks (`tests/unit/test_vocabulary_consistency.py`), so a green run is not green by accident.
+
+Against `docs/SPEC.md`'s Phase 1C done-criteria:
+
+| Criterion | Evidence |
+| --- | --- |
+| `spec/vocabulary_rules.yaml` covering native roots, Tamil-inspired, Japanese-inspired, loanword adaptation, compounds | the file exists and passes `scripts\check_yaml_schema.py` against a new `vocabulary_rules.schema.json`; all five strata are declared, asserted by `tests/unit/test_vocabulary_rules.py` |
+| `docs/language-specification.md` generated from YAML + human-written rationale | 1411 lines, generated by `scripts\gen_spec_doc.py` from `spec/*.yaml` plus seven hand-written files in `docs/_rationale/`; `scripts\gen_spec_doc.py --check` fails if it drifts, and `run_checks.py` runs that check |
+| Internal consistency check passes | the thirteen checks above, including two cross-file ones: check 2 against `spec/grammar_rules/` and check 11 against `spec/phonology.yaml` |
+| Unresolved decisions listed | section 6 of the specification: six of them (U-1 to U-6), each with its trigger and its cost, and U-1 names `docs/CHANGES.md` CH-002 |
+
+`pytest` reports **2481 passed** (`.venv\Scripts\python.exe -m pytest`), up from 1909 after
+Phase 1B. The growth is parametrised: each of the 80 examples is checked for its declared
+legality and, if legal, for its script form and its round-trip; and each of the 38 loan
+substitutions, 14 unmapped sounds, 9 worked examples and 5 required rejections gets its own
+test, so a failure names the rule that broke rather than only the word.
 
 ## Phase 1B results
 
@@ -282,14 +420,16 @@ Honest list of things written but not actually demonstrated:
 - **Installing from `requirements.txt` on Windows.** The clean install is verified on the CI
   runner's Ubuntu + Python 3.11 only; the local pins were read back from an already-populated
   `.venv`, so a from-scratch install on Windows has not been run.
-- **CI on the Phase 1A and 1B commits.** All numbers above are from local runs on Python
-  3.11.9. Phase 0's CI run #1 was green on commit `5f47648`; nothing since has been pushed.
-- **Invalid examples are author-asserted.** The 108 invalid examples are labelled
-  ungrammatical by me, with a reason each. Nothing *proves* they are: the rule-based grammar
-  checker that could reject them is Phase 4. What the checks do prove is that each is a
-  legal Tanese word sequence, spelled consistently with the script, tokenizable, and not
-  claimed valid by any other rule. Until Phase 4 runs over them, "invalid" means "I say so,
-  with a reason".
+- **CI on the Phase 1A, 1B and 1C commits.** All numbers above are from local runs on
+  Python 3.11.9. Phase 0's CI run #1 was green on commit `5f47648`; nothing since has been
+  pushed.
+- **Invalid examples are author-asserted.** The 108 grammar and 40 vocabulary invalid
+  examples are labelled ungrammatical or ill-formed by me, with a reason each. Nothing
+  *proves* they are: the rule-based grammar checker that could reject them is Phase 4. What
+  the checks do prove is that each is either a legal Tanese word sequence — spelled
+  consistently with the script, tokenizable, and not claimed valid by any other rule — or,
+  for the 7 marked `phonotactics: illegal`, genuinely rejected by the validator. Until
+  Phase 4 runs over them, "invalid" means "I say so, with a reason".
 - **Contradictions that live only in prose.** Checks 5 and 6 compare example strings. Two
   rules whose `description` or `reason` disagree, while their examples do not overlap, will
   pass. Only the declared forms, slots, slot order and `asserts` keys are compared
@@ -297,15 +437,36 @@ Honest list of things written but not actually demonstrated:
 - **The originality list is not exhaustive.** `_originality.yaml` holds the 61 Japanese and
   Tamil forms I could enumerate by hand, with a source and gloss each. A Tanese form that
   passes check 9 is *not* thereby proven absent from Japanese or Tamil, let alone from any
-  third language — the check proves only that no listed form was reused. The `unspellable`
-  flags in that file are verified against the phonotactic validator; the list's coverage is
-  not verified at all.
+  third language — the check proves only that no listed form was reused, and the Phase 1C
+  distance gate only that none was closely approached. The `unspellable` flags in that file
+  are verified against the phonotactic validator; the list's coverage is not verified at all.
+- **The originality gate is not retroactive.** 21 existing forms sit one edit from a listed
+  source form, printed in full by `scripts\check_vocabulary.py`. Eighteen are Phase 1B
+  particles and suffixes, where the measure means little. The other three are demo roots,
+  and two are a real problem: `esu`, the demo copula, is one edit from Japanese *desu* **and**
+  shares its grammatical function, and `wesu` is one edit from it too. Both are experimental
+  demo words rather than vocabulary, but Phase 2 must not re-derive either — recorded as
+  unresolved decision U-5 in the specification.
 - **The grammar has not been used.** No corpus, no conversation and no translation has been
   written in Tanese, so whether these 54 rules are usable together — rather than merely
   non-contradictory — is unknown. That is what Phase 3 is for. Three gaps are already known
   and recorded in the rules' own `problems` fields: a topicalised argument loses its
   relation (GR-PART-009), an embedded yes/no question has no form (GR-Q-004), and a
   negative desiderative has no form (GR-TAM-005).
+- **The vocabulary rules have produced no vocabulary.** 20 rules say how a word may be
+  formed, and not one official word has been formed. Whether the root shapes, strata and
+  compound patterns actually yield 300 usable words — and whether the share quotas are
+  reachable in practice rather than merely arithmetically — is what Phase 2 will find out.
+- **Stratum and semantic-field labels are unverifiable.** Four of the five strata borrow
+  structure rather than form, so nothing in a word reveals which habit coined it. No check
+  can catch a native root recorded as `tamil_inspired`, or a loan filed outside the one
+  field loans are confined to. Those classifications are honest metadata, not results.
+- **The loan adapter has seen fourteen inputs.** Nine expected outputs and five expected
+  rejections, all hand-derived from the repair steps and written into
+  `spec/vocabulary_rules.yaml` so the tests cannot simply confirm whatever the code does.
+  That pins down each repair; it is not a real loanword list, and the adapter has never been
+  run over one. One known consequence is unresolved: `strike` adapts to `suturawiku`, five
+  moras, which is a legal word but over the four-mora root cap (U-3).
 - **The demo wordlist has had no collision checking.** The 41 placeholder roots were checked
   for phonotactic legality and exact duplication only. The collision detector (exact,
   phonetic, orthographic, semantic) is Phase 2, so two of them may well be confusably
@@ -323,9 +484,9 @@ Honest list of things written but not actually demonstrated:
   of productivity, semantics or ambiguity resolution, and it is not the morphological
   analyzer — that is Phase 4. It is good enough to catch a typo or an undeclared form in an
   example, which is all it is used for.
-- Everything from Phase 1C onward: the generated language specification, vocabulary, corpus,
-  tokenizer, morphological analyzer, grammar checker, embeddings, RAG, translation, the web
-  app, and all evaluation numbers. None of it exists yet.
+- Everything from Phase 2 onward: the vocabulary itself, the collision detector, the corpus,
+  the tokenizer, the morphological analyzer, the grammar checker, embeddings, RAG,
+  translation, the web app, and all evaluation numbers. None of it exists yet.
 
 ## Evaluation and honesty notes
 
@@ -340,6 +501,6 @@ When results do arrive, they will follow the project's standing rules:
 
 ## Roadmap
 
-Phase 0 skeleton → 1A phonology/script → 1B grammar core → 1C spec document → 2 lexicon →
+Phase 0 skeleton → 1A phonology/script → 1B grammar core → 1C vocabulary rules + spec document → 2 lexicon →
 3 corpus → 4 NLP toolkit → 5 RAG/LLM → 6 web app → 7 evaluation report. Done-criteria for
 each are in `docs/SPEC.md`.

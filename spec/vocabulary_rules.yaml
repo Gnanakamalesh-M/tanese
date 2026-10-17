@@ -1,0 +1,1940 @@
+# Tanese vocabulary rules, v0.1 -- machine-readable source of truth.
+#
+# Derived from LOCKED decisions 1-3, 10, 12, 14 and 15 in docs/SPEC.md. Documentation is
+# generated from this file, never the reverse (docs/language-specification.md).
+#
+# This file says how a Tanese *word* may be shaped and where new words may come from. It
+# does NOT contain any vocabulary: LOCKED decisions 14-15 reserve official words for the
+# Phase 2 pipeline and a separate file. Every form appearing here is an illustration of a
+# rule, is marked experimental, and may not be copied into data/vocabulary/ -- check 13 in
+# tanese_nlp.vocabulary.consistency fails if any of them turns up there.
+#
+# Phoneme and grapheme keys are the ASCII romanization graphemes, shared with
+# spec/phonology.yaml and spec/romanization.yaml (LOCKED decision 12).
+
+version: v0.1
+
+# ======================================================================================
+# strata -- where a word comes from
+# ======================================================================================
+# A stratum labels the *method* a word was coined under, never a resemblance to a source
+# word. Every stratum carries `borrows_form: false` except `loan`, which borrows a form by
+# definition and is the only stratum whose members may resemble anything.
+#
+# `share_target` is a Phase 2 planning quota, not a law: it says what fraction of the ~300
+# official words should come from each method, so the lexicon does not drift into being all
+# compounds or all loans. Phase 2 reports achieved shares against these.
+
+strata:
+  - id: native
+    description: >-
+      A root coined from nothing but the phonology: a legal mora sequence picked for the
+      concept, with no source-language model of any kind.
+    borrows: []
+    borrows_form: false
+    share_target: 0.60
+    reason: >-
+      The majority stratum, because it is the only one that owes nothing to anybody. Tanese
+      is an original language (LOCKED decision 3); the two inspired strata below borrow
+      structure, so if they dominated the lexicon the originality claim would rest on
+      nothing but the sound inventory.
+
+  - id: tamil_inspired
+    description: >-
+      A root coined under a Tamil-like structural habit: fine semantic granularity, where
+      Tamil distinguishes with separate roots what English covers with one word.
+    borrows: [semantic_granularity, field_specific_root_density]
+    borrows_form: false
+    share_target: 0.12
+    reason: >-
+      LOCKED decision 3 bans reusing source forms, and Phase 1C extends that gate to
+      content words. What is left to borrow is how a language carves meaning up, which is
+      the interesting part anyway: Tamil kinship distinguishes elder from younger sibling
+      and maternal from paternal uncle, and copying that distinction costs nothing in
+      originality because the roots filling it are coined natively.
+    alternatives: >-
+      Borrow adapted Tamil forms, capped by a similarity ceiling. Rejected: it makes the
+      originality claim rest on a threshold rather than on a fact, and the threshold would
+      have to be defended word by word.
+    problems: >-
+      The label is unfalsifiable from the form alone. Nothing in a root reveals which habit
+      coined it, so the stratum is provenance metadata the lexicon must carry honestly
+      rather than a property a checker can verify. All check 10 can do is confirm the
+      declared shares are reachable.
+
+  - id: japanese_inspired
+    description: >-
+      A root coined under a Japanese-like structural habit: a small set of concrete roots
+      that combine productively, so compounds rather than new roots cover the space.
+    borrows: [productive_compounding, small_concrete_root_set]
+    borrows_form: false
+    share_target: 0.12
+    reason: >-
+      Japanese covers an enormous vocabulary by compounding a modest stock of morphemes.
+      That is the right habit for a project whose lexicon is capped at about 300 words, and
+      it is a structural habit, so borrowing it takes no form with it.
+    problems: >-
+      It pulls against `tamil_inspired`: one habit says coin a separate root per
+      distinction, the other says compound from few roots. The two are assigned to
+      different semantic fields below so they do not compete over the same word, but the
+      boundary between fields is a judgement call, not a rule.
+
+  - id: compound
+    description: >-
+      A lexical entry made of two or more existing words in modifier-head order, written
+      with a space, as GR-NOUN-004 requires.
+    borrows: []
+    borrows_form: false
+    share_target: 0.10
+    reason: >-
+      The cheapest way to grow the lexicon: it adds meanings without adding roots, and
+      therefore without adding collision risk to the root space.
+
+  - id: loan
+    description: >-
+      A word taken from a source language and put through the adaptation pipeline below.
+      The only stratum that borrows a form.
+    borrows: [form, meaning]
+    borrows_form: true
+    share_target: 0.06
+    reason: >-
+      Some concepts have no non-arbitrary native coinage, and a language with no loan
+      machinery has to pretend they do not exist. Kept to the smallest share of the five: a
+      loan is the least original kind of word Tanese has.
+    problems: >-
+      An adapted loan is recognisable as its source, which is the point and also the cost:
+      the more loans there are, the less Tanese sounds like itself. The 0.06 share is the
+      only thing holding that in check, and it is a judgement, not a result.
+
+# ======================================================================================
+# root shapes
+# ======================================================================================
+
+root_shapes:
+  - id: RS-MIN
+    description: A root is at least two moras.
+    reason: >-
+      One-mora roots are the scarcest resource in the language and the most
+      collision-prone: there are only 86 legal moras, and the particle and suffix inventory
+      already occupies that space (`do`, `lu`, `ke`, `mi`). Starting roots at two moras
+      keeps the root space and the morpheme space from competing.
+    alternatives: >-
+      Allow one-mora roots for very frequent words, as both source languages do. Rejected
+      for v0.1: the collision detector is Phase 2, so nothing yet exists to arbitrate the
+      clashes this would cause.
+    problems: >-
+      The most frequent words in a language are usually its shortest, so a two-mora floor
+      makes Tanese slightly more long-winded than a natural language of the same size.
+
+  - id: RS-MAX
+    description: A root is at most four moras.
+    reason: >-
+      Four moras over 86 legal moras is a root space in the tens of millions, vastly more
+      than 300 words needs. The cap exists to stop the Phase 2 pipeline from escaping a
+      collision by simply making words longer, which would be the easy and wrong answer.
+
+  - id: RS-FINAL
+    description: A root ends in a vowel or in the moraic nasal `n`.
+    reason: >-
+      Not a taste decision: it is forced by the suffixes. Every suffix declared in
+      spec/grammar_rules/ is consonant-initial, so a root ending in a vowel or a moraic `n`
+      concatenates legally with every one of them and needs no morphophonemic rule at the
+      join -- which matters because spec/phonology.yaml declares no allophony and no
+      morphophonemics at all. Check 2 proves this by concatenating every permitted final
+      with every declared suffix, and fails loudly if a later phase adds a vowel-initial
+      suffix.
+    problems: >-
+      The permitted finals are a consequence of the current suffix inventory, so this rule
+      and spec/grammar_rules/ are coupled. That coupling is why check 2 exists rather than
+      a comment.
+
+  - id: RS-RESERVED
+    description: >-
+      A root may not be identical to any particle, suffix or pronoun form declared in
+      spec/grammar_rules/.
+    reason: >-
+      A root that equals a particle makes the tokenizer output genuinely ambiguous: in
+      `X do`, `do` would be either the object marker or a noun. Suffix collisions are worse
+      still, since a suffix is glued to its host and a root is not.
+    problems: >-
+      This compares whole forms only. A root that merely *ends* in a suffix form is still
+      legal and still confusable, and only the Phase 4 morphological analyzer can resolve
+      it. Recorded as an unresolved decision rather than banned, because banning every root
+      ending in any of the fourteen suffix forms would cut deeply into the root space.
+
+mora_counts:
+  min: 2
+  max: 4
+  reason: See RS-MIN and RS-MAX.
+
+permitted_finals:
+  - kind: vowel
+    graphemes: [a, i, u, e, o]
+  - kind: moraic_nasal
+    graphemes: [n]
+
+# ======================================================================================
+# originality
+# ======================================================================================
+
+originality:
+  hard_gate: not_equal
+  hard_gate_reason: >-
+    LOCKED decision 3 says a form must NOT equal a common Japanese or Tamil particle or
+    case ending. Exact equality against the spellable entries of
+    spec/grammar_rules/_originality.yaml is the gate Phase 1B already applies to every
+    particle and suffix; Phase 1C applies the same gate to roots.
+  new_root_gate:
+    metric: levenshtein_absolute
+    min_edit_distance: 2
+    measured_against: spellable entries of spec/grammar_rules/_originality.yaml
+    applies_to: roots coined from v0.1 onward
+    retroactive: false
+  new_root_gate_reason: >-
+    Exact equality alone lets through a form one segment from its source, which is the real
+    failure mode: a root `wesu` is not `desu`, but nobody would believe it was coined
+    independently. An absolute distance of 2 rules out exactly that -- one substitution, one
+    insertion or one deletion -- while staying achievable.
+  alternatives: >-
+    A normalised edit distance (distance divided by the longer length), which was the first
+    proposal. Rejected after measuring it: normalised distance is length-biased against
+    short forms, so a floor of 0.5 fails twelve already-official Phase 1B morphemes (`ban`,
+    `le`, `lun`, `nen`, `nhe`, `nhi`, `sen`, `sun`, `the`, `thin`, `thon`, `kodhu`) purely
+    because a two-letter morpheme cannot be far from a two-letter particle in relative
+    terms. A gate that condemns the existing official spec is measuring the wrong thing.
+  problems: >-
+    Being non-retroactive, the gate leaves standing 21 existing forms it would have
+    rejected, all at distance 1 and all listed by scripts/check_vocabulary.py so the
+    exemption is visible rather than implied. Eighteen are Phase 1B particles and suffixes,
+    and ten of those are two letters long, where distance 1 from a two-letter source
+    particle is close to unavoidable -- which is the honest reason the gate is scoped to
+    roots and not to morphemes.
+    The other three are demo roots, and two of those are a real problem rather than a
+    technicality: `esu`, the copula, is one edit from Japanese *desu* AND has the same
+    grammatical function, and `wesu` ("see") is one edit from it as well. They are demo
+    words, not vocabulary, so nothing official is affected -- but Phase 2 must not re-derive
+    either, and the Phase 1C report recommends retiring both.
+    More fundamentally, passing this gate proves only that no *listed* form was reused. The
+    list is 61 hand-enumerated items; absence from Japanese and Tamil as a whole, let alone
+    from any third language, is not proven and cannot be by this method.
+
+# ======================================================================================
+# semantic fields -- where each inspired habit actually applies
+# ======================================================================================
+# This is the only place the two inspired strata are cashed out. Without it, "Tamil-inspired"
+# and "Japanese-inspired" would be labels with no consequence for any actual word.
+
+semantic_fields:
+  - id: kinship
+    stratum: tamil_inspired
+    habit: separate roots per distinction
+    distinctions: [elder_vs_younger_sibling, maternal_vs_paternal_uncle, maternal_vs_paternal_aunt]
+    reason: >-
+      Tamil carves kinship finely, and the distinctions it makes are socially real wherever
+      extended families are: which side an uncle is from, and whether a sibling is older.
+      A language that forces "uncle" to cover both has lost information its speakers have.
+    problems: >-
+      It costs roots: six kinship roots where English needs two. With a 300-word cap that
+      is two percent of the lexicon spent on one field.
+
+  - id: natural_world
+    stratum: japanese_inspired
+    habit: compound from a small concrete root set
+    distinctions: []
+    reason: >-
+      Terrain, weather and plant vocabulary is where compounding pays best, because the
+      concepts genuinely are compositional: a mountain river really is a mountain and a
+      river. Coining a separate opaque root for each would spend the root budget on
+      meanings a compound expresses exactly.
+
+  - id: body_and_basic_actions
+    stratum: native
+    habit: opaque roots
+    distinctions: []
+    reason: >-
+      The core vocabulary every other word is defined against. These must be short, frequent
+      and not analysable into anything else, so they are coined natively and opaquely.
+
+  - id: numbers
+    stratum: native
+    habit: opaque roots
+    distinctions: []
+    reason: >-
+      A closed decimal set, coined natively. Both source languages have numeral systems too
+      recognisable to go near: a borrowed numeral would be the single most obvious
+      give-away in the language.
+
+  - id: abstract_and_technical
+    stratum: loan
+    habit: adapt from a source language
+    distinctions: []
+    reason: >-
+      Concepts with no non-arbitrary native coinage. Confining loans to one field is what
+      keeps the loan share low without pretending the concepts do not exist.
+    problems: >-
+      The field boundary is the only thing restraining loans, and "abstract" is elastic. A
+      later phase could justify almost anything as abstract, which is a policy risk the
+      share quota only partly covers.
+
+# ======================================================================================
+# compounds
+# ======================================================================================
+# Compounds are MULTI-WORD lexical entries. GR-NOUN-004 (official, since v0.1) declares
+# that two nouns forming a compound meaning stay separate words with no fusion and no
+# linking particle, and lists the fused spelling `kalunami` as an invalid example. Phase 1C
+# does not reopen that: it specifies which compounds may become dictionary entries, not a
+# new way to write them.
+#
+# Because nothing is glued, there is no seam: the morphophonemic questions that fusion would
+# raise (hiatus at the join, sandhi, voicing) do not arise at all. That is the main benefit
+# of GR-NOUN-004 and the reason Phase 1C had no cause to propose changing it.
+
+compound_patterns:
+  - id: CP-NN
+    pattern: "NOUN NOUN"
+    head: final
+    written: separate_words
+    description: >-
+      A modifier noun followed by a head noun, lexicalized as one dictionary entry when the
+      meaning is not fully predictable from the parts.
+    reason: >-
+      Head-final follows LOCKED decision 1 and GR-ORD-003. Lexicalization is what makes this
+      a vocabulary rule rather than a restatement of the syntax: `sedha nami` is
+      syntactically just two nouns, but as an entry it means "restaurant", which "food" and
+      "house" do not give you.
+    lexicalize_when: meaning_not_predictable_from_parts
+    problems: >-
+      A lexicalized compound is spelled identically to the ordinary noun sequence it came
+      from, so `sedha nami` is both "restaurant" and "food house" and only the dictionary
+      distinguishes them. GR-NOUN-004 records the same cost for the syntactic construction.
+
+  - id: CP-NNN
+    pattern: "NOUN NOUN NOUN"
+    head: final
+    written: separate_words
+    description: >-
+      A three-noun chain, strictly head-final: each noun modifies everything to its right.
+    reason: >-
+      Needed because the two-noun pattern alone cannot name a sub-kind of a compound
+      (a "stone food house"). Head-finality makes the bracketing unambiguous without
+      punctuation: the last noun is always the head.
+    lexicalize_when: meaning_not_predictable_from_parts
+    problems: >-
+      Three-word entries are where the compound-versus-sequence ambiguity above gets
+      genuinely hard to parse, and the Phase 4 tokenizer will not attempt it.
+
+  - id: CP-REDUP
+    pattern: "WORD WORD (identical)"
+    head: none
+    written: separate_words
+    description: >-
+      Full reduplication of an adverb for intensity: the word repeated, as two words.
+    reason: >-
+      A Tamil-like structural habit (reduplication for intensity) that costs no root at all
+      and no new morpheme. Written as two words for the same reason as every other compound:
+      GR-ORD-001 glues only suffixes, so a reduplicated form cannot be one word.
+    inspiration_note: >-
+      The habit is Tamil-like; the words it applies to are Tanese and the spelling
+      convention is neither language's.
+    problems: >-
+      Formally indistinguishable from an accidental repetition, which is exactly the kind of
+      typo the Phase 3 invalid corpus will contain. Nothing but the dictionary says
+      `thuri thuri` is intensive rather than a stutter.
+
+# ======================================================================================
+# loanword adaptation
+# ======================================================================================
+# Deterministic and table-driven: one input gives exactly one output, or an explicit
+# rejection naming the sound responsible. Nothing is guessed.
+#
+# Input is a list of source segments in a loose IPA. The adapter
+# (tanese_nlp.vocabulary.loanwords) contains no sound-specific knowledge at all: every
+# substitution, every repair and every rejection below drives it.
+
+loan_substitutions:
+  # --- consonants Tanese has no phoneme for, but which have an unambiguous nearest fit ---
+  - source: f
+    tanese: p
+    source_examples: [film, coffee]
+    reason: >-
+      Both labial obstruents; /p/ is the only labial voiceless consonant in the inventory,
+      so the place is preserved and only the manner changes.
+  - source: v
+    tanese: w
+    source_examples: [video]
+    reason: >-
+      Labial and voiced, like /v/. Mapping to /b/ was the alternative; /w/ keeps the
+      continuant manner, and /b/ is kept free so that source /b/ and source /v/ do not
+      collapse together.
+  - source: z
+    tanese: s
+    source_examples: [zone]
+    reason: Same place and manner; only voicing is lost, and /s/ has no voiced counterpart.
+  - source: h
+    tanese: ""
+    source_examples: [hotel]
+    reason: >-
+      Deleted, not substituted. There is no /h/ phoneme (spec/phonology.yaml: its absence is
+      what lets `h` act as a pure retroflex marker), and every candidate substitute -- /k/,
+      a glide, a vowel -- is further from /h/ than silence is.
+    problems: >-
+      Deletion can make two source words collide where the source kept them apart, and the
+      loss is at the most salient position in the word, the onset.
+  - source: "ng"
+    tanese: n
+    source_examples: [song]
+    reason: >-
+      The velar nasal becomes the moraic nasal, which is the only coda Tanese has. Its place
+      assimilation is not represented because the romanization writes one nasal symbol.
+
+  # --- retroflex source consonants map straight across (Indic source words) -------------
+  - source: "t_retro"
+    tanese: th
+    source_examples: ["koːʈ (coat, via an Indic source)"]
+    reason: >-
+      A retroflex voiceless plosive in the source maps to the Tanese retroflex voiceless
+      plosive. The inventory has a retroflex series precisely so that source words with
+      retroflexes do not have to lose the contrast.
+  - source: "d_retro"
+    tanese: dh
+    source_examples: ["ɖabba"]
+    reason: As `t_retro`, voiced.
+  - source: "n_retro"
+    tanese: nh
+    source_examples: ["maɳi"]
+    reason: As `t_retro`, nasal.
+
+  # --- consonants that map to themselves ------------------------------------------------
+  - source: p
+    tanese: p
+    source_examples: [park]
+    reason: Identical.
+  - source: b
+    tanese: b
+    source_examples: [bank]
+    reason: Identical.
+  - source: t
+    tanese: t
+    source_examples: [taxi]
+    reason: Identical.
+  - source: d
+    tanese: d
+    source_examples: [data]
+    reason: Identical.
+  - source: k
+    tanese: k
+    source_examples: [kilo]
+    reason: Identical.
+  - source: g
+    tanese: g
+    source_examples: [gas]
+    reason: Identical.
+  - source: s
+    tanese: s
+    source_examples: [salad]
+    reason: Identical.
+  - source: m
+    tanese: m
+    source_examples: [metro]
+    reason: Identical.
+  - source: n
+    tanese: n
+    source_examples: [note]
+    reason: Identical.
+  - source: l
+    tanese: l
+    source_examples: [lamp]
+    reason: Identical.
+  - source: r
+    tanese: r
+    source_examples: [radio]
+    reason: >-
+      Every source rhotic -- trill, tap, approximant -- collapses onto the Tanese tap, which
+      is the only rhotic in the inventory.
+  - source: j
+    tanese: y
+    source_examples: [yoga]
+    reason: The palatal glide, spelled `y` in the romanization.
+  - source: w
+    tanese: w
+    source_examples: [watt]
+    reason: Identical.
+
+  # --- vowels ----------------------------------------------------------------------------
+  - source: a
+    tanese: a
+    source_examples: [bank]
+    reason: Identical.
+  - source: i
+    tanese: i
+    source_examples: [film]
+    reason: Identical.
+  - source: u
+    tanese: u
+    source_examples: [bus]
+    reason: Identical.
+  - source: e
+    tanese: e
+    source_examples: [net]
+    reason: Identical.
+  - source: o
+    tanese: o
+    source_examples: [note]
+    reason: Identical.
+  - source: "a:"
+    tanese: aa
+    source_examples: ["kaːr (car)"]
+    reason: >-
+      Source length maps to Tanese length, which is contrastive (LOCKED decision 9) and
+      written by doubling the vowel.
+  - source: "i:"
+    tanese: ii
+    source_examples: ["miːtiŋ (meeting)"]
+    reason: As `a:`.
+  - source: "u:"
+    tanese: uu
+    source_examples: ["skuːl (school)"]
+    reason: As `a:`.
+  - source: "e:"
+    tanese: ee
+    source_examples: ["kafeː (cafe)"]
+    reason: As `a:`.
+  - source: "o:"
+    tanese: oo
+    source_examples: ["koːd (code)"]
+    reason: As `a:`.
+  - source: "ae"
+    tanese: a
+    source_examples: ["kaet (cat)"]
+    reason: >-
+      Low front unrounded, closest to Tanese /a/, the only low vowel. The front quality is
+      lost; no vowel in the inventory keeps it.
+  - source: "uh"
+    tanese: a
+    source_examples: ["bʌs (bus)"]
+    reason: Low-central in most source accents, so /a/ is nearest.
+  - source: "schwa"
+    tanese: u
+    source_examples: ["sofə (sofa)"]
+    reason: >-
+      Mapped to the same vowel as the default epenthesis below, so that an unstressed source
+      vowel and an inserted vowel are spelled alike instead of inventing a contrast Tanese
+      does not hear.
+  - source: "I"
+    tanese: i
+    source_examples: ["sɪstəm (system)"]
+    reason: Near-high front; /i/ is nearest.
+  - source: "U"
+    tanese: u
+    source_examples: ["bʊk (book)"]
+    reason: Near-high back; /u/ is nearest.
+  - source: "E"
+    tanese: e
+    source_examples: ["nɛt (net)"]
+    reason: Mid front; /e/ is nearest.
+  - source: "O"
+    tanese: o
+    source_examples: ["lɔ (law)"]
+    reason: Mid back; /o/ is nearest.
+
+# Source sounds with NO mapping. These are rejected by name, never approximated: each one
+# has at least two candidate substitutes that are equally defensible, and silently picking
+# one would make the adapter non-deterministic in the only sense that matters -- a second
+# person doing it by hand would get a different answer.
+unmapped:
+  - source: "th"
+    code: VL-UNMAPPED
+    reason: >-
+      The voiceless dental fricative is equally close to /t/, /s/ and /th/. Source
+      orthography does not decide it either, since `th` already spells the Tanese retroflex.
+  - source: "dh_fric"
+    code: VL-UNMAPPED
+    reason: As the voiceless dental fricative, between /d/, /dh/ and /s/.
+  - source: "sh"
+    code: VL-UNMAPPED
+    reason: >-
+      The postalveolar fricative sits between /s/ and a /sy/ sequence. Japanese chooses the
+      palatalised sequence and Tamil chooses a separate letter; Tanese has neither option,
+      and /s/ alone loses a contrast that is highly audible.
+  - source: "zh"
+    code: VL-UNMAPPED
+    reason: As the postalveolar fricative, with voicing lost on top.
+  - source: "ch"
+    code: VL-UNMAPPED
+    reason: >-
+      The affricate could be /t/, /s/, or a /ti/ sequence. All three are used by real
+      borrowing traditions, which is exactly why Tanese will not pick one silently.
+  - source: "j_aff"
+    code: VL-UNMAPPED
+    reason: As the voiceless affricate, voiced.
+  - source: "x"
+    code: VL-UNMAPPED
+    reason: >-
+      The velar fricative is between /k/ and deletion, and deletion is already spoken for by
+      /h/. Ambiguous, so rejected.
+  - source: "ny"
+    code: VL-UNMAPPED
+    reason: >-
+      The palatal nasal is a /ny/ sequence or a plain /n/, and the romanization deliberately
+      forbids writing `ny` for a single segment (constraint PT-010), so the sequence reading
+      cannot be spelled as one consonant.
+  - source: "y_vowel"
+    code: VL-UNMAPPED
+    reason: >-
+      Front rounded vowels have no nearest fit: /i/ keeps the frontness and /u/ the
+      rounding, and there is no basis for preferring either.
+  - source: "oe"
+    code: VL-UNMAPPED
+    reason: As the high front rounded vowel, mid.
+  - source: "ai"
+    code: VL-UNMAPPED
+    reason: >-
+      Diphthongs are rejected as single segments on purpose. A diphthong is two Tanese
+      moras, so the caller must say which two: supply `a` and `i` as separate segments and
+      the hiatus repair below will handle the join deterministically.
+  - source: "au"
+    code: VL-UNMAPPED
+    reason: As the other diphthongs -- supply the two vowels separately.
+  - source: "ei"
+    code: VL-UNMAPPED
+    reason: As the other diphthongs.
+  - source: "ou"
+    code: VL-UNMAPPED
+    reason: As the other diphthongs.
+
+# The repair steps, applied in exactly this order. Each step is total: it either produces a
+# legal structure or leaves the word for the next step. After the last step the adapter
+# validates the result against spec/phonology.yaml and rejects it if anything remains, so an
+# illegal output is impossible rather than merely unlikely.
+loan_repairs:
+  - id: LR-1-SUBSTITUTE
+    step: 1
+    name: substitute source sounds
+    description: >-
+      Replace every source segment by its `loan_substitutions` entry. A segment listed under
+      `unmapped` is rejected with its code and name; a segment in neither table is rejected
+      as unknown.
+    reason: >-
+      Done first so every later step operates on Tanese graphemes only, and so the two
+      rejection cases are raised before any repair has altered the word.
+
+  - id: LR-2-NASAL
+    step: 2
+    name: nasal to moraic n
+    description: >-
+      A nasal consonant that is word-final, or that stands immediately before another
+      consonant, becomes the moraic nasal `n`. A word-initial nasal is never converted.
+    reason: >-
+      The moraic nasal is the only coda Tanese has (LOCKED decision 10), so this is the one
+      place a source coda survives as a coda instead of being broken up by a vowel. It runs
+      before epenthesis so that `bank` comes out as `banku` and not `banuku`.
+    exceptions: >-
+      Word-initially a moraic nasal is illegal (constraint PT-005) because it has nothing to
+      attach to, so an initial nasal keeps its consonant status and is dealt with by
+      epenthesis instead.
+
+  - id: LR-3-GEMINATE
+    step: 3
+    name: identical consonant pair to geminate
+    description: >-
+      Two identical adjacent consonants followed by a vowel become a geminate if the
+      consonant is `geminable` in spec/phonology.yaml. If it is not geminable, the pair is
+      left for the later steps: a nasal pair is resolved by step 2, and any other pair by
+      epenthesis.
+    reason: >-
+      A geminate is legal Tanese (LOCKED decision 10) and is a much closer rendering of a
+      source double consonant than an inserted vowel, which would add a syllable the source
+      never had. Restricting it to `geminable` consonants is not a separate decision: it is
+      constraint PT-007 doing its job, and the phonetic argument for it is in the
+      `gemination` block of spec/phonology.yaml.
+    problems: >-
+      Source orthography and source pronunciation disagree about double consonants all the
+      time (English `ll` in `ball` is one /l/), so this step is only as good as the segment
+      list it is given. The adapter takes sounds, not spelling, which pushes that judgement
+      onto the caller.
+
+  - id: LR-4-HIATUS
+    step: 4
+    name: break vowel hiatus
+    description: >-
+      In a run of adjacent vowels: identical vowels collapse into one long vowel, and a run
+      longer than two is truncated to two. Two different vowels are separated by a glide --
+      `y` after a front vowel (i, e), `w` after a back vowel (u, o), and `y` after `a`. If
+      the chosen glide would form a mora listed in the `gaps` block of spec/phonology.yaml
+      (`yi`, `wu`), the other glide is used instead.
+    reason: >-
+      Constraint PT-008 forbids hiatus, and its `problems` field already committed Phase 1C
+      to supplying a glide-based repair. The glide is chosen by the preceding vowel rather
+      than the following one because that is what makes the transition continuous: a front
+      vowel glides out through /j/. The gap fallback is not an extra rule but an unavoidable
+      consequence of `yi` and `wu` not existing: `a` + `i` cannot become `ayi`, so it becomes
+      `awi`.
+    alternatives: >-
+      Choosing the glide by the following vowel. Rejected: it collides with the gaps far more
+      often, since `i` and `u` are the commonest second members of a source diphthong.
+    problems: >-
+      Truncating a three-vowel run loses information, and a word with hiatus comes out a
+      consonant longer than its source, which can push it over the four-mora root cap.
+
+  - id: LR-5-EPENTHESIS
+    step: 5
+    name: insert a vowel after a stranded consonant
+    description: >-
+      Any consonant not followed by a vowel -- in a cluster, or word-final -- takes an
+      inserted vowel: `a` after a retroflex consonant (th, dh, nh), otherwise `u`. The
+      moraic nasal from step 2 and the first half of a geminate from step 3 are already
+      licensed and are skipped. If the inserted vowel would form a gap mora, `i` is used
+      instead.
+    reason: >-
+      LOCKED decision 10 allows no clusters and no final consonant but the moraic nasal, so
+      every surviving consonant needs a vowel. `u` is the default because it is the least
+      perceptually prominent vowel in the inventory, so the inserted syllable intrudes least
+      on the source word. `a` after a retroflex is a phonetic exception, not a stylistic one:
+      a retroflex closure followed by a high back vowel is a difficult and unstable
+      transition, and `a` keeps the tongue low where the retroflex leaves it.
+    alternatives: >-
+      A single epenthetic vowel everywhere, with no retroflex exception, which is simpler to
+      state and to test. Rejected because the retroflex series is the inventory feature
+      Tanese most wants to be pronounceable, and `-thu` is the hardest syllable in the
+      language to say cleanly. Also considered: copying the nearest vowel (vowel harmony),
+      rejected because it interacts with step 4 and makes the output depend on repair order.
+    problems: >-
+      Epenthesis adds moras, so a long source word can exceed the four-mora root cap and
+      become unusable as a root even though it is a legal word. Phase 2 must decide whether
+      to truncate or refuse such loans; this file does not, and that is recorded as an
+      unresolved decision.
+
+  - id: LR-6-SPELL
+    step: 6
+    name: spell the result
+    description: >-
+      Write the result in the canonical romanization, inserting the apostrophe required by
+      constraint PT-010 when a moraic nasal precedes a vowel, `y` or `w`.
+    reason: >-
+      The romanization is the canonical form (LOCKED decision 12), so the adapter must emit
+      it, not an internal segment list. The apostrophe is not optional: without it `kan'a`
+      and `kana` would be the same string.
+
+  - id: LR-7-ASSERT
+    step: 7
+    name: validate or reject
+    description: >-
+      Validate the spelled result with the phonotactic validator. If any constraint is still
+      broken, reject the word with code VL-RESIDUE and the constraint id, rather than
+      returning it.
+    reason: >-
+      The repairs above are believed total, but "believed" is not a guarantee, and a silently
+      illegal loanword would poison the Phase 2 lexicon at its source. This step converts any
+      gap in the repair table into a loud, named failure. It has no effect on any input in
+      `adaptation_examples`, which is the point.
+
+# Hand-derived expected outputs. Each was worked out by applying the steps above by hand and
+# then checked for legality; the test in tests/unit/test_loanwords.py asserts the code
+# reproduces them. The expectation lives here, in the spec, so the test cannot be satisfied
+# by simply recording whatever the code happens to do.
+#
+# `segments` is the input: a list of source sounds using the `source` keys above.
+adaptation_examples:
+  - source_word: film
+    segments: [f, i, l, m]
+    expect: pilun
+    steps_fired: [LR-1-SUBSTITUTE, LR-2-NASAL, LR-5-EPENTHESIS]
+    tests: f-substitution, a final nasal becoming the moraic n, and a stranded l taking u
+  - source_word: strike
+    segments: [s, t, r, a, i, k]
+    expect: suturawiku
+    steps_fired: [LR-1-SUBSTITUTE, LR-4-HIATUS, LR-5-EPENTHESIS]
+    tests: >-
+      a three-consonant initial cluster taking epenthesis twice, and a hiatus whose default
+      glide `y` would make the gap mora `yi`, so `w` is used
+  - source_word: bank
+    segments: [b, a, n, k]
+    expect: banku
+    steps_fired: [LR-1-SUBSTITUTE, LR-2-NASAL, LR-5-EPENTHESIS]
+    tests: a nasal before a stop becoming the moraic n, taking no inserted vowel
+  - source_word: "koːʈ (coat)"
+    segments: [k, o, "t_retro"]
+    expect: kotha
+    steps_fired: [LR-1-SUBSTITUTE, LR-5-EPENTHESIS]
+    tests: the retroflex epenthesis exception -- a, not u, after a final retroflex
+  - source_word: "paʈʈu (silk)"
+    segments: [p, a, "t_retro", "t_retro", u]
+    expect: paththu
+    steps_fired: [LR-1-SUBSTITUTE, LR-3-GEMINATE]
+    tests: an identical pair of a geminable consonant becoming a geminate, not epenthesis
+  - source_word: kiosk
+    segments: [k, i, o, s, k]
+    expect: kiyosuku
+    steps_fired: [LR-1-SUBSTITUTE, LR-4-HIATUS, LR-5-EPENTHESIS]
+    tests: hiatus broken by `y` after a front vowel, where the default glide is legal
+  - source_word: "anna (a source name)"
+    segments: [a, n, n, a]
+    expect: anna
+    steps_fired: [LR-1-SUBSTITUTE, LR-2-NASAL]
+    tests: >-
+      an identical pair of a NON-geminable consonant: the nasal pair resolves as moraic n
+      plus onset, so no vowel is inserted
+  - source_word: "karra (a source name)"
+    segments: [k, a, r, r, a]
+    expect: karura
+    steps_fired: [LR-1-SUBSTITUTE, LR-5-EPENTHESIS]
+    tests: >-
+      an identical pair of a non-geminable, non-nasal consonant, which step 3 declines and
+      step 5 breaks with an inserted vowel
+  - source_word: "kaːr (car)"
+    segments: [k, "a:", r]
+    expect: kaaru
+    steps_fired: [LR-1-SUBSTITUTE, LR-5-EPENTHESIS]
+    tests: a source long vowel becoming a Tanese long vowel, plus a final stranded rhotic
+
+# Inputs that must be REJECTED, with the code and the sound named. Nothing here may be
+# repaired into something plausible.
+adaptation_rejections:
+  - source_word: "θɪŋ (thing)"
+    segments: ["th", "I", "ng"]
+    code: VL-UNMAPPED
+    offending: "th"
+    reason: The dental fricative has no mapping; see the `unmapped` block.
+  - source_word: "tʃɛr (chair)"
+    segments: ["ch", "E", r]
+    code: VL-UNMAPPED
+    offending: "ch"
+    reason: The affricate has no mapping.
+  - source_word: "ʃɔp (shop)"
+    segments: ["sh", "O", p]
+    code: VL-UNMAPPED
+    offending: "sh"
+    reason: The postalveolar fricative has no mapping.
+  - source_word: "taɪm (time), given as a diphthong"
+    segments: [t, "ai", m]
+    code: VL-UNMAPPED
+    offending: "ai"
+    reason: >-
+      Diphthongs must be supplied as two vowel segments so the hiatus repair can decide the
+      join. Given as one segment, the adapter refuses rather than guessing the split.
+  - source_word: "an invented sound"
+    segments: [k, "q", a]
+    code: VL-UNKNOWN
+    offending: "q"
+    reason: >-
+      Not in `loan_substitutions` and not in `unmapped`. An unlisted sound is rejected as
+      unknown, so adding a source sound to the language is always a deliberate edit to this
+      file.
+
+# ======================================================================================
+# the Phase 2 pipeline
+# ======================================================================================
+# LOCKED decision 14, as ordered stages. Phase 2 implements these in this order; the stage
+# ids are declared here so the implementation cannot quietly reorder or drop one.
+
+pipeline:
+  - id: PL-0
+    stage: candidate_generation
+    automated: true
+    llm_allowed: true
+    description: >-
+      Produce candidate forms for a concept. The only stage an LLM may touch, and even here
+      it proposes forms and nothing else.
+    reason: >-
+      LOCKED decision 14: the LLM may only propose candidates. Generation is also the one
+      stage where being wrong is free, because every later stage can still reject.
+  - id: PL-1
+    stage: phonotactic_check
+    automated: true
+    llm_allowed: false
+    description: Reject any candidate the Phase 1A validator rejects, keeping the constraint id.
+    reason: >-
+      Deterministic and already built (tanese_nlp.phonology.validate). Running it first makes
+      every later stage able to assume it is looking at a legal Tanese word.
+  - id: PL-2
+    stage: morphology_check
+    automated: true
+    llm_allowed: false
+    description: >-
+      Reject a candidate that breaks a root shape above, equals a declared morpheme
+      (RS-RESERVED), or fails to combine with every suffix of its word class.
+    reason: >-
+      These are the Phase 1C rules themselves. Checking them before collisions is cheaper:
+      most rejects die here, and collision detection is the expensive stage.
+  - id: PL-3
+    stage: collision_check
+    automated: true
+    llm_allowed: false
+    description: >-
+      Exact, phonetic, orthographic and semantic collision against the existing lexicon, as
+      the Phase 2 done-criteria require. Semantic collision is the one sub-check that needs
+      meaning, so it is where embeddings are used.
+    reason: >-
+      Folded into one stage rather than split, because all four sub-checks answer the same
+      question -- is this too close to a word Tanese already has -- and a candidate rejected
+      by any of them is rejected for the same reason.
+  - id: PL-4
+    stage: rank
+    automated: true
+    llm_allowed: false
+    description: >-
+      Order the survivors so a human reviews the best first. Ranking inputs include distance
+      from the nearest existing word, mora count, and distance from the originality list.
+    reason: >-
+      Ranking is not filtering: nothing is rejected here. Its only job is to put the
+      reviewer's time where it pays.
+  - id: PL-5
+    stage: human_approve
+    automated: false
+    llm_allowed: false
+    description: >-
+      A human promotes a candidate to `official`. Nothing else can, and this stage cannot be
+      automated away.
+    reason: >-
+      LOCKED decision 14 and 15. Rules define Tanese; approval is the point at which a form
+      becomes a rule, so it is the one stage that must stay human.
+
+# Forms this file needs in order to illustrate a shape that no demo word happens to have --
+# a four-mora root, an n-final root, a root with a long vowel. They are experimental, they
+# are not vocabulary, and check 13 forbids them from appearing in data/vocabulary/, exactly
+# as it does for the demo wordlist and the adapted loans above.
+illustrative_forms:
+  - form: thaaben
+    shape: four moras, long vowel, moraic-n final
+    status: experimental
+    why_needed: >-
+      No demo word has a long vowel or a final moraic n, so without this there would be no
+      example of RS-FINAL's second permitted final or of a maximal root.
+  - form: welugan
+    shape: four moras, moraic-n final
+    status: experimental
+    why_needed: An n-final root with no long vowel, to separate the two features above.
+  - form: nhodi
+    shape: two moras, retroflex onset
+    status: experimental
+    why_needed: A minimal root (RS-MIN) that is not also a demo word.
+
+# ======================================================================================
+# rules
+# ======================================================================================
+# One entry per vocabulary rule, in the Phase 1B grammar-rule format (docs/SPEC.md, extended
+# per docs/CHANGES.md CH-001 and CH-003). At least two valid and two invalid examples each.
+#
+# `phonotactics: illegal` on an example means the form is deliberately NOT a legal Tanese
+# word -- which is the whole point of some invalid examples here, since several of these
+# rules are about legality itself. Check 9 asserts the declared legality either way: a
+# `legal` example must pass the Phase 1A validator and round-trip through the script, and an
+# `illegal` one must actually fail it. Mislabelling either way is a failure.
+
+rules:
+  # ---- strata --------------------------------------------------------------------------
+  - id: VR-STR-001
+    category: stratum
+    name: every entry declares a stratum
+    description: >-
+      Every lexicon entry carries exactly one of the five strata: native, tamil_inspired,
+      japanese_inspired, compound or loan.
+    reason: >-
+      The stratum records how the word was made, which is the only way to report the share
+      quotas, to audit the originality of the lexicon later, and to answer "where does this
+      word come from" without guessing. An entry with no stratum is an entry whose
+      provenance has been lost, and provenance cannot be reconstructed from a form.
+    alternatives: >-
+      Infer the stratum from the form (a loan looks like a loan). Rejected: it is false for
+      every stratum but `loan`, because structural inspiration leaves no trace in the form.
+    problems: >-
+      Four of the five strata are unverifiable from the form, so the label is only as honest
+      as the person who typed it. No check can catch a native root mislabelled
+      `tamil_inspired`.
+    inspiration:
+      source: none
+      original_feature: >-
+        Japanese lexical strata (wago, kango, gairaigo) are a real and linguistically active
+        distinction, visible in the writing system and in phonotactics.
+      how_modified: >-
+        Tanese borrows the idea of stratifying the lexicon and nothing else: the strata are
+        different, the labels are metadata rather than phonologically active, and no stratum
+        gets its own script or its own phonotactics.
+    pattern: "ENTRY + stratum in {native, tamil_inspired, japanese_inspired, compound, loan}"
+    valid:
+      - tanese: TS-NA.TS-MI
+        roman: nami
+        english: "house -- stratum: native"
+      - tanese: TS-SE.TS-DHA TS-NA.TS-MI
+        roman: sedha nami
+        english: "restaurant -- stratum: compound (a lexicalized two-noun entry)"
+    invalid:
+      - tanese: TS-NA.TS-MI
+        roman: nami
+        why: >-
+          Entered with no stratum at all. The form is a perfectly good word; the entry is
+          incomplete, and nothing later can recover which method coined it.
+      - tanese: TS-NA.TS-MI
+        roman: nami
+        why: >-
+          Entered with two strata (native and tamil_inspired). A word is coined once, by one
+          method; two labels means the share quotas no longer sum to the lexicon size.
+    status: official
+    since: v0.1
+
+  - id: VR-STR-002
+    category: stratum
+    name: inspiration is structural, never a form
+    description: >-
+      A tamil_inspired or japanese_inspired word borrows a structural or semantic habit from
+      its source language. Its form is coined natively and must not resemble any source
+      word.
+    reason: >-
+      LOCKED decision 3 forbids a particle form that equals a common Japanese or Tamil one.
+      Phase 1C applies the same principle to content words, because the alternative -- a
+      lexicon of recognisably adapted source words -- would make the claim that Tanese is an
+      original language untrue in the place where it matters most, the vocabulary.
+      What remains borrowable is how meaning is divided up, and that is borrowed openly:
+      see the semantic_fields block.
+    alternatives: >-
+      Permit adapted source forms under a similarity ceiling, with per-source quotas.
+      Rejected: the originality claim would then rest on a threshold, defended word by word,
+      and any threshold low enough to admit useful words is also low enough to admit obvious
+      ones.
+    problems: >-
+      It makes the two inspired strata invisible in the words themselves, so a reader cannot
+      hear what is Tamil-inspired about a Tamil-inspired word. The inspiration is real but
+      it lives in the shape of the lexicon, not the shape of the word.
+    inspiration:
+      source: tamil
+      original_feature: Tamil semantic granularity, especially in kinship.
+      how_modified: >-
+        The distinctions are kept and every form filling them is coined natively, so not one
+        Tamil morpheme enters the language.
+    pattern: "coined form, natively generated; habit borrowed"
+    valid:
+      - tanese: TS-NA.TS-NASAL.TS-THE
+        roman: nanthe
+        english: >-
+          friend -- a natively coined form; its stratum may be tamil_inspired because of the
+          semantic field it sits in, not because of how it sounds
+      - tanese: TS-NHO.TS-DI
+        roman: nhodi
+        english: >-
+          an illustrative minimal root: coined from the phonology, at distance 3 from the
+          nearest listed source form
+    invalid:
+      - roman: kanhnhi
+        why: >-
+          A form built to echo a Tamil kinship word. Even setting the resemblance aside, it
+          is not a legal Tanese word -- `nh` may not be geminated (constraint PT-007) -- so
+          it fails twice.
+        phonotactics: illegal
+      - tanese: TS-DE.TS-SU
+        roman: desu
+        why: >-
+          A Japanese copula form taken over as a root. It equals an entry in
+          spec/grammar_rules/_originality.yaml, so the hard gate in VR-ORIG-001 rejects it.
+    status: official
+    since: v0.1
+
+  - id: VR-STR-003
+    category: stratum
+    name: loans are confined to one semantic field
+    description: >-
+      The loan stratum is the only one that borrows a form, and it is restricted to the
+      abstract_and_technical field with a share target of 0.06.
+    reason: >-
+      A language with no loan machinery has to pretend that concepts like `computer` do not
+      exist, which is worse than borrowing. Confining loans to one field and a small quota
+      is what stops that concession from spreading: the restriction, not the adaptation
+      rules, is what keeps Tanese sounding like itself.
+    alternatives: >-
+      No loans at all in v0.1, coining a native root for every concept. Rejected: the native
+      coinage for an imported technical concept is arbitrary, and arbitrary roots are exactly
+      what the collision detector has the least ability to justify.
+    problems: >-
+      The word "abstract" is elastic, and the field boundary is the only real restraint. A
+      later phase could classify almost anything as abstract and stay formally compliant.
+    inspiration:
+      source: japanese
+      original_feature: >-
+        Japanese gairaigo: a large, clearly marked loan stratum with its own adaptation
+        phonology.
+      how_modified: >-
+        The adaptation machinery is kept in spirit and is entirely Tanese in content; unlike
+        gairaigo the stratum is capped by quota and confined to one semantic field, and it
+        gets no separate script.
+    pattern: "source word -> adaptation pipeline -> loan entry in abstract_and_technical"
+    valid:
+      - tanese: TS-BA.TS-NASAL.TS-KU
+        roman: banku
+        english: "bank -- an adapted loan (see adaptation_examples), stratum: loan"
+      - tanese: TS-KO.TS-THA
+        roman: kotha
+        english: "coat -- an adapted loan from an Indic source form with a retroflex coda"
+    invalid:
+      - tanese: TS-PI.TS-LU.TS-NASAL
+        roman: pilun
+        why: >-
+          "film" adapted correctly but filed in the natural_world field. The adaptation is
+          fine; the classification is not, and misfiling a loan is how the 0.06 quota gets
+          evaded.
+      - tanese: TS-SA.TS-BO
+        roman: sabo
+        why: >-
+          A native root filed as a loan. Nothing was borrowed, so the entry inflates the loan
+          share and understates the native one, making both quotas meaningless.
+    status: official
+    since: v0.1
+
+  # ---- root shapes ---------------------------------------------------------------------
+  - id: VR-ROOT-001
+    category: root_shape
+    name: a root is two to four moras
+    description: Every root is at least two and at most four moras long.
+    reason: >-
+      See RS-MIN and RS-MAX. The floor keeps roots out of the one-mora space the particles
+      and suffixes already occupy; the ceiling stops the Phase 2 pipeline from escaping a
+      collision by lengthening a word instead of rethinking it.
+    problems: >-
+      Measured in moras, not letters, so a root with a long vowel or a geminate reaches the
+      ceiling with fewer consonants and vowels than one without. `thaaben` and `welugan` are
+      both maximal, and only one of them looks long.
+    inspiration:
+      source: japanese
+      original_feature: >-
+        Japanese native roots are overwhelmingly two moras, and the mora is the unit length
+        is counted in.
+      how_modified: >-
+        Counting in moras is kept because Tanese is mora-based (LOCKED decision 10); the
+        range is wider than Japanese native roots and is set by the collision argument above
+        rather than by any source language.
+    pattern: "2 <= mora count <= 4"
+    valid:
+      - tanese: TS-NA.TS-MI
+        roman: nami
+        english: "house -- two syllables, two moras: the minimum"
+      - tanese: TS-THA.TS-LONG.TS-BE.TS-NASAL
+        roman: thaaben
+        english: >-
+          an illustrative maximal root: four moras (tha + length + be + n), showing that the
+          cap is counted in moras and not in letters
+    invalid:
+      - tanese: TS-DO
+        roman: do
+        why: >-
+          One mora. Below RS-MIN, and it also equals the object particle `do`, which
+          VR-ROOT-003 forbids outright.
+      - tanese: TS-WE.TS-LU.TS-GA.TS-LONG.TS-NE.TS-NASAL
+        roman: welugaanen
+        why: >-
+          Six moras, over the RS-MAX ceiling. It is a perfectly legal Tanese word -- the cap
+          is a vocabulary rule, not a phonotactic one -- which is why only this check can
+          reject it.
+    status: official
+    since: v0.1
+
+  - id: VR-ROOT-002
+    category: root_shape
+    name: a root ends in a vowel or the moraic nasal
+    description: A root ends either in a vowel or in the moraic nasal `n`, and in nothing else.
+    reason: >-
+      Forced by the suffix inventory, not chosen: every suffix in spec/grammar_rules/ is
+      consonant-initial, so these two finals concatenate legally with all fourteen of them
+      and no morphophonemic rule is needed at the join. That matters because
+      spec/phonology.yaml declares no allophony and no morphophonemics at all -- there is no
+      machinery to repair a bad join, so no join may be bad.
+    alternatives: >-
+      Allow any phonotactically legal final and add a linking rule for the awkward cases.
+      Rejected: the linking rule would be the first morphophonemics in the language, and
+      LOCKED decision 2 (suffixing only, agglutinative) is at its most defensible when
+      suffixation is literal concatenation.
+    problems: >-
+      This rule is coupled to spec/grammar_rules/: a future vowel-initial suffix would break
+      it silently. Check 2 exists for exactly that reason -- it concatenates every permitted
+      final with every declared suffix on every run.
+    inspiration:
+      source: none
+      original_feature: >-
+        Japanese words end in a vowel or the moraic nasal too, for the same phonotactic
+        reason.
+      how_modified: >-
+        Arrived at independently from LOCKED decision 10, which permits exactly those two
+        word-finals. The convergence is a consequence of both languages being mora-based,
+        not a borrowing.
+    pattern: "ROOT -> ... (V | n)"
+    valid:
+      - tanese: TS-WE.TS-LU.TS-GA.TS-NASAL
+        roman: welugan
+        english: an illustrative root ending in the moraic nasal
+      - tanese: TS-MO.TS-THU
+        roman: mothu
+        english: "cat -- a root ending in a vowel, the commoner case"
+    invalid:
+      - roman: welugat
+        why: >-
+          Ends in `t`. A word may end only in a vowel or the moraic nasal (constraint
+          PT-004), so this is not a legal Tanese word at all.
+        phonotactics: illegal
+      - roman: welugam
+        why: >-
+          Ends in `m`. The moraic nasal is written `n` and is the only nasal that may close a
+          word, so `m` here is an illegal final rather than an alternative spelling.
+        phonotactics: illegal
+    status: official
+    since: v0.1
+
+  - id: VR-ROOT-003
+    category: root_shape
+    name: a root may not equal a declared morpheme
+    description: >-
+      A root may not be identical to any particle, suffix or pronoun form declared in
+      spec/grammar_rules/.
+    reason: >-
+      A root that equals a particle makes tokenizer output genuinely ambiguous: in `X do`,
+      `do` is either the object marker or a noun, and GR-ORD-001 gives no way to tell. A root
+      that equals a suffix is worse, since a suffix is glued to its host and a root is not.
+    problems: >-
+      Whole forms only. A root that merely ends in a suffix form -- a hypothetical `kanen`
+      ending in `-nen` -- passes this rule and is still confusable, and only the Phase 4
+      morphological analyzer can resolve it. Banning every root that ends in any of the
+      fourteen suffix forms would remove a large share of the root space, so it is recorded
+      as an unresolved decision instead.
+    inspiration:
+      source: none
+      original_feature: none
+      how_modified: >-
+        An internal consistency requirement between the Phase 1B morpheme inventory and the
+        Phase 1C root space; neither source language is involved.
+    pattern: "ROOT not in declared particle/suffix/pronoun forms"
+    valid:
+      - tanese: TS-DHI.TS-MI
+        roman: dhimi
+        english: "river -- resembles no declared morpheme"
+      - tanese: TS-KA.TS-LU
+        roman: kalu
+        english: >-
+          stone -- legal even though the genitive particle `lu` is a substring of it, because
+          the rule compares whole forms
+    invalid:
+      - tanese: TS-THO.TS-NASAL
+        roman: thon
+        why: >-
+          Equals the prohibitive particle `thon` (GR-NEG-003). As a noun it would make every
+          negative command ambiguous between a prohibition and a noun.
+      - tanese: TS-NE.TS-NASAL
+        roman: nen
+        why: >-
+          Equals the plural suffix `-nen` (GR-NOUN-001). A root spelled like a suffix is the
+          worst case of all: the segmenter cannot tell whether it is a word or the end of
+          one.
+    status: official
+    since: v0.1
+
+  - id: VR-ROOT-004
+    category: root_shape
+    name: a root is invariant
+    description: >-
+      A root never changes shape. There are no stem alternations, no irregular forms and no
+      consonant or vowel changes when a suffix attaches.
+    reason: >-
+      LOCKED decision 2 makes the morphology agglutinative and suffixing only, and GR-VERB
+      rules already declare the verb root invariant. Phase 1C states the same thing as a
+      property of the lexicon: a dictionary entry is one form, so nothing else has to be
+      stored, learned or predicted.
+    alternatives: >-
+      Allow a small irregular class for the most frequent words, as every natural language
+      has. Rejected: irregularity has to be memorised rather than derived, which costs the
+      learner, the morphological analyzer and the dictionary format all at once, and buys
+      nothing a v0.1 needs.
+    problems: >-
+      Perfectly regular morphology is the clearest sign that a language is constructed. This
+      is a cost paid deliberately, and it cannot be undone later without rewriting every
+      entry.
+    inspiration:
+      source: tamil
+      original_feature: >-
+        Tamil is agglutinative but has substantial stem-level sandhi and several verb
+        classes.
+      how_modified: The agglutination is kept; the stem classes and the sandhi are dropped entirely.
+    pattern: "ROOT + SUFFIX -> concatenation, no change to ROOT"
+    valid:
+      - tanese: TS-MA.TS-NASAL.TS-DU.TS-KE
+        roman: manduke
+        english: >-
+          eats -- the point is the join: `mandu` is identical to its citation form before the
+          suffix, with nothing changed on either side
+        gloss: mandu-ke / eat-NPST
+      - tanese: TS-WE.TS-LU.TS-GA.TS-NASAL.TS-NE.TS-NASAL
+        roman: welugannen
+        english: >-
+          an illustrative n-final root plus the plural suffix: the root keeps its final
+          moraic n and the suffix keeps its shape
+    invalid:
+      - tanese: TS-MA.TS-NASAL.TS-DO.TS-KE
+        roman: mandoke
+        why: >-
+          The root vowel has changed from `mandu` to `mando` before the suffix. That is a
+          stem alternation, which the morphology does not have.
+      - tanese: TS-MA.TS-NASAL.TS-NU.TS-KE
+        roman: mannuke
+        why: >-
+          The root consonant has geminated at the join. Gemination is legal Tanese
+          phonology, so this is a legal word -- it is simply not a form of `mandu`, because
+          roots do not change.
+    status: official
+    since: v0.1
+
+  # ---- originality ---------------------------------------------------------------------
+  - id: VR-ORIG-001
+    category: originality
+    name: no form may equal a listed source form
+    description: >-
+      No root, and no part of a compound entry, may be identical to any spellable entry in
+      spec/grammar_rules/_originality.yaml.
+    reason: >-
+      LOCKED decision 3 in its own words: a form must NOT equal a common Japanese or Tamil
+      particle or case ending. Phase 1B applies this gate to every particle and suffix;
+      Phase 1C applies the identical gate to the root space, so the two halves of the
+      lexicon are held to one standard.
+    problems: >-
+      The list holds the 61 forms that could be enumerated by hand. Passing this gate proves
+      that no listed form was reused and nothing more: it is not evidence of absence from
+      Japanese or Tamil, let alone from any third language.
+    inspiration:
+      source: none
+      original_feature: none
+      how_modified: The machine-readable half of LOCKED decision 3; no source feature involved.
+    pattern: "form not in _originality.yaml"
+    valid:
+      - tanese: TS-DHO.TS-KA
+        roman: dhoka
+        english: "tomorrow -- at edit distance 3 or more from every listed source form"
+      - tanese: TS-THA.TS-LONG.TS-BE.TS-NASAL
+        roman: thaaben
+        english: >-
+          an illustrative maximal root, at distance 2 from the nearest listed form
+          (Tamil *thaan*), so it clears both this gate and VR-ORIG-002
+    invalid:
+      - tanese: TS-MA.TS-DE
+        roman: made
+        why: >-
+          Equals the Japanese particle *made* ("until"), which is on the banned list. It is a
+          legal Tanese word, which is exactly why the gate has to be a list lookup and not a
+          phonotactic test.
+      - tanese: TS-YO.TS-RI
+        roman: yori
+        why: Equals the Japanese comparative particle *yori*, also on the list.
+    status: official
+    since: v0.1
+
+  - id: VR-ORIG-002
+    category: originality
+    name: new roots keep an edit distance of two
+    description: >-
+      A root coined from v0.1 onward must be at least edit distance 2 (absolute Levenshtein)
+      from every spellable entry in spec/grammar_rules/_originality.yaml. The gate is not
+      retroactive.
+    reason: >-
+      Exact equality alone admits a form one segment from its source, which is the real
+      failure mode rather than a theoretical one: a root `wesu` is not `desu`, but no reader
+      would accept that it was coined independently. Distance 2 excludes precisely the
+      one-edit cases -- one substitution, one insertion, one deletion -- and is achievable
+      for a coined root, which a stricter gate is not.
+    alternatives: >-
+      A normalised edit distance floor of 0.5, which was the original proposal. Rejected
+      after measuring it against the existing spec: it fails twelve already-official Phase 1B
+      morphemes, because a two-letter morpheme cannot be relatively far from a two-letter
+      particle. The measurement is in the originality block above.
+    problems: >-
+      Not retroactive, so it leaves standing 21 existing forms at distance 1, which
+      scripts/check_vocabulary.py prints in full. Eighteen are Phase 1B morphemes, where the
+      measure means little because a two-letter suffix cannot be far from a two-letter
+      particle; that is why this gate is scoped to roots. The remaining three are demo
+      roots, and two are a genuine problem: `esu`, the copula, is one edit from Japanese
+      *desu* and shares its grammatical function, and `wesu` is one edit from it as well.
+      Both are experimental demo words rather than vocabulary, but Phase 2 must not re-derive
+      either, and the Phase 1C report recommends retiring them.
+    inspiration:
+      source: none
+      original_feature: none
+      how_modified: An internal originality gate; no source feature involved.
+    pattern: "min edit distance to banned list >= 2"
+    valid:
+      - tanese: TS-NHO.TS-DI
+        roman: nhodi
+        english: "an illustrative minimal root, distance 3 from the nearest listed form"
+      - tanese: TS-WE.TS-LU.TS-GA.TS-NASAL
+        roman: welugan
+        english: "an illustrative n-final root, distance 4 from the nearest listed form"
+    invalid:
+      - tanese: TS-WE.TS-SU
+        roman: wesu
+        why: >-
+          Distance 1 from Japanese *desu*. It is an existing demo word, which is why the gate
+          is declared non-retroactive -- and why this rule names it rather than hiding it.
+      - tanese: TS-MA.TS-DO
+        roman: mado
+        why: >-
+          Distance 1 from the Japanese particle *made*: one deletion. It clears the exact
+          equality gate in VR-ORIG-001 and is exactly the case this rule exists to stop.
+    status: official
+    since: v0.1
+
+  # ---- compounds -----------------------------------------------------------------------
+  - id: VR-COMP-001
+    category: compound
+    name: a compound entry is more than one word
+    description: >-
+      A compound lexical entry is written as two or more separate words in modifier-head
+      order. The parts are never fused and take no linking particle.
+    reason: >-
+      GR-NOUN-004 already decided this for the syntax, and declared the fused spelling
+      invalid; Phase 1C does not reopen it. The reason it was right is that fusion would
+      create a seam, and a seam raises morphophonemic questions -- hiatus at the join,
+      sandhi, voicing -- that spec/phonology.yaml deliberately has no answers to. With
+      nothing glued, there is no seam and no question.
+    alternatives: >-
+      Fuse compounds into single words, as both source languages do, and add a seam rule
+      (a glide for hiatus, as the loanword repair uses). Rejected and NOT proposed: it would
+      amend an official rule to buy a shorter spelling, and the glide repair exists for loans
+      because a source word arrives in one piece, which a compound does not.
+    problems: >-
+      A lexicalized compound is spelled exactly like the ordinary noun sequence it came from,
+      so `sedha nami` is both the entry "restaurant" and the phrase "food house". Only the
+      dictionary separates them, and the Phase 4 tokenizer will not attempt to.
+    inspiration:
+      source: none
+      original_feature: >-
+        Tamil and Japanese both compound productively and both fuse the parts, with sandhi or
+        with rendaku.
+      how_modified: >-
+        The productivity is kept, the fusion is dropped, because Tanese has no
+        morphophonemics to govern a join.
+    pattern: "WORD WORD (modifier head), separate words"
+    valid:
+      - tanese: TS-SE.TS-DHA TS-NA.TS-MI
+        roman: sedha nami
+        english: restaurant (food house)
+      - tanese: TS-KA.TS-LU TS-THU.TS-NASAL.TS-GA
+        roman: kalu thunga
+        english: a rocky mountain, as a lexical entry rather than a description
+    invalid:
+      - tanese: TS-SE.TS-DHA.TS-NA.TS-MI
+        roman: sedhanami
+        why: >-
+          The two nouns are fused into one word. GR-ORD-001 glues only suffixes, and
+          GR-NOUN-004 lists exactly this spelling as invalid. It is a legal Tanese word; it
+          is not a legal compound entry.
+      - tanese: TS-SE.TS-DHA TS-LU TS-NA.TS-MI
+        roman: sedha lu nami
+        why: >-
+          A genitive particle between the parts makes it a possessive phrase ("the food's
+          house"), not a compound. A compound takes no linking particle (GR-NOUN-004).
+    status: official
+    since: v0.1
+
+  - id: VR-COMP-002
+    category: compound
+    name: lexicalize only what the parts do not predict
+    description: >-
+      A noun sequence becomes a dictionary entry only when its meaning is not predictable
+      from its parts. A fully transparent sequence stays syntax and gets no entry.
+    reason: >-
+      Otherwise the lexicon is unbounded: every grammatical noun pair would be an entry, the
+      300-word target would be met by listing transparent phrases, and the dictionary would
+      stop carrying information. The test is whether a reader who knows both parts still
+      needs to be told the meaning.
+    problems: >-
+      "Not predictable" is a judgement, and the margins are wide: `kalu nami` ("stone house")
+      might be an ordinary description or a specific building type. Phase 2 has to make these
+      calls one at a time and will not always be consistent.
+    inspiration:
+      source: none
+      original_feature: >-
+        The distinction between a compound and a phrase is a standard lexicographic problem
+        in every language.
+      how_modified: >-
+        Tanese takes the standard test (semantic non-compositionality) and nothing
+        language-specific, since neither source language resolves it any better.
+    pattern: "entry iff meaning not derivable from parts"
+    valid:
+      - tanese: TS-BU.TS-NASAL.TS-KO TS-NA.TS-MI
+        roman: bunko nami
+        english: library (book house) -- a kind of building, not merely a house with books in it
+      - tanese: TS-SE.TS-DHA TS-NA.TS-MI
+        roman: sedha nami
+        english: restaurant (food house) -- a business, which "food" and "house" do not give you
+    invalid:
+      - tanese: TS-KA.TS-LU TS-KA.TS-LU
+        roman: kalu kalu
+        why: >-
+          A reduplication of a noun entered as a compound. Reduplication is intensive and
+          applies to adverbs (VR-COMP-003); a doubled noun predicts nothing and means nothing
+          new.
+      - tanese: TS-THO.TS-RA TS-WE.TS-LI
+        roman: thora weli
+        why: >-
+          "tree water" entered as a compound while meaning exactly tree water. Fully
+          transparent, so it is a noun sequence the syntax already produces and needs no
+          entry.
+    status: official
+    since: v0.1
+
+  - id: VR-COMP-003
+    category: compound
+    name: reduplication for intensity
+    description: >-
+      An adverb repeated as two identical words is an intensive: `thuri thuri` is "very
+      quickly".
+    reason: >-
+      It adds a productive meaning at zero cost -- no root, no morpheme, no new spelling
+      convention -- which is exactly what a 300-word lexicon needs. The Tamil-like habit is
+      structural, so borrowing it brings no Tamil form with it.
+    alternatives: >-
+      An intensifying suffix. Rejected: it would be a new morpheme, it would need a slot in
+      the noun or adverb morphology that does not exist, and the Phase 1B contradiction
+      checker would have to arbitrate it against the verb slots.
+    problems: >-
+      Formally indistinguishable from an accidental repetition, which is a typo class the
+      Phase 3 invalid corpus will deliberately contain. Nothing but the dictionary says
+      `thuri thuri` is intensive and not a stutter, and the Phase 4 grammar checker will
+      therefore not flag a doubled word.
+    inspiration:
+      source: tamil
+      original_feature: Tamil full reduplication for intensity and distribution.
+      how_modified: >-
+        The intensive reading is kept; the distributive reading is not, the words are Tanese,
+        and the two-word spelling follows GR-ORD-001 rather than either source language.
+    pattern: "ADVERB ADVERB (identical)"
+    valid:
+      - tanese: TS-THU.TS-RI TS-THU.TS-RI
+        roman: thuri thuri
+        english: very quickly
+      - tanese: TS-THU.TS-RI TS-THU.TS-RI TS-A.TS-NO TS-DHE.TS-NASAL TS-SI.TS-GEM.TS-PA.TS-DHO
+        roman: thuri thuri ano dhen sippadho
+        english: I wrote very quickly.
+    invalid:
+      - tanese: TS-THU.TS-RI.TS-THU.TS-RI
+        roman: thurithuri
+        why: >-
+          Fused into one word. Like every other compound, a reduplication is two words
+          (GR-ORD-001 glues only suffixes). The fused form is a legal Tanese word but not an
+          intensive.
+      - tanese: TS-THU.TS-RI TS-THU.TS-RI TS-THU.TS-RI
+        roman: thuri thuri thuri
+        why: >-
+          Tripled. The intensive is full reduplication, which is exactly two copies; there is
+          no third degree for a third copy to express.
+    status: official
+    since: v0.1
+
+  # ---- loanword adaptation --------------------------------------------------------------
+  - id: VR-LOAN-001
+    category: loan
+    name: an unmapped sound is rejected, never approximated
+    description: >-
+      A source sound with no entry in `loan_substitutions` is rejected by name: with code
+      VL-UNMAPPED if it is listed in `unmapped`, and VL-UNKNOWN if it is in neither table.
+    reason: >-
+      The sounds in `unmapped` each have at least two equally defensible substitutes, and
+      silently picking one would make the adapter non-deterministic in the sense that
+      matters: a second person adapting the same word by hand would get a different answer.
+      Rejecting by name also makes the gap in the table visible and fixable, instead of
+      burying it in output nobody can audit.
+    alternatives: >-
+      Approximate everything, so adaptation never fails. Rejected: it would give the
+      postalveolar fricative an arbitrary rendering, and that arbitrary choice would then be
+      frozen into every loan containing it.
+    problems: >-
+      It makes the adapter refuse common English words -- `thing`, `chair`, `shop` -- so
+      Phase 2 cannot borrow them at all until this file is extended with a decision. That is
+      intended, but it is a real limitation and not merely a formality.
+    inspiration:
+      source: japanese
+      original_feature: >-
+        Japanese has a fixed, conventional substitution table for foreign sounds, applied
+        mechanically.
+      how_modified: >-
+        The mechanical table is kept and the completeness is not: where Japanese convention
+        has settled on a substitute, Tanese declares the choice undecided and refuses, rather
+        than inheriting another language's arbitration.
+    pattern: "source sound not in table -> rejection naming the sound"
+    valid:
+      - tanese: TS-BA.TS-NASAL.TS-KU
+        roman: banku
+        english: "bank -- every sound in /bank/ is in the table, so adaptation succeeds"
+      - tanese: TS-KI.TS-YO.TS-SU.TS-KU
+        roman: kiyosuku
+        english: "kiosk -- likewise, with a hiatus repair on the way"
+    invalid:
+      - tanese: TS-SO.TS-PU
+        roman: sopu
+        why: >-
+          "shop" adapted by quietly turning the postalveolar fricative into `s`. The sound is
+          listed as unmapped, so the correct result is a VL-UNMAPPED rejection naming it, not
+          a plausible-looking word.
+      - tanese: TS-TI.TS-NI
+        roman: tini
+        why: >-
+          "thing" adapted by guessing `t` for the dental fricative and dropping the final
+          nasal. Two undeclared decisions in one form.
+    status: official
+    since: v0.1
+
+  - id: VR-LOAN-002
+    category: loan
+    name: epenthesis repairs clusters and stranded finals
+    description: >-
+      A consonant not followed by a vowel takes an inserted vowel: `a` after a retroflex
+      (th, dh, nh), otherwise `u`; and `i` instead if the default would make one of the gap
+      moras `yi` or `wu`.
+    reason: >-
+      LOCKED decision 10 allows no clusters and no word-final consonant but the moraic nasal,
+      so every consonant a source word strands needs a vowel. `u` is the default because it
+      is the least perceptually prominent vowel in the inventory, so the syllable it adds
+      intrudes least. The retroflex exception is phonetic, not stylistic: a retroflex closure
+      into a high back vowel is an unstable transition, and `a` leaves the tongue where the
+      retroflex puts it.
+    alternatives: >-
+      One epenthetic vowel everywhere. Simpler to state and to test, and rejected because the
+      retroflex series is the feature Tanese most needs to stay pronounceable. Vowel harmony
+      (copy the nearest vowel) was also rejected: it interacts with the hiatus repair, so the
+      output would depend on repair order.
+    problems: >-
+      Epenthesis adds moras, so a long source word can clear every phonotactic constraint and
+      still exceed the four-mora root cap -- `suturawiku` for "strike" is five moras, a legal
+      word that cannot be a root. Whether to truncate or refuse such loans is left unresolved.
+    inspiration:
+      source: japanese
+      original_feature: Japanese breaks foreign clusters with epenthetic /u/.
+      how_modified: >-
+        The default vowel coincides because the phonetic argument is the same one; the
+        retroflex exception has no Japanese counterpart, Japanese having no retroflex series,
+        and the gap fallback follows from Tanese gaps that Japanese does not share.
+    pattern: "C not followed by V -> C + epenthetic V"
+    valid:
+      - tanese: TS-PI.TS-LU.TS-NASAL
+        roman: pilun
+        english: "film -- the stranded l takes u, and the final nasal becomes the moraic n"
+      - tanese: TS-KO.TS-THA
+        roman: kotha
+        english: "coat (Indic source) -- the final retroflex takes a, not u"
+    invalid:
+      - roman: pilm
+        why: >-
+          "film" with the cluster left unrepaired. Not a legal Tanese word: `l` is followed by
+          a consonant (constraint PT-003) and the word ends in `m` (PT-004).
+        phonotactics: illegal
+      - tanese: TS-KO.TS-THU
+        roman: kothu
+        why: >-
+          "coat" with the default `u` after the final retroflex instead of the declared `a`.
+          A legal word, and the wrong output -- which is why this rule is tested against the
+          expected value in `adaptation_examples` rather than against legality alone.
+    status: official
+    since: v0.1
+
+  - id: VR-LOAN-003
+    category: loan
+    name: hiatus is broken by a glide
+    description: >-
+      Two different adjacent vowels are separated by a glide chosen by the preceding vowel --
+      `y` after a front vowel or after `a`, `w` after a back vowel -- and by the other glide
+      if the first would form the gap mora `yi` or `wu`. Identical adjacent vowels become one
+      long vowel instead.
+    reason: >-
+      Constraint PT-008 forbids hiatus, and its own `problems` field committed Phase 1C to
+      supplying this repair. The glide follows the preceding vowel because that is what makes
+      the transition continuous: a front vowel glides out through /j/. The gap fallback is
+      not an extra rule but a consequence of `yi` and `wu` not existing, so `a` + `i` cannot
+      become `ayi` and becomes `awi`.
+    alternatives: >-
+      Choose the glide by the following vowel. Rejected: `i` and `u` are the commonest second
+      members of a source diphthong, so that rule would hit the gaps far more often than this
+      one does.
+    problems: >-
+      A word with hiatus comes out one consonant longer than its source, which pushes it
+      toward the four-mora root cap. Truncating a run of three or more identical vowels to
+      two also loses information outright.
+    inspiration:
+      source: none
+      original_feature: >-
+        Japanese permits hiatus freely and so needs no repair; Tamil has glide insertion in
+        some sandhi contexts.
+      how_modified: >-
+        The repair exists because Tanese forbids hiatus and Japanese does not, so the problem
+        is Tanese's own. The glide choice is derived from the Tanese gap inventory, which
+        neither source language shares.
+    pattern: "V1 V2 (different) -> V1 GLIDE V2"
+    valid:
+      - tanese: TS-KI.TS-YO.TS-SU.TS-KU
+        roman: kiyosuku
+        english: "kiosk -- i + o is broken by y, the default glide after a front vowel"
+      - tanese: TS-SU.TS-TU.TS-RA.TS-WI.TS-KU
+        roman: suturawiku
+        english: >-
+          strike -- a + i would give the gap mora `yi` with the default glide, so `w` is used
+          and the result is `awi`
+    invalid:
+      - roman: kiosuku
+        why: >-
+          "kiosk" with the hiatus left in place. Not a legal Tanese word: `o` has no onset and
+          is not word-initial (constraint PT-008).
+        phonotactics: illegal
+      - roman: suturayiku
+        why: >-
+          "strike" with the default glide applied blindly, producing the mora `yi`, which the
+          phonology declares a gap (constraint PT-012). This is the case the fallback exists
+          for.
+        phonotactics: illegal
+    status: official
+    since: v0.1
+
+  - id: VR-LOAN-004
+    category: loan
+    name: nasals and identical pairs before epenthesis
+    description: >-
+      A nasal that is word-final or stands before a consonant becomes the moraic nasal, never
+      word-initially; and an identical adjacent consonant pair followed by a vowel becomes a
+      geminate if the consonant is geminable.
+    reason: >-
+      Both repairs exist to avoid inserting a vowel where Tanese already has a legal
+      structure for the shape. The moraic nasal is the one coda the language has, so a source
+      coda nasal survives as a coda; a geminate is legal, so a source double consonant
+      survives as a geminate. Doing both before epenthesis is what makes `bank` come out as
+      `banku` rather than `banuku`, and `pattu` as `paththu` rather than `pathuthu`.
+    problems: >-
+      The geminate repair depends on the segment list being sounds rather than spelling,
+      since source orthography doubles consonants that are not doubled in speech. The
+      restriction to geminable consonants is constraint PT-007, which is why a nasal pair
+      falls through to the moraic-nasal repair and a rhotic pair falls through to epenthesis.
+    inspiration:
+      source: japanese
+      original_feature: >-
+        Japanese uses its moraic nasal and its geminate for exactly these two source shapes.
+      how_modified: >-
+        The strategy is the same because the phonotactics are the same shape; the geminable
+        set is Tanese's own (ten of sixteen consonants, by the phonetic criterion in
+        spec/phonology.yaml), and Japanese does not exclude nasals from gemination as Tanese
+        does.
+    pattern: "N before C -> moraic n ; C C (identical, geminable) -> geminate"
+    valid:
+      - tanese: TS-PA.TS-GEM.TS-THU
+        roman: paththu
+        english: >-
+          a source form with a doubled retroflex: the pair becomes a geminate, so no vowel is
+          inserted
+      - tanese: TS-A.TS-NASAL.TS-NA
+        roman: anna
+        english: >-
+          a source form with a doubled n: `n` is not geminable, so the first becomes the
+          moraic nasal and still no vowel is inserted
+    invalid:
+      - tanese: TS-BA.TS-NU.TS-KU
+        roman: banuku
+        why: >-
+          "bank" with the coda nasal broken up by epenthesis instead of becoming the moraic
+          nasal. A legal word, one mora too long, and not the declared output.
+      - roman: panhnhu
+        why: >-
+          A doubled retroflex nasal treated as a geminate. `nh` may not be geminated
+          (constraint PT-007), so this is not a legal Tanese word -- the pair must fall
+          through to the moraic-nasal repair instead.
+        phonotactics: illegal
+    status: official
+    since: v0.1
+
+  # ---- semantics -----------------------------------------------------------------------
+  - id: VR-SEM-001
+    category: semantics
+    name: the semantic field selects the coining habit
+    description: >-
+      Each semantic field declares which stratum coins its words, so a concept's field
+      determines whether it gets a new root, a compound, or a loan.
+    reason: >-
+      Without this, the two inspired strata would be labels with no consequence: nothing
+      would say when to coin a root and when to compound. Assigning habits by field also
+      keeps the two habits from competing over the same word, which is the problem the
+      `japanese_inspired` stratum records.
+    problems: >-
+      The field boundaries are judgement calls, and a concept can sit in two fields -- a body
+      part used as a terrain metaphor, say. The declared field then decides the habit for a
+      word that could reasonably have gone either way.
+    inspiration:
+      source: none
+      original_feature: >-
+        Japanese lexical strata correlate strongly with semantic domain (native words for
+        everyday things, Sino-Japanese for technical ones).
+      how_modified: >-
+        The correlation is made explicit and prescriptive rather than left as a historical
+        accident, and the fields and strata are Tanese's own.
+    pattern: "field -> stratum -> coining habit"
+    valid:
+      - tanese: TS-THU.TS-NASAL.TS-GA TS-DHI.TS-MI
+        roman: thunga dhimi
+        english: >-
+          mountain river -- natural_world, so the japanese_inspired habit applies and the
+          concept is compounded from existing roots
+      - tanese: TS-BA.TS-NASAL.TS-KU
+        roman: banku
+        english: >-
+          bank -- abstract_and_technical, so the loan stratum applies and the word is adapted
+          rather than coined
+    invalid:
+      - tanese: TS-BA.TS-NASAL.TS-KU
+        roman: banku
+        why: >-
+          The same adapted loan filed under natural_world. Nothing in that field may be a
+          loan, so the entry breaks the field-to-stratum mapping and quietly inflates the
+          loan quota.
+      - tanese: TS-WE.TS-LU.TS-GA.TS-NASAL
+        roman: welugan
+        why: >-
+          An illustrative coined root entered for a natural_world concept that the existing
+          roots already compound. The field's habit is to compound, so coining a new root
+          here spends the root budget the habit exists to protect.
+    status: official
+    since: v0.1
+
+  - id: VR-SEM-002
+    category: semantics
+    name: kinship is finely divided
+    description: >-
+      The kinship field distinguishes elder from younger sibling, and maternal from paternal
+      uncle and aunt, with a separate root for each.
+    reason: >-
+      The concrete case of the tamil_inspired habit, and the reason that stratum exists. These
+      distinctions are socially real wherever extended families are, and a language that
+      forces one word to cover both sides of a family has lost information its speakers have.
+      Every root filling the distinction is coined natively, so the granularity is borrowed
+      and no Tamil form is.
+    alternatives: >-
+      English-style kinship: one word for uncle, one for sibling, with a modifier when the
+      distinction matters. Rejected: it would make the tamil_inspired stratum empty of
+      consequence, and the modifier would be needed often enough to cost more than the roots.
+    problems: >-
+      Six kinship roots where English needs two, which is about two percent of a 300-word
+      lexicon spent on one field. It also makes translation into English lossy in the
+      opposite direction from usual: the Tanese word says more than its English gloss.
+    inspiration:
+      source: tamil
+      original_feature: >-
+        Tamil kinship terminology, which distinguishes relative age among siblings and the
+        maternal from the paternal line.
+      how_modified: >-
+        The distinctions are kept exactly; every form is coined natively, and the Tamil terms
+        themselves are banned by VR-ORIG-001 like any other source form.
+    pattern: "one root per kinship distinction, not one root plus a modifier"
+    valid:
+      - tanese: TS-NA.TS-NASAL.TS-THE
+        roman: nanthe
+        english: >-
+          friend -- a natively coined social-relation root, standing in for the kinship roots
+          Phase 2 will coin, since the demo wordlist has none
+      - tanese: TS-NA.TS-NASAL.TS-THE.TS-NE.TS-NASAL
+        roman: nanthenen
+        english: >-
+          friends -- the field's roots take ordinary morphology, with the plural suffix
+          attached like any other; nothing about kinship is morphologically special
+        gloss: nanthe-nen / friend-PL
+    invalid:
+      - tanese: TS-NA.TS-NASAL.TS-THE TS-LU TS-NA.TS-NASAL.TS-THE
+        roman: nanthe lu nanthe
+        why: >-
+          A kinship distinction built as a possessive phrase instead of a root. The field's
+          habit is a separate root per distinction; a phrase makes the distinction optional,
+          which defeats the point.
+      - tanese: TS-NA.TS-NASAL.TS-THE.TS-NA.TS-NASAL.TS-THE
+        roman: nanthenanthe
+        why: >-
+          A kinship term built by fusing two words. No entry of any kind is written fused
+          (VR-COMP-001), and fusion is not how this field coins words either.
+    status: official
+    since: v0.1
+
+  # ---- pipeline ------------------------------------------------------------------------
+  - id: VR-PIPE-001
+    category: pipeline
+    name: six ordered stages, LLM only at the first
+    description: >-
+      Every official word passes stages PL-0 to PL-5 in order. The LLM may act only at PL-0,
+      candidate generation.
+    reason: >-
+      LOCKED decision 14 names the pipeline and says the LLM may only propose candidates.
+      Order matters for a practical reason as well: each stage is more expensive than the one
+      before, so the cheap deterministic checks run first and the collision detector only
+      ever sees candidates that are already legal words of a legal shape.
+    problems: >-
+      A strict order means a candidate rejected at PL-1 is never seen by the semantic checks,
+      so the pipeline cannot report "this would have been a good word if it were legal". That
+      information would be useful to a human reviewer and is simply lost.
+    inspiration:
+      source: none
+      original_feature: none
+      how_modified: >-
+        The machine-readable form of LOCKED decision 14, with the stages named so an
+        implementation cannot quietly reorder or drop one.
+    pattern: "PL-0 -> PL-1 -> PL-2 -> PL-3 -> PL-4 -> PL-5"
+    valid:
+      - tanese: TS-NHO.TS-DI
+        roman: nhodi
+        english: >-
+          an illustrative candidate: legal (PL-1), a legal root shape (PL-2), distinct from
+          every declared morpheme and demo root (PL-3), and still experimental because PL-5
+          has not happened
+      - tanese: TS-WE.TS-LU.TS-GA.TS-NASAL
+        roman: welugan
+        english: >-
+          another illustrative candidate at the same stage -- generated, checked, ranked, and
+          deliberately not approved
+    invalid:
+      - tanese: TS-DO
+        roman: do
+        why: >-
+          A candidate that would reach PL-3 without passing PL-2: it equals a declared
+          particle and is one mora. Running collision detection on it would waste the
+          expensive stage on a candidate the cheap one rejects.
+      - tanese: TS-DE.TS-SU
+        roman: desu
+        why: >-
+          A candidate an LLM proposed and that was taken as official without PL-1 to PL-5. It
+          is a banned source form, which is exactly what the stages between proposal and
+          approval exist to catch.
+    status: official
+    since: v0.1
+
+  - id: VR-PIPE-002
+    category: pipeline
+    name: nothing is official without human approval
+    description: >-
+      A word is `experimental` until a human approves it at PL-5, and official and
+      experimental words live in separate files.
+    reason: >-
+      LOCKED decisions 14 and 15. Rules define Tanese and the LLM never changes them, so the
+      moment a form becomes a rule is the moment that must stay human. Separate files make
+      the distinction structural rather than a field somebody can flip by accident.
+    problems: >-
+      Approval is a bottleneck by design, so the lexicon grows only as fast as one person can
+      review it. That is the main reason the Phase 2 target is 300 words and not 1000.
+    inspiration:
+      source: none
+      original_feature: none
+      how_modified: The machine-readable form of LOCKED decisions 14 and 15.
+    pattern: "candidate -> experimental -> (human) -> official"
+    valid:
+      - tanese: TS-NHO.TS-DI
+        roman: nhodi
+        english: >-
+          an illustrative form in this file: experimental, and forbidden by check 13 from
+          appearing in data/vocabulary/ at all
+      - tanese: TS-THA.TS-LONG.TS-BE.TS-NASAL
+        roman: thaaben
+        english: >-
+          likewise experimental -- Phase 2 must re-derive any of these through the pipeline,
+          which may reject them
+    invalid:
+      - tanese: TS-NHO.TS-DI
+        roman: nhodi
+        why: >-
+          The same form entered in data/vocabulary/ as official, which is what check 13
+          forbids. An illustration in the spec is not a word of the language, and copying it
+          across would skip every pipeline stage.
+      - tanese: TS-PI.TS-LU.TS-NASAL
+        roman: pilun
+        why: >-
+          An adapted loan from `adaptation_examples` entered as official. The adapter output
+          demonstrates the adapter; it has had no collision check and no human approval.
+    status: official
+    since: v0.1

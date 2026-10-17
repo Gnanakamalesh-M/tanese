@@ -1,10 +1,12 @@
-"""Run every Phase 0 check with plain python (no make).
+"""Run every check with plain python (no make).
 
 Usage (from any working directory):
     python scripts/run_checks.py
 
-Steps: lint (ruff), unit tests (pytest), YAML schema check. The first failure stops
-the run. CI runs this exact command, so local green and CI green mean the same thing.
+Steps: lint (ruff), unit tests (pytest), YAML schema check, the grammar and vocabulary
+consistency checks, and a staleness check on the generated language specification. The
+first failure stops the run. CI runs this exact command, so local green and CI green mean
+the same thing.
 """
 
 from __future__ import annotations
@@ -25,6 +27,10 @@ STEPS: list[tuple[str, list[str]]] = [
     ("tests", [sys.executable, "-m", "pytest"]),
     ("yaml-schema", [sys.executable, str(REPO_ROOT / "scripts" / "check_yaml_schema.py")]),
     ("grammar", [sys.executable, str(REPO_ROOT / "scripts" / "check_grammar.py")]),
+    ("vocabulary", [sys.executable, str(REPO_ROOT / "scripts" / "check_vocabulary.py")]),
+    # The specification document is generated, so a stale committed copy means the project
+    # has two sources of truth. --check writes nothing and fails if it has drifted.
+    ("spec-doc", [sys.executable, str(REPO_ROOT / "scripts" / "gen_spec_doc.py"), "--check"]),
 ]
 
 

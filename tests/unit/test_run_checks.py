@@ -1,8 +1,8 @@
 """Wiring guards for scripts/run_checks.py and scripts/check_yaml_schema.py.
 
-These do not re-run the checks (that would recurse); they assert the runner is wired
-to the three steps docs/SPEC.md requires, and that both scripts can be imported and
-executed without depending on the caller's working directory.
+These do not re-run the checks (that would recurse); they assert the runner is wired to
+every step the phases so far require, and that both scripts can be imported and executed
+without depending on the caller's working directory.
 """
 
 from __future__ import annotations
@@ -24,14 +24,23 @@ def load_script(name: str):
     return module
 
 
-def test_run_checks_has_the_four_spec_steps() -> None:
+def test_run_checks_has_the_six_spec_steps() -> None:
     run_checks = load_script("run_checks")
     assert [name for name, _ in run_checks.STEPS] == [
         "lint",
         "tests",
         "yaml-schema",
         "grammar",
+        "vocabulary",
+        "spec-doc",
     ]
+
+
+def test_the_spec_doc_step_only_checks_and_never_writes() -> None:
+    """A run of the checks must not modify a tracked file, so the step passes --check."""
+    run_checks = load_script("run_checks")
+    cmd = dict(run_checks.STEPS)["spec-doc"]
+    assert "--check" in cmd
 
 
 def test_run_checks_resolves_the_repo_root() -> None:
